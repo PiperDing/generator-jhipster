@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -17,15 +17,15 @@
  * limitations under the License.
  */
 const BaseBlueprintGenerator = require('../generator-base-blueprint');
+const { INITIALIZING_PRIORITY, COMPOSING_PRIORITY, DEFAULT_PRIORITY, WRITING_PRIORITY } =
+  require('../../lib/constants/priorities.cjs').compat;
 const { JHIPSTER_CONFIG_DIR } = require('../generator-constants');
 const { SQL } = require('../../jdl/jhipster/database-types');
 const { GENERATOR_ENTITIES, GENERATOR_ENTITIES_CLIENT, GENERATOR_ENTITY, GENERATOR_DATABASE_CHANGELOG } = require('../generator-list');
 
-let useBlueprints;
-
 module.exports = class extends BaseBlueprintGenerator {
-  constructor(args, opts) {
-    super(args, opts, { unique: 'namespace' });
+  constructor(args, options, features) {
+    super(args, options, { unique: 'namespace', ...features });
 
     // This makes `name` a required argument.
     this.argument('entities', {
@@ -75,10 +75,12 @@ module.exports = class extends BaseBlueprintGenerator {
       defaults: true,
       hide: true,
     });
+  }
 
-    if (this.options.help) return;
-
-    useBlueprints = !this.fromBlueprint && this.instantiateBlueprints(GENERATOR_ENTITIES);
+  async _postConstruct() {
+    if (!this.fromBlueprint) {
+      await this.composeWithBlueprints(GENERATOR_ENTITIES);
+    }
 
     if (this.options.entitiesToImport) {
       const entities = this.jhipsterConfig.entities || [];
@@ -122,29 +124,32 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get initializing() {
-    return useBlueprints ? undefined : this._initializing();
+  get [INITIALIZING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
+    return this._initializing();
   }
 
   // Public API method used by the getter and also by Blueprints
   _composing() {
     return {
-      composeEachEntity() {
-        this.getExistingEntityNames().forEach(entityName => {
-          if (this.options.composedEntities && this.options.composedEntities.includes(entityName)) return;
-          const selectedEntity = this.options.entities.includes(entityName);
-          const { regenerate = !selectedEntity } = this.options;
-          this.composeWithJHipster(GENERATOR_ENTITY, [entityName], {
-            skipWriting: !this.options.writeEveryEntity && !selectedEntity,
-            regenerate,
-            skipDbChangelog: this.jhipsterConfig.databaseType === SQL || this.options.skipDbChangelog,
-            skipInstall: true,
-            skipPrompts: this.options.skipPrompts,
-          });
-        });
+      async composeEachEntity() {
+        return Promise.all(
+          this.getExistingEntityNames().map(async entityName => {
+            if (this.options.composedEntities && this.options.composedEntities.includes(entityName)) return;
+            const selectedEntity = this.options.entities.includes(entityName);
+            const { regenerate = !selectedEntity } = this.options;
+            await this.composeWithJHipster(GENERATOR_ENTITY, [entityName], {
+              skipWriting: this.options.skipWriting || (!this.options.writeEveryEntity && !selectedEntity),
+              regenerate,
+              skipDbChangelog: this.jhipsterConfig.databaseType === SQL || this.options.skipDbChangelog,
+              skipInstall: true,
+              skipPrompts: this.options.skipPrompts,
+            });
+          })
+        );
       },
 
-      databaseChangelog() {
+      async databaseChangelog() {
         if (this.jhipsterConfig.skipServer || this.jhipsterConfig.databaseType !== SQL || this.options.skipDbChangelog) {
           return;
         }
@@ -153,20 +158,24 @@ module.exports = class extends BaseBlueprintGenerator {
           return;
         }
 
-        this.composeWithJHipster(GENERATOR_DATABASE_CHANGELOG, this.options.writeEveryEntity ? existingEntities : this.options.entities);
+        await this.composeWithJHipster(
+          GENERATOR_DATABASE_CHANGELOG,
+          this.options.writeEveryEntity ? existingEntities : this.options.entities
+        );
       },
     };
   }
 
-  get composing() {
-    return useBlueprints ? undefined : this._composing();
+  get [COMPOSING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
+    return this._composing();
   }
 
   // Public API method used by the getter and also by Blueprints
   _default() {
     return {
-      composeEntitiesClient() {
-        if (this.options.entities.length !== this.jhipsterConfig.entities.length) return;
+      async composeEntitiesClient() {
+        if (this.options.skipWriting || this.options.entities.length !== this.jhipsterConfig.entities.length) return;
         const clientEntities = this.getExistingEntityNames()
           .map(entityName => {
             const entity = this.configOptions.sharedEntities[entityName];
@@ -177,15 +186,16 @@ module.exports = class extends BaseBlueprintGenerator {
           })
           .filter(entity => !entity.skipClient);
         if (clientEntities.length === 0) return;
-        this.composeWithJHipster(GENERATOR_ENTITIES_CLIENT, clientEntities, {
+        await this.composeWithJHipster(GENERATOR_ENTITIES_CLIENT, clientEntities, {
           skipInstall: this.options.skipInstall,
         });
       },
     };
   }
 
-  get default() {
-    return useBlueprints ? undefined : this._default();
+  get [DEFAULT_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
+    return this._default();
   }
 
   // Public API method used by the getter and also by Blueprints
@@ -193,7 +203,8 @@ module.exports = class extends BaseBlueprintGenerator {
     return {};
   }
 
-  get writing() {
-    return useBlueprints ? undefined : this._writing();
+  get [WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
+    return this._writing();
   }
 };

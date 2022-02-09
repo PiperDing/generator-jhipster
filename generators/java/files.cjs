@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -17,10 +17,6 @@
  * limitations under the License.
  */
 
-/**
- * The default is to use a file path string. It implies use of the template method.
- * For any other config an object { file:.., method:.., template:.. } can be used
- */
 module.exports.files = {
   javaProject: [
     {

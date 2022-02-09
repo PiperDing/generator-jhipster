@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -16,10 +16,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const NODE_VERSION = '14.17.1';
+const NODE_VERSION = '14.18.1';
+
 const PRETTIER_DEFAULT_INDENT = 'prettierDefaultIndent';
 const PRETTIER_DEFAULT_INDENT_DEFAULT_VALUE = 2;
+
 const SKIP_COMMIT_HOOK = 'skipCommitHook';
+const SKIP_COMMIT_HOOK_DESCRIPTION = 'Skip adding husky commit hooks';
 const SKIP_COMMIT_HOOK_DEFAULT_VALUE = false;
 
 module.exports = {
@@ -27,6 +30,6 @@ module.exports = {
   PRETTIER_DEFAULT_INDENT,
   PRETTIER_DEFAULT_INDENT_DEFAULT_VALUE,
   SKIP_COMMIT_HOOK,
-  SKIP_COMMIT_HOOK_DESCRIPTION: 'Skip adding husky commit hooks',
+  SKIP_COMMIT_HOOK_DESCRIPTION,
   SKIP_COMMIT_HOOK_DEFAULT_VALUE,
 };

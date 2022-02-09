@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -20,16 +20,24 @@
 const _ = require('lodash');
 
 const BaseBlueprintGenerator = require('../generator-base-blueprint');
+const {
+  INITIALIZING_PRIORITY,
+  CONFIGURING_PRIORITY,
+  LOADING_PRIORITY,
+  PREPARING_PRIORITY,
+  DEFAULT_PRIORITY,
+  WRITING_PRIORITY,
+  POST_WRITING_PRIORITY,
+} = require('../../lib/constants/priorities.cjs').compat;
+
 const writeFiles = require('./files').writeFiles;
 const prettierConfigFiles = require('./files').prettierConfigFiles;
 const constants = require('../generator-constants');
 const packageJson = require('../../package.json');
 
-let useBlueprints;
-
 module.exports = class JHipsterCommonGenerator extends BaseBlueprintGenerator {
-  constructor(args, opts) {
-    super(args, opts, { unique: 'namespace' });
+  constructor(args, options, features) {
+    super(args, options, { unique: 'namespace', ...features });
 
     if (this.options.help) {
       return;
@@ -37,8 +45,12 @@ module.exports = class JHipsterCommonGenerator extends BaseBlueprintGenerator {
 
     this.loadStoredAppOptions();
     this.loadRuntimeOptions();
+  }
 
-    useBlueprints = !this.fromBlueprint && this.instantiateBlueprints('common');
+  async _postConstruct() {
+    if (!this.fromBlueprint) {
+      await this.composeWithBlueprints('common');
+    }
   }
 
   // Public API method used by the getter and also by Blueprints
@@ -63,9 +75,33 @@ module.exports = class JHipsterCommonGenerator extends BaseBlueprintGenerator {
     };
   }
 
-  get initializing() {
-    if (useBlueprints) return;
+  get [INITIALIZING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._initializing();
+  }
+
+  // Public API method used by the getter and also by Blueprints
+  _configuring() {
+    return {
+      async configureMonorepository() {
+        if (this.jhipsterConfig.monorepository) return;
+
+        const git = this.createGit();
+        if ((await git.checkIsRepo()) && !(await git.checkIsRepo('root'))) {
+          this.jhipsterConfig.monorepository = true;
+        }
+      },
+      configureCommitHook() {
+        if (this.jhipsterConfig.monorepository) {
+          this.jhipsterConfig.skipCommitHook = true;
+        }
+      },
+    };
+  }
+
+  get [CONFIGURING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
+    return this._configuring();
   }
 
   // Public API method used by the getter and also by Blueprints
@@ -97,8 +133,8 @@ module.exports = class JHipsterCommonGenerator extends BaseBlueprintGenerator {
     };
   }
 
-  get loading() {
-    if (useBlueprints) return;
+  get [LOADING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._loading();
   }
 
@@ -112,8 +148,8 @@ module.exports = class JHipsterCommonGenerator extends BaseBlueprintGenerator {
     };
   }
 
-  get preparing() {
-    if (useBlueprints) return;
+  get [PREPARING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._preparing();
   }
 
@@ -124,14 +160,27 @@ module.exports = class JHipsterCommonGenerator extends BaseBlueprintGenerator {
     };
   }
 
-  get default() {
-    if (useBlueprints) return;
+  get [DEFAULT_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._default();
   }
 
   // Public API method used by the getter and also by Blueprints
   _writing() {
     return {
+      cleanup() {
+        if (this.isJhipsterVersionLessThan('7.1.1')) {
+          if (!this.skipCommitHook) {
+            this.removeFile('.huskyrc');
+          }
+        }
+        if (this.isJhipsterVersionLessThan('7.6.1')) {
+          if (this.skipClient) {
+            this.removeFile('npmw');
+            this.removeFile('npmw.cmd');
+          }
+        }
+      },
       writePrettierConfig() {
         // Prettier configuration needs to be the first written files - all subgenerators considered - for prettier transform to work
         return this.writeFilesToDisk(prettierConfigFiles);
@@ -141,8 +190,30 @@ module.exports = class JHipsterCommonGenerator extends BaseBlueprintGenerator {
     };
   }
 
-  get writing() {
-    if (useBlueprints) return;
+  get [WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._writing();
+  }
+
+  _postWriting() {
+    return {
+      addCommitHookDependencies() {
+        if (this.skipCommitHook) return;
+        this.packageJson.merge({
+          scripts: {
+            prepare: 'husky install',
+          },
+          devDependencies: {
+            husky: this.dependabotPackageJson.devDependencies.husky,
+            'lint-staged': this.dependabotPackageJson.devDependencies['lint-staged'],
+          },
+        });
+      },
+    };
+  }
+
+  get [POST_WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
+    return this._postWriting();
   }
 };

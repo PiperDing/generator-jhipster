@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -16,9 +16,9 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -%>
-package <%= packageName %>.repository.search;
+package <%= entityAbsolutePackage %>.repository.search;
 
-import <%= packageName %>.domain.<%= persistClass %>;
+import <%= entityAbsolutePackage %>.domain.<%= persistClass %>;
 
 <%_ if (!paginationNo) { _%>
   <%_ if (!reactive) { _%>
@@ -29,6 +29,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
   <%_ } _%>
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.elasticsearch.search.sort.FieldSortBuilder;
+import java.util.List;
+import org.springframework.data.domain.PageRequest;
+
+
 <%_ } _%>
 <%_ if (reactive) { _%>
 import org.springframework.data.elasticsearch.core.ReactiveElasticsearchTemplate;
@@ -72,9 +78,19 @@ class <%= entityClass %>SearchRepositoryInternalImpl implements <%= entityClass 
 
     @Override
     public Flux<<%= entityClass %>> search(String query<% if (!paginationNo) { %>, Pageable pageable<% } %>) {
-        NativeSearchQuery nativeSearchQuery = new NativeSearchQuery(queryStringQuery(query));
   <%_ if (!paginationNo) { _%>
-        nativeSearchQuery.setPageable(pageable);
+        List<FieldSortBuilder> builders = new SortToFieldSortBuilderConverter().convert(pageable.getSort());
+
+        NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder().withQuery(queryStringQuery(query))
+            .withPageable(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize()));
+
+        builders.stream().forEach(builder -> {
+            queryBuilder.withSort(builder);
+        });
+
+        NativeSearchQuery nativeSearchQuery = queryBuilder.build();
+  <%_ } else { _%>
+        NativeSearchQuery nativeSearchQuery = new NativeSearchQuery(queryStringQuery(query));
   <%_ } _%>
         return reactiveElasticsearchTemplate
             .search(nativeSearchQuery, <%= entityClass %>.class)

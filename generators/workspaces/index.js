@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -20,6 +20,9 @@
 const fs = require('fs');
 const path = require('path');
 
+const { CONFIGURING_PRIORITY, LOADING_PRIORITY, WRITING_PRIORITY, POST_WRITING_PRIORITY, INSTALL_PRIORITY } =
+  require('../../lib/constants/priorities.cjs').compat;
+
 const { GENERATOR_JHIPSTER } = require('../generator-constants');
 const {
   DeploymentTypes: { DOCKERCOMPOSE },
@@ -27,8 +30,8 @@ const {
 const BaseBlueprintGenerator = require('../generator-base-blueprint');
 
 module.exports = class extends BaseBlueprintGenerator {
-  constructor(args, opts) {
-    super(args, opts);
+  constructor(args, options, features) {
+    super(args, options, features);
 
     this.option('workspaces', {
       desc: 'Generate workspaces for multiples applications',
@@ -42,13 +45,17 @@ module.exports = class extends BaseBlueprintGenerator {
 
     if (this.options.help) return;
 
-    this.useBlueprints = !this.fromBlueprint && this.instantiateBlueprints('workspaces');
-
     // Generate workspaces file only when option passed or regenerating
     this.generateWorkspaces = this.options.workspaces !== false || !!this.packageJson.get('workspaces');
 
     // When generating workspaces, save to .yo-rc.json. Use a dummy config otherwise.
     this.workspacesConfig = this.generateWorkspaces ? this.jhipsterConfig : {};
+  }
+
+  async _postConstruct() {
+    if (!this.fromBlueprint) {
+      await this.composeWithBlueprints('workspaces');
+    }
 
     this.loadRuntimeOptions();
   }
@@ -105,8 +112,9 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get configuring() {
-    return this.useBlueprints ? undefined : this._configuring();
+  get [CONFIGURING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
+    return this._configuring();
   }
 
   _loading() {
@@ -121,8 +129,9 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get loading() {
-    return this.useBlueprints ? undefined : this._loading();
+  get [LOADING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
+    return this._loading();
   }
 
   _writing() {
@@ -145,8 +154,9 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get writing() {
-    return this.useBlueprints ? undefined : this._writing();
+  get [WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
+    return this._writing();
   }
 
   _postWriting() {
@@ -170,7 +180,7 @@ module.exports = class extends BaseBlueprintGenerator {
             'ci:e2e:package': 'npm run ci:docker:build --workspaces --if-present && npm run java:docker --workspaces --if-present',
             'ci:e2e:run': 'npm run e2e:headless --workspaces --if-present',
             ...this._getOtherScripts(),
-            ...this._createConcurrentyScript('watch', 'backend:build-cache'),
+            ...this._createConcurrentlyScript('watch', 'backend:build-cache', 'java:docker', 'java:docker:arm64'),
             ...this._createWorkspacesScript('ci:backend:test', 'ci:frontend:test', 'webapp:test'),
           },
         });
@@ -178,8 +188,9 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get postWriting() {
-    return this.useBlueprints ? undefined : this._postWriting();
+  get [POST_WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
+    return this._postWriting();
   }
 
   // Public API method used by the getter and also by Blueprints
@@ -198,8 +209,9 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get install() {
-    return this.useBlueprints ? undefined : this._install();
+  get [INSTALL_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
+    return this._install();
   }
 
   _detectNodePackageManager() {
@@ -229,7 +241,7 @@ module.exports = class extends BaseBlueprintGenerator {
     return {};
   }
 
-  _createConcurrentyScript(...scripts) {
+  _createConcurrentlyScript(...scripts) {
     const scriptsList = scripts
       .map(script => {
         const packageScripts = this.packages.map(packageName => [

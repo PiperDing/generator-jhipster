@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -98,7 +98,11 @@ const generateFakeDataForField = (field, faker, changelogDate, type = 'csv') => 
   if (field.fakerTemplate) {
     data = faker.faker(field.fakerTemplate);
   } else if (field.fieldValidate && field.fieldValidateRules.includes('pattern')) {
-    const generated = field.createRandexp().gen();
+    const re = field.createRandexp();
+    if (!re) {
+      return undefined;
+    }
+    const generated = re.gen();
     if (type === 'csv' || type === 'cypress') {
       data = generated.replace(/"/g, '');
     } else {
@@ -125,9 +129,12 @@ const generateFakeDataForField = (field, faker, changelogDate, type = 'csv') => 
     });
   } else if ([INSTANT, ZONED_DATE_TIME, LOCAL_DATE].includes(field.fieldType)) {
     // Iso: YYYY-MM-DDTHH:mm:ss.sssZ
-    const isoDate = faker.date.recent(1, changelogDate).toISOString();
+    const date = faker.date.recent(1, changelogDate);
+    const isoDate = date.toISOString();
     if (field.fieldType === LOCAL_DATE) {
       data = isoDate.split('T')[0];
+    } else if (type === 'json-serializable') {
+      data = date;
     } else {
       // Write the date without milliseconds so Java can parse it
       // See https://stackoverflow.com/a/34053802/150868
@@ -148,6 +155,10 @@ const generateFakeDataForField = (field, faker, changelogDate, type = 'csv') => 
     data = faker.datatype.uuid();
   } else if (field.fieldType === BOOLEAN) {
     data = faker.datatype.boolean();
+  }
+
+  if (field.fieldType === BYTES && type === 'json-serializable') {
+    data = Buffer.from(data).toString('base64');
   }
 
   // Validation rules
@@ -285,61 +296,19 @@ function prepareFieldForTemplates(entityWithConfig, field, generator) {
 
   field.fieldIsEnum = !field.id && fieldIsEnum(fieldType);
   field.fieldWithContentType = (fieldType === BYTES || fieldType === BYTE_BUFFER) && field.fieldTypeBlobContent !== TEXT;
-
-  if (field.fieldNameAsDatabaseColumn === undefined) {
-    const fieldNameUnderscored = _.snakeCase(field.fieldName);
-    const jhiFieldNamePrefix = generator.getColumnName(entityWithConfig.jhiPrefix);
-    if (isReservedTableName(fieldNameUnderscored, entityWithConfig.prodDatabaseType)) {
-      if (!jhiFieldNamePrefix) {
-        generator.warning(
-          `The field name '${fieldNameUnderscored}' is regarded as a reserved keyword, but you have defined an empty jhiPrefix. This might lead to a non-working application.`
-        );
-        field.fieldNameAsDatabaseColumn = fieldNameUnderscored;
-      } else {
-        field.fieldNameAsDatabaseColumn = `${jhiFieldNamePrefix}_${fieldNameUnderscored}`;
-      }
-    } else {
-      field.fieldNameAsDatabaseColumn = fieldNameUnderscored;
-    }
+  if (field.fieldWithContentType) {
+    field.contentTypeFieldName = `${field.fieldName}ContentType`;
   }
-  field.columnName = field.fieldNameAsDatabaseColumn;
 
-  if (field.fieldInJavaBeanMethod === undefined) {
-    // Handle the specific case when the second letter is capitalized
-    // See http://stackoverflow.com/questions/2948083/naming-convention-for-getters-setters-in-java
-    if (field.fieldName.length > 1) {
-      const firstLetter = field.fieldName.charAt(0);
-      const secondLetter = field.fieldName.charAt(1);
-      if (firstLetter === firstLetter.toLowerCase() && secondLetter === secondLetter.toUpperCase()) {
-        field.fieldInJavaBeanMethod = firstLetter.toLowerCase() + field.fieldName.slice(1);
-      } else {
-        field.fieldInJavaBeanMethod = _.upperFirst(field.fieldName);
-      }
-    } else {
-      field.fieldInJavaBeanMethod = _.upperFirst(field.fieldName);
-    }
+  if (entityWithConfig.prodDatabaseType) {
+    // TODO move to server generator.
+    prepareServerFieldForTemplates(entityWithConfig, field, generator);
   }
+
+  prepareClientFieldForTemplates(entityWithConfig, field, generator);
 
   if (field.fieldIsEnum) {
     field.enumValues = getEnumValuesWithCustomValues(field.fieldValues);
-  }
-
-  if (field.fieldValidateRulesPatternJava === undefined) {
-    field.fieldValidateRulesPatternJava = field.fieldValidateRulesPattern
-      ? field.fieldValidateRulesPattern.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
-      : field.fieldValidateRulesPattern;
-  }
-
-  if (field.fieldValidateRulesPatternAngular === undefined) {
-    field.fieldValidateRulesPatternAngular = field.fieldValidateRulesPattern
-      ? field.fieldValidateRulesPattern.replace(/"/g, '&#34;')
-      : field.fieldValidateRulesPattern;
-  }
-
-  if (field.fieldValidateRulesPatternReact === undefined) {
-    field.fieldValidateRulesPatternReact = field.fieldValidateRulesPattern
-      ? field.fieldValidateRulesPattern.replace(/'/g, "\\'")
-      : field.fieldValidateRulesPattern;
   }
 
   field.fieldValidate = Array.isArray(field.fieldValidateRules) && field.fieldValidateRules.length >= 1;
@@ -357,7 +326,17 @@ function prepareFieldForTemplates(entityWithConfig, field, generator) {
   }
 
   const faker = entityWithConfig.faker;
-  field.createRandexp = () => faker.createRandexp(field.fieldValidateRulesPattern);
+  field.createRandexp = () => {
+    // check if regex is valid. If not, issue warning and we skip fake data generation.
+    try {
+      // eslint-disable-next-line no-new
+      new RegExp(field.fieldValidateRulesPattern);
+    } catch (e) {
+      generator.warning(`${field.fieldName} pattern is not valid: ${field.fieldValidateRulesPattern}. Skipping generating fake data. `);
+      return undefined;
+    }
+    return faker.createRandexp(field.fieldValidateRulesPattern);
+  };
 
   field.uniqueValue = [];
 
@@ -427,6 +406,63 @@ function getEnumValuesWithCustomValues(enumValues) {
       value: matched[2],
     };
   });
+}
+
+function prepareClientFieldForTemplates(entityWithConfig, field, generator) {
+  if (field.fieldValidateRulesPatternAngular === undefined) {
+    field.fieldValidateRulesPatternAngular = field.fieldValidateRulesPattern
+      ? field.fieldValidateRulesPattern.replace(/"/g, '&#34;')
+      : field.fieldValidateRulesPattern;
+  }
+
+  if (field.fieldValidateRulesPatternReact === undefined) {
+    field.fieldValidateRulesPatternReact = field.fieldValidateRulesPattern
+      ? field.fieldValidateRulesPattern.replace(/'/g, "\\'")
+      : field.fieldValidateRulesPattern;
+  }
+}
+
+function prepareServerFieldForTemplates(entityWithConfig, field, generator) {
+  if (field.fieldNameAsDatabaseColumn === undefined) {
+    const fieldNameUnderscored = _.snakeCase(field.fieldName);
+    const jhiFieldNamePrefix = generator.getColumnName(entityWithConfig.jhiPrefix);
+
+    if (isReservedTableName(fieldNameUnderscored, entityWithConfig.prodDatabaseType)) {
+      if (!jhiFieldNamePrefix) {
+        generator.warning(
+          `The field name '${fieldNameUnderscored}' is regarded as a reserved keyword, but you have defined an empty jhiPrefix. This might lead to a non-working application.`
+        );
+        field.fieldNameAsDatabaseColumn = fieldNameUnderscored;
+      } else {
+        field.fieldNameAsDatabaseColumn = `${jhiFieldNamePrefix}_${fieldNameUnderscored}`;
+      }
+    } else {
+      field.fieldNameAsDatabaseColumn = fieldNameUnderscored;
+    }
+  }
+  field.columnName = field.fieldNameAsDatabaseColumn;
+
+  if (field.fieldInJavaBeanMethod === undefined) {
+    // Handle the specific case when the second letter is capitalized
+    // See http://stackoverflow.com/questions/2948083/naming-convention-for-getters-setters-in-java
+    if (field.fieldName.length > 1) {
+      const firstLetter = field.fieldName.charAt(0);
+      const secondLetter = field.fieldName.charAt(1);
+      if (firstLetter === firstLetter.toLowerCase() && secondLetter === secondLetter.toUpperCase()) {
+        field.fieldInJavaBeanMethod = firstLetter.toLowerCase() + field.fieldName.slice(1);
+      } else {
+        field.fieldInJavaBeanMethod = _.upperFirst(field.fieldName);
+      }
+    } else {
+      field.fieldInJavaBeanMethod = _.upperFirst(field.fieldName);
+    }
+  }
+
+  if (field.fieldValidateRulesPatternJava === undefined) {
+    field.fieldValidateRulesPatternJava = field.fieldValidateRulesPattern
+      ? field.fieldValidateRulesPattern.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+      : field.fieldValidateRulesPattern;
+  }
 }
 
 function fieldToReference(entity, field, pathPrefix = []) {

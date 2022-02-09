@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -161,7 +161,11 @@ function parseLiquibaseLoadColumnType(entity, field) {
   }
 
   // eslint-disable-next-line no-template-curly-in-string
-  if (['date', '${datetimeType}', 'boolean'].includes(columnType)) {
+  if (['date', '${datetimeType}'].includes(columnType)) {
+    return 'date';
+  }
+
+  if (columnType === 'boolean') {
     return columnType;
   }
 

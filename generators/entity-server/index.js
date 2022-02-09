@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -17,27 +17,34 @@
  * limitations under the License.
  */
 /* eslint-disable consistent-return */
+const BaseBlueprintGenerator = require('../generator-base-blueprint');
+const { INITIALIZING_PRIORITY, PREPARING_PRIORITY, DEFAULT_PRIORITY, WRITING_PRIORITY, PREPARING_FIELDS_PRIORITY, POST_WRITING_PRIORITY } =
+  require('../../lib/constants/priorities.cjs').compat;
+
 const constants = require('../generator-constants');
+const { entityDefaultConfig } = require('../generator-defaults');
 const { writeFiles, customizeFiles } = require('./files');
 const utils = require('../utils');
-const BaseBlueprintGenerator = require('../generator-base-blueprint');
 const { GENERATOR_ENTITY_SERVER } = require('../generator-list');
 const { OAUTH2, SESSION } = require('../../jdl/jhipster/authentication-types');
 const { SQL } = require('../../jdl/jhipster/database-types');
 const { isReservedTableName } = require('../../jdl/jhipster/reserved-keywords');
 
 /* constants used throughout */
-let useBlueprints;
 
 module.exports = class extends BaseBlueprintGenerator {
-  constructor(args, opts) {
-    super(args, opts);
+  constructor(args, options, features) {
+    super(args, options, features);
 
-    this.entity = opts.context;
+    this.entity = this.options.context || { ...entityDefaultConfig };
 
-    this.jhipsterContext = opts.jhipsterContext || opts.context;
+    this.jhipsterContext = this.options.jhipsterContext || this.options.context;
+  }
 
-    useBlueprints = !this.fromBlueprint && this.instantiateBlueprints(GENERATOR_ENTITY_SERVER, { context: opts.context });
+  async _postConstruct() {
+    if (!this.fromBlueprint) {
+      await this.composeWithBlueprints(GENERATOR_ENTITY_SERVER, { context: this.options.context });
+    }
   }
 
   // Public API method used by the getter and also by Blueprints
@@ -50,8 +57,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get initializing() {
-    if (useBlueprints) return;
+  get [INITIALIZING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._initializing();
   }
 
@@ -68,8 +75,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get preparing() {
-    if (useBlueprints) return;
+  get [PREPARING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._preparing();
   }
 
@@ -97,8 +104,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get preparingFields() {
-    if (useBlueprints) return;
+  get [PREPARING_FIELDS_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._preparingFields();
   }
 
@@ -157,24 +164,28 @@ module.exports = class extends BaseBlueprintGenerator {
       },
 
       processUniqueEntityTypes() {
+        this.reactiveOtherEntities = new Set(this.reactiveEagerRelations.map(rel => rel.otherEntity));
         this.reactiveUniqueEntityTypes = new Set(this.reactiveEagerRelations.map(rel => rel.otherEntityNameCapitalized));
         this.reactiveUniqueEntityTypes.add(this.entityClass);
       },
     };
   }
 
-  get default() {
-    if (useBlueprints) return;
+  get [DEFAULT_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._default();
   }
 
   // Public API method used by the getter and also by Blueprints
   _writing() {
-    return { ...writeFiles(), ...super._missingPostWriting() };
+    return {
+      ...writeFiles(),
+      ...super._missingPostWriting(),
+    };
   }
 
-  get writing() {
-    if (useBlueprints) return;
+  get [WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._writing();
   }
 
@@ -187,8 +198,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get postWriting() {
-    if (useBlueprints) return;
+  get [POST_WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._postWriting();
   }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -74,7 +74,12 @@ describe('ApplicationOptions', () => {
     });
   });
   describe('shouldTheValueBeQuoted', () => {
-    const optionsThatShouldBeQuoted = new Set([OptionNames.JHIPSTER_VERSION, OptionNames.REMEMBER_ME_KEY, OptionNames.JWT_SECRET_KEY]);
+    const optionsThatShouldBeQuoted = new Set([
+      OptionNames.JHIPSTER_VERSION,
+      OptionNames.REMEMBER_ME_KEY,
+      OptionNames.JWT_SECRET_KEY,
+      OptionNames.GRADLE_ENTERPRISE_HOST,
+    ]);
     const optionsThatShouldNotBeQuoted = new Set(
       Object.values(OptionNames).filter(optionName => !optionsThatShouldBeQuoted.has(optionName))
     );

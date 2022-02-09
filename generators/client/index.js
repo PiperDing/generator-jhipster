@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -19,12 +19,28 @@
 /* eslint-disable consistent-return */
 const chalk = require('chalk');
 const _ = require('lodash');
+
 const BaseBlueprintGenerator = require('../generator-base-blueprint');
+const {
+  INITIALIZING_PRIORITY,
+  PROMPTING_PRIORITY,
+  CONFIGURING_PRIORITY,
+  COMPOSING_PRIORITY,
+  LOADING_PRIORITY,
+  PREPARING_PRIORITY,
+  DEFAULT_PRIORITY,
+  WRITING_PRIORITY,
+  POST_WRITING_PRIORITY,
+  END_PRIORITY,
+} = require('../../lib/constants/priorities.cjs').compat;
+
 const prompts = require('./prompts');
 const writeAngularFiles = require('./files-angular').writeFiles;
-const writeReactFiles = require('./files-react').writeFiles;
-const { writeFiles: writeVueFiles, customizeFiles: customizeVueFiles } = require('./files-vue');
+const { cleanup: cleanupReact, writeFiles: writeReactFiles } = require('./files-react');
+const { cleanup: cleanupVue, writeFiles: writeVueFiles, customizeFiles: customizeVueFiles } = require('./files-vue');
 const writeCommonFiles = require('./files-common').writeFiles;
+const { clientI18nFiles } = require('../languages/files');
+
 const packagejs = require('../../package.json');
 const constants = require('../generator-constants');
 const statistics = require('../statistics');
@@ -42,11 +58,9 @@ const { CommonDBTypes } = require('../../jdl/jhipster/field-types');
 const TYPE_STRING = CommonDBTypes.STRING;
 const TYPE_UUID = CommonDBTypes.UUID;
 
-let useBlueprints;
-
 module.exports = class JHipsterClientGenerator extends BaseBlueprintGenerator {
-  constructor(args, opts) {
-    super(args, opts, { unique: 'namespace' });
+  constructor(args, options, features) {
+    super(args, options, { unique: 'namespace', ...features });
 
     // This adds support for a `--auth` flag
     this.option('auth', {
@@ -74,8 +88,12 @@ module.exports = class JHipsterClientGenerator extends BaseBlueprintGenerator {
     this.loadRuntimeOptions();
 
     this.existingProject = !!this.jhipsterConfig.clientFramework;
+  }
 
-    useBlueprints = !this.fromBlueprint && this.instantiateBlueprints(GENERATOR_CLIENT);
+  async _postConstruct() {
+    if (!this.fromBlueprint) {
+      await this.composeWithBlueprints(GENERATOR_CLIENT);
+    }
   }
 
   // Public API method used by the getter and also by Blueprints
@@ -105,8 +123,8 @@ module.exports = class JHipsterClientGenerator extends BaseBlueprintGenerator {
     };
   }
 
-  get initializing() {
-    if (useBlueprints) return;
+  get [INITIALIZING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._initializing();
   }
 
@@ -121,8 +139,8 @@ module.exports = class JHipsterClientGenerator extends BaseBlueprintGenerator {
     };
   }
 
-  get prompting() {
-    if (useBlueprints) return;
+  get [PROMPTING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._prompting();
   }
 
@@ -157,33 +175,33 @@ module.exports = class JHipsterClientGenerator extends BaseBlueprintGenerator {
     };
   }
 
-  get configuring() {
-    if (useBlueprints) return;
+  get [CONFIGURING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._configuring();
   }
 
   // Public API method used by the getter and also by Blueprints
   _composing() {
     return {
-      composeCommon() {
-        this.composeWithJHipster(GENERATOR_COMMON, true);
+      async composeCommon() {
+        await this.composeWithJHipster(GENERATOR_COMMON, true);
       },
-      composeCypress() {
+      async composeCypress() {
         const testFrameworks = this.jhipsterConfig.testFrameworks;
         if (!Array.isArray(testFrameworks) || !testFrameworks.includes(CYPRESS)) return;
-        this.composeWithJHipster(GENERATOR_CYPRESS, { existingProject: this.existingProject }, true);
+        await this.composeWithJHipster(GENERATOR_CYPRESS, { existingProject: this.existingProject }, true);
       },
-      composeLanguages() {
+      async composeLanguages() {
         // We don't expose client/server to cli, composing with languages is used for test purposes.
         if (this.jhipsterConfig.enableTranslation === false) return;
 
-        this.composeWithJHipster(GENERATOR_LANGUAGES, true);
+        await this.composeWithJHipster(GENERATOR_LANGUAGES, true);
       },
     };
   }
 
-  get composing() {
-    if (useBlueprints) return;
+  get [COMPOSING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._composing();
   }
 
@@ -196,15 +214,8 @@ module.exports = class JHipsterClientGenerator extends BaseBlueprintGenerator {
         this.loadClientConfig();
         this.loadDerivedClientConfig();
         this.loadServerConfig();
-        this.loadDerivedServerConfig();
         this.loadPlatformConfig();
         this.loadTranslationConfig();
-      },
-
-      checkMicrofrontend() {
-        if (this.microfrontend && !this.clientFrameworkAngular) {
-          throw new Error(`Microfrontend requires ${ANGULAR} client framework.`);
-        }
       },
 
       validateSkipServer() {
@@ -241,8 +252,8 @@ module.exports = class JHipsterClientGenerator extends BaseBlueprintGenerator {
     };
   }
 
-  get loading() {
-    if (useBlueprints) return;
+  get [LOADING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._loading();
   }
 
@@ -261,24 +272,28 @@ module.exports = class JHipsterClientGenerator extends BaseBlueprintGenerator {
         this.styleSheetExt = 'scss';
         this.DIST_DIR = this.getResourceBuildDirectoryForBuildTool(this.buildTool) + constants.CLIENT_DIST_DIR;
 
-        // Application name modified, using each technology's conventions
-        this.camelizedBaseName = _.camelCase(this.baseName);
-        this.frontendAppName = this.getFrontendAppName();
-        this.hipster = this.getHipster(this.baseName);
-        this.capitalizedBaseName = _.upperFirst(this.baseName);
-        this.dasherizedBaseName = _.kebabCase(this.baseName);
-        this.lowercaseBaseName = this.baseName.toLowerCase();
-        this.humanizedBaseName = this.baseName.toLowerCase() === 'jhipster' ? 'JHipster' : _.startCase(this.baseName);
-
         if (this.authenticationType === OAUTH2 || this.databaseType === NO_DATABASE) {
           this.skipUserManagement = true;
         }
       },
+
+      async loadNativeLanguage() {
+        if (!this.jhipsterConfig.baseName) return;
+        const context = {};
+        this.loadAppConfig(undefined, context);
+        this.loadDerivedAppConfig(context);
+        this.loadClientConfig(undefined, context);
+        this.loadDerivedClientConfig(context);
+        this.loadServerConfig(undefined, context);
+        this.loadPlatformConfig(undefined, context);
+        this.loadTranslationConfig(undefined, context);
+        await this._loadClientTranslations(context);
+      },
     };
   }
 
-  get preparing() {
-    if (useBlueprints) return;
+  get [PREPARING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._preparing();
   }
 
@@ -295,6 +310,14 @@ module.exports = class JHipsterClientGenerator extends BaseBlueprintGenerator {
         this.userPrimaryKeyTypeUUID = this.user.primaryKey.type === TYPE_UUID;
       },
 
+      loadEntities() {
+        if (!this.configOptions.sharedEntities) {
+          this.localEntities = [];
+          return;
+        }
+        this.localEntities = Object.values(this.configOptions.sharedEntities).filter(entity => !entity.builtIn && !entity.skipClient);
+      },
+
       insight() {
         statistics.sendSubGenEvent('generator', GENERATOR_CLIENT, {
           app: {
@@ -308,38 +331,41 @@ module.exports = class JHipsterClientGenerator extends BaseBlueprintGenerator {
     };
   }
 
-  get default() {
-    if (useBlueprints) return;
+  get [DEFAULT_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._default();
   }
 
   // Public API method used by the getter and also by Blueprints
   _writing() {
     return {
+      cleanupReact,
+      cleanupVue,
+
       write() {
         if (this.skipClient) return;
         switch (this.clientFramework) {
           case ANGULAR:
-            return writeAngularFiles.call(this, useBlueprints);
+            return writeAngularFiles.call(this);
           case REACT:
-            return writeReactFiles.call(this, useBlueprints);
+            return writeReactFiles.call(this);
           case VUE:
-            return writeVueFiles.call(this, useBlueprints);
+            return writeVueFiles.call(this);
           default:
           // do nothing by default
         }
       },
       writeCommonFiles() {
         if (this.skipClient) return;
-        return writeCommonFiles.call(this, useBlueprints);
+        return writeCommonFiles.call(this);
       },
 
       ...super._missingPostWriting(),
     };
   }
 
-  get writing() {
-    if (useBlueprints) return;
+  get [WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._writing();
   }
 
@@ -378,13 +404,20 @@ module.exports = class JHipsterClientGenerator extends BaseBlueprintGenerator {
 
       microfrontend() {
         if (!this.microfrontend) return;
-        this.addWebpackConfig("require('./webpack.microfrontend')(config, options, targetOptions)");
+        if (this.clientFrameworkAngular) {
+          const conditional = this.applicationTypeMicroservice ? "targetOptions.target === 'serve' ? {} : " : '';
+          this.addWebpackConfig(`${conditional}require('./webpack.microfrontend')(config, options, targetOptions)`);
+        } else if (this.clientFrameworkVue) {
+          this.addWebpackConfig("require('./webpack.microfrontend')({ serve: options.env.WEBPACK_SERVE })");
+        } else {
+          throw new Error(`Client framework ${this.clientFramework} doesn't support microfrontends`);
+        }
       },
     };
   }
 
-  get postWriting() {
-    if (useBlueprints) return;
+  get [POST_WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._postWriting();
   }
 
@@ -405,8 +438,62 @@ module.exports = class JHipsterClientGenerator extends BaseBlueprintGenerator {
     };
   }
 
-  get end() {
-    if (useBlueprints) return;
+  get [END_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._end();
+  }
+
+  /**
+   * @experimental
+   * Load client native translation.
+   */
+  async _loadClientTranslations(configContext = this) {
+    configContext.clientTranslations = this.configOptions.clientTranslations;
+    if (configContext.clientTranslations) {
+      this.clientTranslations = configContext.clientTranslations;
+      return;
+    }
+    const { nativeLanguage } = configContext;
+    this.clientTranslations = configContext.clientTranslations = this.configOptions.clientTranslations = {};
+    const rootTemplatesPath = this.fetchFromInstalledJHipster('languages/templates/');
+
+    // Prepare and load en translation
+    const translationFiles = await this.writeFiles({
+      sections: clientI18nFiles,
+      rootTemplatesPath,
+      context: {
+        ...configContext,
+        lang: 'en',
+        clientSrcDir: '__tmp__',
+      },
+    });
+
+    // Prepare and load native translation
+    configContext.lang = configContext.nativeLanguage;
+    if (nativeLanguage && nativeLanguage !== 'en') {
+      translationFiles.push(
+        ...(await this.writeFiles({
+          sections: clientI18nFiles,
+          rootTemplatesPath,
+          context: {
+            ...configContext,
+            lang: configContext.nativeLanguage,
+            clientSrcDir: '__tmp__',
+          },
+        }))
+      );
+    }
+    for (const translationFile of translationFiles) {
+      _.merge(this.clientTranslations, this.readDestinationJSON(translationFile));
+      delete this.env.sharedFs.get(translationFile).state;
+    }
+  }
+
+  /**
+   * @experimental
+   * Get translation value for a key.
+   */
+  _getClientTranslation(translationKey) {
+    return _.get(this.clientTranslations, translationKey, `Translation missing for ${translationKey}`);
   }
 };

@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -19,13 +19,14 @@
 const chalk = require('chalk');
 const shelljs = require('shelljs');
 const BaseGenerator = require('../generator-base');
+const { INITIALIZING_PRIORITY } = require('../../lib/constants/priorities.cjs').compat;
 
 // We use console.log() in this generator because we want to print on stdout not on
 // stderr unlike yeoman's log() so that user can easily redirect output to a file.
 /* eslint-disable no-console */
 module.exports = class extends BaseGenerator {
-  constructor(args, options) {
-    super(args, options, { unique: 'namespace' });
+  constructor(args, options, features) {
+    super(args, options, { unique: 'namespace', ...features });
 
     this.option('skipCommit', {
       desc: 'Skip commit',
@@ -34,10 +35,12 @@ module.exports = class extends BaseGenerator {
       defaults: true,
     });
 
+    if (this.options.help) return;
+
     this.env.options.skipInstall = true;
   }
 
-  get initializing() {
+  get [INITIALIZING_PRIORITY]() {
     return {
       sayHello() {
         this.log(chalk.white('Welcome to the JHipster Information Sub-Generator\n'));

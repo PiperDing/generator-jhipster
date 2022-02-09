@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -17,8 +17,11 @@
  * limitations under the License.
  */
 const fs = require('fs');
-const { JHIPSTER_CONFIG_DIR } = require('../generator-constants');
+
 const BaseBlueprintGenerator = require('../generator-base-blueprint');
+const { DEFAULT_PRIORITY } = require('../../lib/constants/priorities.cjs').compat;
+
+const { JHIPSTER_CONFIG_DIR } = require('../generator-constants');
 const { GENERATOR_DATABASE_CHANGELOG, GENERATOR_DATABASE_CHANGELOG_LIQUIBASE } = require('../generator-list');
 
 const BASE_CHANGELOG = {
@@ -28,11 +31,10 @@ const BASE_CHANGELOG = {
   removedRelationships: [],
 };
 
-let useBlueprints;
 /* eslint-disable consistent-return */
 module.exports = class extends BaseBlueprintGenerator {
-  constructor(args, options) {
-    super(args, options, { unique: 'namespace' });
+  constructor(args, options, features) {
+    super(args, options, { unique: 'namespace', ...features });
 
     this.argument('entities', {
       desc: 'Which entities to generate a new changelog',
@@ -45,37 +47,49 @@ module.exports = class extends BaseBlueprintGenerator {
     }
     this.info(`Creating changelog for entities ${this.options.entities}`);
     this.configOptions.oldSharedEntities = this.configOptions.oldSharedEntities || [];
-    useBlueprints = !this.fromBlueprint && this.instantiateBlueprints(GENERATOR_DATABASE_CHANGELOG);
+  }
+
+  async _postConstruct() {
+    if (!this.fromBlueprint) {
+      await this.composeWithBlueprints(GENERATOR_DATABASE_CHANGELOG);
+    }
   }
 
   _default() {
     return {
-      calculateChangelogs() {
+      async calculateChangelogs() {
         const diff = this._generateChangelogFromFiles();
 
-        diff.forEach(([fieldChanges, _relationshipChanges]) => {
-          if (fieldChanges.type === 'entity-new') {
-            this._composeWithIncrementalChangelogProvider(fieldChanges);
-          } else if (fieldChanges.addedFields.length > 0 || fieldChanges.removedFields.length > 0) {
-            this._composeWithIncrementalChangelogProvider(fieldChanges);
-          }
-        });
+        await Promise.all(
+          diff.map(([fieldChanges, _relationshipChanges]) => {
+            if (fieldChanges.type === 'entity-new') {
+              return this._composeWithIncrementalChangelogProvider(fieldChanges);
+            }
+            if (fieldChanges.addedFields.length > 0 || fieldChanges.removedFields.length > 0) {
+              return this._composeWithIncrementalChangelogProvider(fieldChanges);
+            }
+            return undefined;
+          })
+        );
 
-        diff.forEach(([_fieldChanges, relationshipChanges]) => {
-          if (
-            relationshipChanges &&
-            relationshipChanges.incremental &&
-            (relationshipChanges.addedRelationships.length > 0 || relationshipChanges.removedRelationships.length > 0)
-          ) {
-            this._composeWithIncrementalChangelogProvider(relationshipChanges);
-          }
-        });
+        await Promise.all(
+          diff.map(([_fieldChanges, relationshipChanges]) => {
+            if (
+              relationshipChanges &&
+              relationshipChanges.incremental &&
+              (relationshipChanges.addedRelationships.length > 0 || relationshipChanges.removedRelationships.length > 0)
+            ) {
+              return this._composeWithIncrementalChangelogProvider(relationshipChanges);
+            }
+            return undefined;
+          })
+        );
       },
     };
   }
 
-  get default() {
-    if (useBlueprints) return;
+  get [DEFAULT_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._default();
   }
 
@@ -84,8 +98,8 @@ module.exports = class extends BaseBlueprintGenerator {
   /* ======================================================================== */
 
   _composeWithIncrementalChangelogProvider(databaseChangelog) {
-    const skipWriting = !this.options.entities.includes(databaseChangelog.entityName);
-    this.composeWithJHipster(GENERATOR_DATABASE_CHANGELOG_LIQUIBASE, {
+    const skipWriting = this.options.skipWriting || !this.options.entities.includes(databaseChangelog.entityName);
+    return this.composeWithJHipster(GENERATOR_DATABASE_CHANGELOG_LIQUIBASE, {
       databaseChangelog,
       skipWriting,
       configOptions: this.configOptions,

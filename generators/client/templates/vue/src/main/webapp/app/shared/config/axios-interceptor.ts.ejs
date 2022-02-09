@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -18,8 +18,6 @@
 -%>
 import axios from 'axios';
 
-import {SERVER_API_URL} from "@/constants";
-
 const TIMEOUT = 1000000;
 const onRequestSuccess = config => {
 <%_ if (authenticationTypeJwt) { _%>
@@ -35,14 +33,18 @@ const onRequestSuccess = config => {
   config.url = `${SERVER_API_URL}${config.url}`;
   return config;
 };
-const setupAxiosInterceptors = onUnauthenticated => {
+const setupAxiosInterceptors = (onUnauthenticated, onServerError) => {
   const onResponseError = err => {
     const status = err.status || err.response.status;
     if (status === 403 || status === 401) {
       onUnauthenticated();
     }
+    if (status >= 500) {
+      onServerError();
+    }
     return Promise.reject(err);
   };
+  
   if (axios.interceptors) {
     axios.interceptors.request.use(onRequestSuccess);
     axios.interceptors.response.use(res => res, onResponseError);

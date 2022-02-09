@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -18,20 +18,18 @@
 -%>
 package <%= packageName %>.cucumber;
 
-import org.junit.runner.RunWith;
-
-<%_ if (databaseType === 'cassandra') { _%>
+<%_ if (databaseTypeCassandra) { _%>
 import <%= packageName %>.AbstractCassandraTest;
 <%_ } _%>
-<%_ if (databaseType === 'neo4j') { _%>
+<%_ if (databaseTypeNeo4j) { _%>
 import <%= packageName %>.AbstractNeo4jIT;
 <%_ } _%>
-import io.cucumber.junit.CucumberOptions;
-import io.cucumber.junit.Cucumber;
+import io.cucumber.junit.platform.engine.Cucumber;
 
-@RunWith(Cucumber.class)
-@CucumberOptions(plugin = "pretty", features = "<%= TEST_DIR %>features")
-<% if (databaseType === 'neo4j') { %>@ExtendWith(AbstractNeo4jIT) <% } %>
-class CucumberIT <% if (databaseType === 'cassandra') { %>extends AbstractCassandraTest<% } %> {
+@Cucumber
+<%_ if (databaseTypeNeo4j) { _%>
+@ExtendWith(AbstractNeo4jIT)
+<%_ } _%>
+class CucumberIT <% if (databaseTypeCassandra) { %>extends AbstractCassandraTest<% } %> {
 
 }

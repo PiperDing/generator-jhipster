@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -23,8 +23,6 @@ import { NavItem, NavLink, NavbarBrand } from 'reactstrap';
 import { NavLink as Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import appConfig from 'app/config/constants';
-
 export const BrandIcon = props => (
   <div {...props} className="brand-icon">
     <img
@@ -38,7 +36,7 @@ export const Brand = () => (
 <NavbarBrand tag={Link} to="/" className="brand-logo">
   <BrandIcon />
   <span className="brand-title"><Translate contentKey="global.title"><%= capitalizedBaseName %></Translate></span>
-  <span className="navbar-version">{appConfig.VERSION}</span>
+  <span className="navbar-version">{VERSION}</span>
 </NavbarBrand>
 );
 

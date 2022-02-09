@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -156,7 +156,7 @@ function askForUpdate() {
 function askForFields() {
   const context = this.context;
   // don't prompt if data is imported from a file
-  if (context.useConfigurationFile && context.updateEntity !== 'add') {
+  if (this.options.defaults || (context.useConfigurationFile && context.updateEntity !== 'add')) {
     return undefined;
   }
 
@@ -209,6 +209,9 @@ function askForFieldsToRemove() {
 
 function askForRelationships() {
   const context = this.context;
+  if (this.options.defaults) {
+    return undefined;
+  }
   // don't prompt if data is imported from a file
   if (context.useConfigurationFile && context.updateEntity !== 'add') {
     return undefined;

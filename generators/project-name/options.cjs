@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -16,18 +16,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const { BASE_NAME, BASE_NAME_DESC, JHIPSTER_VERSION, JHIPSTER_VERSION_DESC } = require('./constants.cjs');
+const { BASE_NAME, BASE_NAME_DESCRIPTION, JHIPSTER_VERSION, JHIPSTER_VERSION_DESCRIPTION } = require('./constants.cjs');
 
 module.exports.options = {
-  [JHIPSTER_VERSION]: {
-    desc: JHIPSTER_VERSION_DESC,
+  [BASE_NAME]: {
+    desc: BASE_NAME_DESCRIPTION,
     type: String,
-    hide: true,
     scope: 'storage',
   },
-  [BASE_NAME]: {
-    desc: BASE_NAME_DESC,
+  [JHIPSTER_VERSION]: {
+    desc: JHIPSTER_VERSION_DESCRIPTION,
     type: String,
+    hide: true,
     scope: 'storage',
   },
 };

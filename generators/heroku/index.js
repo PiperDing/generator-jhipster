@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -24,7 +24,18 @@ const ChildProcess = require('child_process');
 const util = require('util');
 const chalk = require('chalk');
 const glob = require('glob');
+
 const BaseBlueprintGenerator = require('../generator-base-blueprint');
+const {
+  INITIALIZING_PRIORITY,
+  PROMPTING_PRIORITY,
+  CONFIGURING_PRIORITY,
+  LOADING_PRIORITY,
+  DEFAULT_PRIORITY,
+  WRITING_PRIORITY,
+  END_PRIORITY,
+} = require('../../lib/constants/priorities.cjs').compat;
+
 const statistics = require('../statistics');
 const constants = require('../generator-constants');
 const cacheProviderOptions = require('../../jdl/jhipster/cache-types');
@@ -39,11 +50,9 @@ const { EUREKA } = require('../../jdl/jhipster/service-discovery-types');
 const NO_CACHE_PROVIDER = cacheProviderOptions.NO;
 const execCmd = util.promisify(ChildProcess.exec);
 
-let useBlueprints;
-
 module.exports = class extends BaseBlueprintGenerator {
-  constructor(args, opts) {
-    super(args, opts);
+  constructor(args, options, features) {
+    super(args, options, features);
 
     this.option('skip-build', {
       desc: 'Skips building the application',
@@ -64,8 +73,12 @@ module.exports = class extends BaseBlueprintGenerator {
     this.randomPassword = crypto.randomBytes(20).toString('hex');
     this.herokuSkipBuild = this.options.skipBuild;
     this.herokuSkipDeploy = this.options.skipDeploy || this.options.skipBuild;
+  }
 
-    useBlueprints = !this.fromBlueprint && this.instantiateBlueprints(GENERATOR_HEROKU);
+  async _postConstruct() {
+    if (!this.fromBlueprint) {
+      await this.composeWithBlueprints(GENERATOR_HEROKU);
+    }
   }
 
   _initializing() {
@@ -98,8 +111,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get initializing() {
-    if (useBlueprints) return;
+  get [INITIALIZING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._initializing();
   }
 
@@ -191,29 +204,8 @@ module.exports = class extends BaseBlueprintGenerator {
             type: 'list',
             name: 'herokuJavaVersion',
             message: 'Which Java version would you like to use to build and run your app ?',
-            choices: [
-              {
-                value: '1.8',
-                name: '1.8',
-              },
-              {
-                value: '11',
-                name: '11',
-              },
-              {
-                value: '12',
-                name: '12',
-              },
-              {
-                value: '13',
-                name: '13',
-              },
-              {
-                value: '14',
-                name: '14',
-              },
-            ],
-            default: 1,
+            choices: constants.JAVA_COMPATIBLE_VERSIONS.map(version => ({ value: version })),
+            default: constants.JAVA_VERSION,
           },
         ];
 
@@ -244,6 +236,7 @@ module.exports = class extends BaseBlueprintGenerator {
             default: 1,
           },
           {
+            when: answers => answers.useOkta,
             type: 'input',
             name: 'oktaAdminLogin',
             message: 'Login (valid email) for the JHipster Admin user:',
@@ -254,27 +247,21 @@ module.exports = class extends BaseBlueprintGenerator {
               return true;
             },
           },
-          {
-            type: 'confirm',
-            name: 'oktaAdminPassword',
-            message: `${chalk.blue('Take note of this password!')} You will need it on your first login: ${chalk.blue(
-              this.randomPassword
-            )}`,
-            default: true,
-          },
         ];
 
         return this.prompt(prompts).then(props => {
           this.useOkta = props.useOkta;
-          this.oktaAdminLogin = props.oktaAdminLogin;
-          this.oktaAdminPassword = this.randomPassword;
+          if (this.useOkta) {
+            this.oktaAdminLogin = props.oktaAdminLogin;
+            this.oktaAdminPassword = this.randomPassword;
+          }
         });
       },
     };
   }
 
-  get prompting() {
-    if (useBlueprints) return;
+  get [PROMPTING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._prompting();
   }
 
@@ -300,14 +287,13 @@ module.exports = class extends BaseBlueprintGenerator {
           herokuJavaVersion: this.herokuJavaVersion,
           useOkta: this.useOkta,
           oktaAdminLogin: this.oktaAdminLogin,
-          oktaAdminPassword: this.oktaAdminPassword,
         });
       },
     };
   }
 
-  get configuring() {
-    if (useBlueprints) return;
+  get [CONFIGURING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._configuring();
   }
 
@@ -326,8 +312,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get loading() {
-    if (useBlueprints) return;
+  get [LOADING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._loading();
   }
 
@@ -391,7 +377,7 @@ module.exports = class extends BaseBlueprintGenerator {
         const regionParams = this.herokuRegion !== 'us' ? ` --region ${this.herokuRegion}` : '';
 
         this.log(chalk.bold('\nCreating Heroku application and setting up node environment'));
-        const child = ChildProcess.exec(`heroku create ${this.herokuAppName}${regionParams}`, (err, stdout, stderr) => {
+        const child = ChildProcess.exec(`heroku create ${this.herokuAppName}${regionParams}`, { timeout: 6000 }, (err, stdout, stderr) => {
           if (err) {
             if (stderr.includes('is already taken')) {
               const prompts = [
@@ -458,7 +444,11 @@ module.exports = class extends BaseBlueprintGenerator {
               });
             } else {
               this.abort = true;
-              this.log.error(err);
+              if (stderr.includes('Invalid credentials')) {
+                this.log.error("Error: Not authenticated. Run 'heroku login' to login to your heroku account and try again.");
+              } else {
+                this.log.error(err);
+              }
               done();
             }
           } else {
@@ -597,8 +587,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get default() {
-    if (useBlueprints) return;
+  get [DEFAULT_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._default();
   }
 
@@ -644,8 +634,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get writing() {
-    if (useBlueprints) return;
+  get [WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._writing();
   }
 
@@ -779,7 +769,7 @@ module.exports = class extends BaseBlueprintGenerator {
                 this.log(chalk.yellow('After you have installed jq execute ./provision-okta-addon.sh manually.'));
               }
               if (curlAvailable && jqAvailable) {
-                this.log(chalk.green('Running ./provision-okta-addon.sh to create all required roles and users to use with jhipster.'));
+                this.log(chalk.green('Running ./provision-okta-addon.sh to create all required roles and users for JHipster.'));
                 try {
                   await execCmd('./provision-okta-addon.sh');
                   this.log(chalk.bold('\nOkta configured successfully!'));
@@ -850,7 +840,7 @@ module.exports = class extends BaseBlueprintGenerator {
                 this.log(chalk.yellow('After you have installed jq execute ./provision-okta-addon.sh manually.'));
               }
               if (curlAvailable && jqAvailable) {
-                this.log(chalk.green('Running ./provision-okta-addon.sh to create all required roles and users to use with JHipster.'));
+                this.log(chalk.green('Running ./provision-okta-addon.sh to create all required roles and users for JHipster.'));
                 try {
                   await execCmd('./provision-okta-addon.sh');
                   this.log(chalk.bold('\nOkta configured successfully!'));
@@ -872,8 +862,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get end() {
-    if (useBlueprints) return;
+  get [END_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._end();
   }
 };

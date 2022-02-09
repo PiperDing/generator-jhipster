@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -17,16 +17,20 @@
  * limitations under the License.
  */
 const BaseBlueprintGenerator = require('../generator-base-blueprint');
+const { INITIALIZING_PRIORITY, LOADING_PRIORITY, DEFAULT_PRIORITY, END_PRIORITY } = require('../../lib/constants/priorities.cjs').compat;
 const { GENERATOR_ENTITIES_CLIENT } = require('../generator-list');
 
-let useBlueprints;
-
 module.exports = class extends BaseBlueprintGenerator {
-  constructor(args, opts) {
-    super(args, opts);
+  constructor(args, options, features) {
+    super(args, options, features);
     if (this.options.help) return;
     this.clientEntities = this.options.clientEntities;
-    useBlueprints = !this.fromBlueprint && this.instantiateBlueprints(GENERATOR_ENTITIES_CLIENT);
+  }
+
+  async _postConstruct() {
+    if (!this.fromBlueprint) {
+      await this.composeWithBlueprints(GENERATOR_ENTITIES_CLIENT);
+    }
   }
 
   // Public API method used by the getter and also by Blueprints
@@ -38,8 +42,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get initializing() {
-    return useBlueprints ? undefined : this._initializing();
+  get [INITIALIZING_PRIORITY]() {
+    return this.delegateToBlueprint ? undefined : this._initializing();
   }
 
   // Public API method used by the getter and also by Blueprints
@@ -51,8 +55,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get loading() {
-    return useBlueprints ? undefined : this._loading();
+  get [LOADING_PRIORITY]() {
+    return this.delegateToBlueprint ? undefined : this._loading();
   }
 
   // Public API method used by the getter and also by Blueprints
@@ -66,8 +70,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get default() {
-    return useBlueprints ? undefined : this._default();
+  get [DEFAULT_PRIORITY]() {
+    return this.delegateToBlueprint ? undefined : this._default();
   }
 
   // Public API method used by the getter and also by Blueprints
@@ -81,7 +85,7 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get end() {
-    return useBlueprints ? undefined : this._end();
+  get [END_PRIORITY]() {
+    return this.delegateToBlueprint ? undefined : this._end();
   }
 };

@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -32,7 +32,7 @@ export default () => next => action => {
    * The error middleware serves to log error messages from dispatch
    * It need not run in production
    */
-  if (process.env.NODE_ENV === 'development') {
+  if (DEVELOPMENT) {
     const { error } = action;
     if (error) {
       console.error(`${action.type} caught at middleware with reason: ${JSON.stringify(error.message)}.`);

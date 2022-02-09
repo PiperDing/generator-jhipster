@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -107,7 +107,7 @@ _%>
 <%_ if (!readOnly) { _%>
 
             <button type="button"
-                    [routerLink]="['/<%= entityUrl %>', <%= entityInstance %>.<%= primaryKey.name %>, 'edit']"
+                    [routerLink]="['/<%= entityPage %>', <%= entityInstance %>.<%= primaryKey.name %>, 'edit']"
                     class="btn btn-primary">
                 <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span <%= jhiPrefix %>Translate="entity.action.edit">Edit</span>
             </button>

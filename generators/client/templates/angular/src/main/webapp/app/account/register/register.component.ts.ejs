@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -75,7 +75,7 @@ export class RegisterComponent implements AfterViewInit {
       const email = this.registerForm.get(['email'])!.value;
       this.registerService
         .save({ login, email, password, langKey: <% if (enableTranslation) { %>this.translateService.currentLang<% } else { %>'en'<% } %> })
-        .subscribe(() => (this.success = true), response => this.processError(response));
+        .subscribe({ next: () => (this.success = true), error: response => this.processError(response)});
     }
   }
 

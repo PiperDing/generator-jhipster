@@ -6,12 +6,12 @@ Object {
     "contents": "{
   \\"generator-jhipster\\": {
     \\"appsFolders\\": [\\"01-gateway\\", \\"10-couchbase\\"],
+    \\"clusteredDbApps\\": [\\"10-couchbase\\"],
     \\"directoryPath\\": \\"./\\",
     \\"gatewayType\\": \\"SpringCloudGateway\\",
-    \\"clusteredDbApps\\": [\\"10-couchbase\\"],
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"monitoring\\": \\"no\\",
-    \\"serviceDiscoveryType\\": \\"eureka\\",
-    \\"jwtSecretKey\\": \\"SECRET--50\\"
+    \\"serviceDiscoveryType\\": \\"eureka\\"
   }
 }
 ",
@@ -72,7 +72,7 @@ eureka:
     ports:
       - \\"8080:8080\\"
   jhgate-mysql:
-    image: mysql:8.0.25
+    image: mysql:8.0.27
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=jhgate
@@ -83,8 +83,8 @@ eureka:
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - SPRING_CLOUD_CONFIG_URI=http://admin:admin@jhipster-registry:8761/config
-      - SPRING_COUCHBASE_BOOTSTRAP_HOSTS=mscouchbase-couchbase
-      - SPRING_COUCHBASE_BUCKET_NAME=mscouchbase
+      - SPRING_COUCHBASE_CONNECTION_STRING=mscouchbase-couchbase
+      - JHIPSTER_DATABASE_COUCHBASE_BUCKET_NAME=mscouchbase
       - JHIPSTER_REGISTRY_PASSWORD=admin
   mscouchbase-couchbase-node:
     build:
@@ -104,7 +104,7 @@ eureka:
       - BUCKET=mscouchbase
 
   jhipster-registry:
-    image: jhipster/jhipster-registry:v6.8.0
+    image: jhipster/jhipster-registry:v7.2.0
     volumes:
       - ./central-server-config:/central-config
     # By default the JHipster Registry runs with the \\"dev\\" and \\"native\\"
@@ -135,12 +135,12 @@ Object {
     "contents": "{
   \\"generator-jhipster\\": {
     \\"appsFolders\\": [\\"01-gateway\\", \\"05-cassandra\\"],
+    \\"clusteredDbApps\\": {},
     \\"directoryPath\\": \\"./\\",
     \\"gatewayType\\": \\"SpringCloudGateway\\",
-    \\"clusteredDbApps\\": {},
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"monitoring\\": \\"no\\",
-    \\"serviceDiscoveryType\\": \\"eureka\\",
-    \\"jwtSecretKey\\": \\"SECRET--50\\"
+    \\"serviceDiscoveryType\\": \\"eureka\\"
   }
 }
 ",
@@ -202,7 +202,7 @@ eureka:
     ports:
       - \\"8080:8080\\"
   jhgate-mysql:
-    image: mysql:8.0.25
+    image: mysql:8.0.27
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=jhgate
@@ -217,7 +217,7 @@ eureka:
       - JHIPSTER_SLEEP=30
       - JHIPSTER_REGISTRY_PASSWORD=admin
   mscassandra-cassandra-node:
-    image: cassandra:3.11.10
+    image: cassandra:3.11.11
     environment:
       - CASSANDRA_SEEDS=mscassandra-cassandra
   mscassandra-cassandra-migration:
@@ -231,10 +231,10 @@ eureka:
     volumes:
       - 05-cassandra/src/main/resources/config/cql:/cql:ro
   mscassandra-cassandra:
-    image: cassandra:3.11.10
+    image: cassandra:3.11.11
 
   jhipster-registry:
-    image: jhipster/jhipster-registry:v6.8.0
+    image: jhipster/jhipster-registry:v7.2.0
     volumes:
       - ./central-server-config:/central-config
     # By default the JHipster Registry runs with the \\"dev\\" and \\"native\\"
@@ -271,12 +271,12 @@ Object {
       \\"04-mongo\\",
       \\"07-mariadb\\"
     ],
+    \\"clusteredDbApps\\": [],
     \\"directoryPath\\": \\"./\\",
     \\"gatewayType\\": \\"SpringCloudGateway\\",
-    \\"clusteredDbApps\\": [],
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"monitoring\\": \\"no\\",
-    \\"serviceDiscoveryType\\": \\"eureka\\",
-    \\"jwtSecretKey\\": \\"SECRET--50\\"
+    \\"serviceDiscoveryType\\": \\"eureka\\"
   }
 }
 ",
@@ -346,7 +346,7 @@ eureka:
     ports:
       - \\"8080:8080\\"
   jhgate-mysql:
-    image: mysql:8.0.25
+    image: mysql:8.0.27
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=jhgate
@@ -360,7 +360,7 @@ eureka:
       - SPRING_DATASOURCE_URL=jdbc:mysql://msmysql-mysql:3306/msmysql?useUnicode=true&characterEncoding=utf8&useSSL=false&createDatabaseIfNotExist=true
       - JHIPSTER_REGISTRY_PASSWORD=admin
   msmysql-mysql:
-    image: mysql:8.0.25
+    image: mysql:8.0.27
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=msmysql
@@ -375,7 +375,7 @@ eureka:
       - SPRING_ELASTICSEARCH_REST_URIS=http://mspsql-elasticsearch:9200
       - JHIPSTER_REGISTRY_PASSWORD=admin
   mspsql-postgresql:
-    image: postgres:13.3
+    image: postgres:14.1
     environment:
       - POSTGRES_USER=mspsql
       - POSTGRES_PASSWORD=
@@ -391,7 +391,7 @@ eureka:
       - SPRING_DATA_MONGODB_DATABASE=msmongodb
       - JHIPSTER_REGISTRY_PASSWORD=admin
   msmongodb-mongodb:
-    image: mongo:4.4.6
+    image: mongo:4.4.11
 
   msmariadb:
     image: msmariadb
@@ -401,7 +401,7 @@ eureka:
       - SPRING_DATASOURCE_URL=jdbc:mariadb://msmariadb-mariadb:3306/msmariadb
       - JHIPSTER_REGISTRY_PASSWORD=admin
   msmariadb-mariadb:
-    image: mariadb:10.6.1
+    image: mariadb:10.7.1
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=msmysql
@@ -410,7 +410,7 @@ eureka:
     command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
 
   jhipster-registry:
-    image: jhipster/jhipster-registry:v6.8.0
+    image: jhipster/jhipster-registry:v7.2.0
     volumes:
       - ./central-server-config:/central-config
     # By default the JHipster Registry runs with the \\"dev\\" and \\"native\\"
@@ -441,12 +441,12 @@ Object {
     "contents": "{
   \\"generator-jhipster\\": {
     \\"appsFolders\\": [\\"01-gateway\\", \\"02-mysql\\", \\"03-psql\\", \\"04-mongo\\"],
+    \\"clusteredDbApps\\": [\\"04-mongo\\"],
     \\"directoryPath\\": \\"./\\",
     \\"gatewayType\\": \\"SpringCloudGateway\\",
-    \\"clusteredDbApps\\": [\\"04-mongo\\"],
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"monitoring\\": \\"no\\",
-    \\"serviceDiscoveryType\\": \\"eureka\\",
-    \\"jwtSecretKey\\": \\"SECRET--50\\"
+    \\"serviceDiscoveryType\\": \\"eureka\\"
   }
 }
 ",
@@ -513,7 +513,7 @@ eureka:
     ports:
       - \\"8080:8080\\"
   jhgate-mysql:
-    image: mysql:8.0.25
+    image: mysql:8.0.27
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=jhgate
@@ -527,7 +527,7 @@ eureka:
       - SPRING_DATASOURCE_URL=jdbc:mysql://msmysql-mysql:3306/msmysql?useUnicode=true&characterEncoding=utf8&useSSL=false&createDatabaseIfNotExist=true
       - JHIPSTER_REGISTRY_PASSWORD=admin
   msmysql-mysql:
-    image: mysql:8.0.25
+    image: mysql:8.0.27
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=msmysql
@@ -542,7 +542,7 @@ eureka:
       - SPRING_ELASTICSEARCH_REST_URIS=http://mspsql-elasticsearch:9200
       - JHIPSTER_REGISTRY_PASSWORD=admin
   mspsql-postgresql:
-    image: postgres:13.3
+    image: postgres:14.1
     environment:
       - POSTGRES_USER=mspsql
       - POSTGRES_PASSWORD=
@@ -563,14 +563,14 @@ eureka:
       dockerfile: mongodb/MongoDB.Dockerfile
     command: mongod --shardsvr --replSet rs1
   msmongodb-mongodb-config:
-    image: mongo:4.4.6
+    image: mongo:4.4.11
     command: mongod --configsvr --dbpath /data/db --replSet csvr
   msmongodb-mongodb:
-    image: mongo:4.4.6
+    image: mongo:4.4.11
     command: mongos --configdb csvr/msmongodb-mongodb-config --bind_ip 0.0.0.0
 
   jhipster-registry:
-    image: jhipster/jhipster-registry:v6.8.0
+    image: jhipster/jhipster-registry:v7.2.0
     volumes:
       - ./central-server-config:/central-config
     # By default the JHipster Registry runs with the \\"dev\\" and \\"native\\"
@@ -607,12 +607,12 @@ Object {
       \\"10-couchbase\\",
       \\"07-mariadb\\"
     ],
+    \\"clusteredDbApps\\": [],
     \\"directoryPath\\": \\"./\\",
     \\"gatewayType\\": \\"SpringCloudGateway\\",
-    \\"clusteredDbApps\\": [],
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"monitoring\\": \\"no\\",
-    \\"serviceDiscoveryType\\": \\"eureka\\",
-    \\"jwtSecretKey\\": \\"SECRET--50\\"
+    \\"serviceDiscoveryType\\": \\"eureka\\"
   }
 }
 ",
@@ -682,7 +682,7 @@ eureka:
     ports:
       - \\"8080:8080\\"
   jhgate-mysql:
-    image: mysql:8.0.25
+    image: mysql:8.0.27
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=jhgate
@@ -696,7 +696,7 @@ eureka:
       - SPRING_DATASOURCE_URL=jdbc:mysql://msmysql-mysql:3306/msmysql?useUnicode=true&characterEncoding=utf8&useSSL=false&createDatabaseIfNotExist=true
       - JHIPSTER_REGISTRY_PASSWORD=admin
   msmysql-mysql:
-    image: mysql:8.0.25
+    image: mysql:8.0.27
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=msmysql
@@ -711,7 +711,7 @@ eureka:
       - SPRING_ELASTICSEARCH_REST_URIS=http://mspsql-elasticsearch:9200
       - JHIPSTER_REGISTRY_PASSWORD=admin
   mspsql-postgresql:
-    image: postgres:13.3
+    image: postgres:14.1
     environment:
       - POSTGRES_USER=mspsql
       - POSTGRES_PASSWORD=
@@ -723,8 +723,8 @@ eureka:
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - SPRING_CLOUD_CONFIG_URI=http://admin:admin@jhipster-registry:8761/config
-      - SPRING_COUCHBASE_BOOTSTRAP_HOSTS=mscouchbase-couchbase
-      - SPRING_COUCHBASE_BUCKET_NAME=mscouchbase
+      - SPRING_COUCHBASE_CONNECTION_STRING=mscouchbase-couchbase
+      - JHIPSTER_DATABASE_COUCHBASE_BUCKET_NAME=mscouchbase
       - JHIPSTER_REGISTRY_PASSWORD=admin
   mscouchbase-couchbase:
     build:
@@ -741,7 +741,7 @@ eureka:
       - SPRING_DATASOURCE_URL=jdbc:mariadb://msmariadb-mariadb:3306/msmariadb
       - JHIPSTER_REGISTRY_PASSWORD=admin
   msmariadb-mariadb:
-    image: mariadb:10.6.1
+    image: mariadb:10.7.1
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=msmysql
@@ -750,7 +750,7 @@ eureka:
     command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
 
   jhipster-registry:
-    image: jhipster/jhipster-registry:v6.8.0
+    image: jhipster/jhipster-registry:v7.2.0
     volumes:
       - ./central-server-config:/central-config
     # By default the JHipster Registry runs with the \\"dev\\" and \\"native\\"
@@ -781,12 +781,12 @@ Object {
     "contents": "{
   \\"generator-jhipster\\": {
     \\"appsFolders\\": [\\"01-gateway\\", \\"02-mysql\\"],
+    \\"clusteredDbApps\\": {},
     \\"directoryPath\\": \\"./\\",
     \\"gatewayType\\": \\"SpringCloudGateway\\",
-    \\"clusteredDbApps\\": {},
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"monitoring\\": \\"no\\",
-    \\"serviceDiscoveryType\\": \\"eureka\\",
-    \\"jwtSecretKey\\": \\"SECRET--50\\"
+    \\"serviceDiscoveryType\\": \\"eureka\\"
   }
 }
 ",
@@ -848,7 +848,7 @@ eureka:
     ports:
       - \\"8080:8080\\"
   jhgate-mysql:
-    image: mysql:8.0.25
+    image: mysql:8.0.27
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=jhgate
@@ -862,14 +862,14 @@ eureka:
       - SPRING_DATASOURCE_URL=jdbc:mysql://msmysql-mysql:3306/msmysql?useUnicode=true&characterEncoding=utf8&useSSL=false&createDatabaseIfNotExist=true
       - JHIPSTER_REGISTRY_PASSWORD=admin
   msmysql-mysql:
-    image: mysql:8.0.25
+    image: mysql:8.0.27
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=msmysql
     command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
 
   jhipster-registry:
-    image: jhipster/jhipster-registry:v6.8.0
+    image: jhipster/jhipster-registry:v7.2.0
     volumes:
       - ./central-server-config:/central-config
     # By default the JHipster Registry runs with the \\"dev\\" and \\"native\\"
@@ -900,12 +900,12 @@ Object {
     "contents": "{
   \\"generator-jhipster\\": {
     \\"appsFolders\\": [\\"01-gateway\\", \\"02-mysql\\"],
+    \\"clusteredDbApps\\": {},
     \\"directoryPath\\": \\"./\\",
     \\"gatewayType\\": \\"SpringCloudGateway\\",
-    \\"clusteredDbApps\\": {},
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"monitoring\\": \\"no\\",
-    \\"serviceDiscoveryType\\": \\"eureka\\",
-    \\"jwtSecretKey\\": \\"SECRET--50\\"
+    \\"serviceDiscoveryType\\": \\"eureka\\"
   }
 }
 ",
@@ -967,7 +967,7 @@ eureka:
     ports:
       - \\"8080:8080\\"
   jhgate-mysql:
-    image: mysql:8.0.25
+    image: mysql:8.0.27
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=jhgate
@@ -981,14 +981,14 @@ eureka:
       - SPRING_DATASOURCE_URL=jdbc:mysql://msmysql-mysql:3306/msmysql?useUnicode=true&characterEncoding=utf8&useSSL=false&createDatabaseIfNotExist=true
       - JHIPSTER_REGISTRY_PASSWORD=admin
   msmysql-mysql:
-    image: mysql:8.0.25
+    image: mysql:8.0.27
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=msmysql
     command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
 
   jhipster-registry:
-    image: jhipster/jhipster-registry:v6.8.0
+    image: jhipster/jhipster-registry:v7.2.0
     volumes:
       - ./central-server-config:/central-config
     # By default the JHipster Registry runs with the \\"dev\\" and \\"native\\"
@@ -1019,12 +1019,12 @@ Object {
     "contents": "{
   \\"generator-jhipster\\": {
     \\"appsFolders\\": [\\"01-gateway\\", \\"02-mysql\\"],
+    \\"clusteredDbApps\\": {},
     \\"directoryPath\\": \\"./\\",
     \\"gatewayType\\": \\"SpringCloudGateway\\",
-    \\"clusteredDbApps\\": {},
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"monitoring\\": \\"prometheus\\",
-    \\"serviceDiscoveryType\\": \\"eureka\\",
-    \\"jwtSecretKey\\": \\"SECRET--50\\"
+    \\"serviceDiscoveryType\\": \\"eureka\\"
   }
 }
 ",
@@ -1112,7 +1112,7 @@ eureka:
     ports:
       - \\"8080:8080\\"
   jhgate-mysql:
-    image: mysql:8.0.25
+    image: mysql:8.0.27
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=jhgate
@@ -1126,14 +1126,14 @@ eureka:
       - SPRING_DATASOURCE_URL=jdbc:mysql://msmysql-mysql:3306/msmysql?useUnicode=true&characterEncoding=utf8&useSSL=false&createDatabaseIfNotExist=true
       - JHIPSTER_REGISTRY_PASSWORD=admin
   msmysql-mysql:
-    image: mysql:8.0.25
+    image: mysql:8.0.27
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=msmysql
     command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
 
   jhipster-registry:
-    image: jhipster/jhipster-registry:v6.8.0
+    image: jhipster/jhipster-registry:v7.2.0
     volumes:
       - ./central-server-config:/central-config
     # By default the JHipster Registry runs with the \\"dev\\" and \\"native\\"
@@ -1155,7 +1155,7 @@ eureka:
       - 8761:8761
 
   prometheus:
-    image: prom/prometheus:v2.27.1
+    image: prom/prometheus:v2.32.1
     volumes:
       - ./prometheus-conf/:/etc/prometheus/
       - prometheus_data:/prometheus
@@ -1164,7 +1164,7 @@ eureka:
     ports:
       - 9090:9090
   alertmanager:
-    image: prom/alertmanager:v0.22.2
+    image: prom/alertmanager:v0.23.0
     ports:
       - 9093:9093
     volumes:
@@ -1174,7 +1174,7 @@ eureka:
       - \\"--storage.path=/alertmanager\\"
 
   grafana:
-    image: grafana/grafana:8.0.1
+    image: grafana/grafana:8.3.3
     ports:
       - 3000:3000
     volumes:
@@ -1248,18 +1248,137 @@ scrape_configs:
 }
 `;
 
+exports[`JHipster Docker Compose Sub Generator gateway and one microservice, without monitoring should match files snapshot 1`] = `
+Object {
+  ".yo-rc.json": Object {
+    "contents": "{
+  \\"generator-jhipster\\": {
+    \\"appsFolders\\": [\\"01-gateway\\", \\"02-mysql\\"],
+    \\"clusteredDbApps\\": {},
+    \\"directoryPath\\": \\"./\\",
+    \\"gatewayType\\": \\"SpringCloudGateway\\",
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
+    \\"monitoring\\": \\"no\\",
+    \\"serviceDiscoveryType\\": \\"eureka\\"
+  }
+}
+",
+    "stateCleared": "modified",
+  },
+  "README-DOCKER-COMPOSE.md": Object {
+    "contents": "# JHipster generated Docker-Compose configuration
+
+## Usage
+
+Launch all your infrastructure by running: \`docker-compose up -d\`.
+
+## Configured Docker services
+
+### Service registry and configuration server:
+
+- [JHipster Registry](http://localhost:8761)
+
+### Applications and dependencies:
+
+- jhgate (gateway application)
+- jhgate's mysql database
+- jhgate's no search engine
+- msmysql (microservice application)
+- msmysql's mysql database
+- msmysql's no search engine
+
+### Additional Services:
+",
+    "stateCleared": "modified",
+  },
+  "central-server-config/application.yml": Object {
+    "contents": "#common configuration shared between all applications
+configserver:
+  name: Docker JHipster Registry
+  status: Connected to the JHipster Registry running in Docker
+
+jhipster:
+  security:
+    authentication:
+      jwt:
+        base64-secret: SECRET--50
+eureka:
+  client:
+    service-url:
+      defaultZone: http://admin:\${jhipster.registry.password}@jhipster-registry:8761/eureka/
+",
+    "stateCleared": "modified",
+  },
+  "docker-compose.yml": Object {
+    "contents": "services:
+  jhgate:
+    image: jhgate
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_CLOUD_CONFIG_URI=http://admin:admin@jhipster-registry:8761/config
+      - SPRING_DATASOURCE_URL=jdbc:mysql://jhgate-mysql:3306/jhgate?useUnicode=true&characterEncoding=utf8&useSSL=false&createDatabaseIfNotExist=true
+      - JHIPSTER_REGISTRY_PASSWORD=admin
+    ports:
+      - \\"8080:8080\\"
+  jhgate-mysql:
+    image: mysql:8.0.27
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_DATABASE=jhgate
+    command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
+
+  msmysql:
+    image: msmysql
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_CLOUD_CONFIG_URI=http://admin:admin@jhipster-registry:8761/config
+      - SPRING_DATASOURCE_URL=jdbc:mysql://msmysql-mysql:3306/msmysql?useUnicode=true&characterEncoding=utf8&useSSL=false&createDatabaseIfNotExist=true
+      - JHIPSTER_REGISTRY_PASSWORD=admin
+  msmysql-mysql:
+    image: mysql:8.0.27
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_DATABASE=msmysql
+    command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
+
+  jhipster-registry:
+    image: jhipster/jhipster-registry:v7.2.0
+    volumes:
+      - ./central-server-config:/central-config
+    # By default the JHipster Registry runs with the \\"dev\\" and \\"native\\"
+    # Spring profiles.
+    # \\"native\\" profile means the filesystem is used to store data, see
+    # http://cloud.spring.io/spring-cloud-config/spring-cloud-config.html
+    environment:
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_SECURITY_USER_PASSWORD=admin
+      - JHIPSTER_REGISTRY_PASSWORD=admin
+      - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_0_TYPE=native
+      - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_0_SEARCH_LOCATIONS=file:./central-config
+      # - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_0_TYPE=git
+      # - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_0_URI=https://github.com/jhipster/jhipster-registry/
+      # - SPRING_CLOUD_CONFIG_SERVER_COMPOSITE_0_SEARCH_PATHS=central-config
+    ports:
+      - 8761:8761
+",
+    "stateCleared": "modified",
+  },
+}
+`;
+
 exports[`JHipster Docker Compose Sub Generator monolith should match files snapshot 1`] = `
 Object {
   ".yo-rc.json": Object {
     "contents": "{
   \\"generator-jhipster\\": {
     \\"appsFolders\\": [\\"08-monolith\\"],
+    \\"clusteredDbApps\\": {},
     \\"directoryPath\\": \\"./\\",
     \\"gatewayType\\": \\"SpringCloudGateway\\",
-    \\"clusteredDbApps\\": {},
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"monitoring\\": \\"no\\",
-    \\"serviceDiscoveryType\\": false,
-    \\"jwtSecretKey\\": \\"SECRET--50\\"
+    \\"serviceDiscoveryType\\": false
   }
 }
 ",
@@ -1295,7 +1414,7 @@ Launch all your infrastructure by running: \`docker-compose up -d\`.
     ports:
       - \\"8080:8080\\"
   samplemysql-mysql:
-    image: mysql:8.0.25
+    image: mysql:8.0.27
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=samplemysql
@@ -1314,12 +1433,12 @@ Object {
     "contents": "{
   \\"generator-jhipster\\": {
     \\"appsFolders\\": [\\"02-mysql\\"],
+    \\"clusteredDbApps\\": {},
     \\"directoryPath\\": \\"./\\",
     \\"gatewayType\\": \\"SpringCloudGateway\\",
-    \\"clusteredDbApps\\": {},
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"monitoring\\": \\"no\\",
-    \\"serviceDiscoveryType\\": \\"eureka\\",
-    \\"jwtSecretKey\\": \\"SECRET--50\\"
+    \\"serviceDiscoveryType\\": \\"eureka\\"
   }
 }
 ",
@@ -1376,14 +1495,14 @@ eureka:
       - SPRING_DATASOURCE_URL=jdbc:mysql://msmysql-mysql:3306/msmysql?useUnicode=true&characterEncoding=utf8&useSSL=false&createDatabaseIfNotExist=true
       - JHIPSTER_REGISTRY_PASSWORD=admin
   msmysql-mysql:
-    image: mysql:8.0.25
+    image: mysql:8.0.27
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=msmysql
     command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
 
   jhipster-registry:
-    image: jhipster/jhipster-registry:v6.8.0
+    image: jhipster/jhipster-registry:v7.2.0
     volumes:
       - ./central-server-config:/central-config
     # By default the JHipster Registry runs with the \\"dev\\" and \\"native\\"
@@ -1414,12 +1533,12 @@ Object {
     "contents": "{
   \\"generator-jhipster\\": {
     \\"appsFolders\\": [\\"01-gateway\\"],
+    \\"clusteredDbApps\\": {},
     \\"directoryPath\\": \\"./\\",
     \\"gatewayType\\": \\"SpringCloudGateway\\",
-    \\"clusteredDbApps\\": {},
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"monitoring\\": \\"no\\",
-    \\"serviceDiscoveryType\\": \\"eureka\\",
-    \\"jwtSecretKey\\": \\"SECRET--50\\"
+    \\"serviceDiscoveryType\\": \\"eureka\\"
   }
 }
 ",
@@ -1478,14 +1597,14 @@ eureka:
     ports:
       - \\"8080:8080\\"
   jhgate-mysql:
-    image: mysql:8.0.25
+    image: mysql:8.0.27
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=jhgate
     command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
 
   jhipster-registry:
-    image: jhipster/jhipster-registry:v6.8.0
+    image: jhipster/jhipster-registry:v7.2.0
     volumes:
       - ./central-server-config:/central-config
     # By default the JHipster Registry runs with the \\"dev\\" and \\"native\\"
@@ -1516,12 +1635,12 @@ Object {
     "contents": "{
   \\"generator-jhipster\\": {
     \\"appsFolders\\": [\\"02-mysql\\"],
+    \\"clusteredDbApps\\": {},
     \\"directoryPath\\": \\"./\\",
     \\"gatewayType\\": \\"SpringCloudGateway\\",
-    \\"clusteredDbApps\\": {},
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"monitoring\\": \\"no\\",
-    \\"serviceDiscoveryType\\": \\"eureka\\",
-    \\"jwtSecretKey\\": \\"SECRET--50\\"
+    \\"serviceDiscoveryType\\": \\"eureka\\"
   }
 }
 ",
@@ -1578,14 +1697,14 @@ eureka:
       - SPRING_DATASOURCE_URL=jdbc:mysql://msmysql-mysql:3306/msmysql?useUnicode=true&characterEncoding=utf8&useSSL=false&createDatabaseIfNotExist=true
       - JHIPSTER_REGISTRY_PASSWORD=admin
   msmysql-mysql:
-    image: mysql:8.0.25
+    image: mysql:8.0.27
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=msmysql
     command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
 
   jhipster-registry:
-    image: jhipster/jhipster-registry:v6.8.0
+    image: jhipster/jhipster-registry:v7.2.0
     volumes:
       - ./central-server-config:/central-config
     # By default the JHipster Registry runs with the \\"dev\\" and \\"native\\"
@@ -1616,12 +1735,12 @@ Object {
     "contents": "{
   \\"generator-jhipster\\": {
     \\"appsFolders\\": [\\"12-oracle\\"],
+    \\"clusteredDbApps\\": {},
     \\"directoryPath\\": \\"./\\",
     \\"gatewayType\\": \\"SpringCloudGateway\\",
-    \\"clusteredDbApps\\": {},
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"monitoring\\": \\"no\\",
-    \\"serviceDiscoveryType\\": false,
-    \\"jwtSecretKey\\": \\"SECRET--50\\"
+    \\"serviceDiscoveryType\\": false
   }
 }
 ",

@@ -11,7 +11,7 @@ Object {
   ".gitignore": Object {
     "stateCleared": "modified",
   },
-  ".huskyrc": Object {
+  ".husky/pre-commit": Object {
     "stateCleared": "modified",
   },
   ".lintstagedrc.js": Object {
@@ -92,6 +92,9 @@ Object {
   "src/main/docker/sonar.yml": Object {
     "stateCleared": "modified",
   },
+  "src/main/docker/zipkin.yml": Object {
+    "stateCleared": "modified",
+  },
   "src/main/java/com/mycompany/myapp/ApplicationWebXml.java": Object {
     "stateCleared": "modified",
   },
@@ -159,6 +162,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/domain/package-info.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/java/com/mycompany/myapp/management/SecurityMetersService.java": Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/repository/AuthorityRepository.java": Object {
@@ -434,10 +440,10 @@ Object {
   "src/main/webapp/i18n/fr/user-management.json": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/ArchTest.java": Object {
+  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
+  "src/test/java/com/mycompany/myapp/TechnicalStructureTest.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/config/NoOpMailConfiguration.java": Object {
@@ -455,6 +461,9 @@ Object {
   "src/test/java/com/mycompany/myapp/config/timezone/HibernateTimeZoneIT.java": Object {
     "stateCleared": "modified",
   },
+  "src/test/java/com/mycompany/myapp/management/SecurityMetersServiceTests.java": Object {
+    "stateCleared": "modified",
+  },
   "src/test/java/com/mycompany/myapp/repository/timezone/DateTimeWrapper.java": Object {
     "stateCleared": "modified",
   },
@@ -468,6 +477,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/JWTFilterTest.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderSecurityMetersTests.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderTest.java": Object {
@@ -519,6 +531,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/test/resources/i18n/messages_fr.properties": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/resources/junit-platform.properties": Object {
     "stateCleared": "modified",
   },
   "src/test/resources/logback.xml": Object {

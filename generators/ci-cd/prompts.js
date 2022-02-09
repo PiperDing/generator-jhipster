@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -123,7 +123,7 @@ async function askIntegrations() {
   }
 
   const integrationChoices = [];
-  if (['jenkins', 'gitlab', 'github'].includes(this.pipeline)) {
+  if (['jenkins', 'gitlab'].includes(this.pipeline)) {
     integrationChoices.push({ name: `Deploy your application to an ${chalk.yellow('*Artifactory*')}`, value: 'deploy' });
   }
   if (['jenkins', 'gitlab', 'travis', 'github'].includes(this.pipeline)) {

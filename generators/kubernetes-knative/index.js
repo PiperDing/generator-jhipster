@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -20,9 +20,13 @@
 const chalk = require('chalk');
 const shelljs = require('shelljs');
 const fs = require('fs');
+
+const BaseDockerGenerator = require('../generator-base-docker');
+const { INITIALIZING_PRIORITY, PROMPTING_PRIORITY, CONFIGURING_PRIORITY, LOADING_PRIORITY, WRITING_PRIORITY, END_PRIORITY } =
+  require('../../lib/constants/priorities.cjs').compat;
+
 const prompts = require('./prompts');
 const { writeFiles } = require('./files');
-const BaseDockerGenerator = require('../generator-base-docker');
 const { GENERATOR_KUBERNETES_KNATIVE } = require('../generator-list');
 const { MAVEN } = require('../../jdl/jhipster/build-tool-types');
 const { KAFKA } = require('../../jdl/jhipster/message-broker-types');
@@ -41,11 +45,11 @@ const { GeneratorTypes } = require('../../jdl/jhipster/kubernetes-platform-types
 
 const { K8S } = GeneratorTypes;
 
-let useBlueprints;
 module.exports = class extends BaseDockerGenerator {
-  constructor(args, opts) {
-    super(args, opts);
-    useBlueprints = !this.fromBlueprint && this.instantiateBlueprints(GENERATOR_KUBERNETES_KNATIVE);
+  async _postConstruct() {
+    if (!this.fromBlueprint) {
+      await this.composeWithBlueprints(GENERATOR_KUBERNETES_KNATIVE);
+    }
   }
 
   _initializing() {
@@ -84,8 +88,8 @@ module.exports = class extends BaseDockerGenerator {
     };
   }
 
-  get initializing() {
-    if (useBlueprints) return;
+  get [INITIALIZING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._initializing();
   }
 
@@ -105,8 +109,8 @@ module.exports = class extends BaseDockerGenerator {
     };
   }
 
-  get prompting() {
-    if (useBlueprints) return;
+  get [PROMPTING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._prompting();
   }
 
@@ -133,8 +137,8 @@ module.exports = class extends BaseDockerGenerator {
     };
   }
 
-  get configuring() {
-    if (useBlueprints) return;
+  get [CONFIGURING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._configuring();
   }
 
@@ -142,8 +146,7 @@ module.exports = class extends BaseDockerGenerator {
     return {
       loadSharedConfig() {
         this.appConfigs.forEach(element => {
-          this.loadServerConfig(element);
-          this.loadDerivedServerConfig(element);
+          this.loadServerConfig(element, element);
           this.loadDerivedAppConfig(element);
         });
         this.loadDeploymentConfig(this);
@@ -152,8 +155,8 @@ module.exports = class extends BaseDockerGenerator {
     };
   }
 
-  get loading() {
-    if (useBlueprints) return;
+  get [LOADING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._loading();
   }
 
@@ -161,8 +164,8 @@ module.exports = class extends BaseDockerGenerator {
     return writeFiles();
   }
 
-  get writing() {
-    if (useBlueprints) return;
+  get [WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._writing();
   }
 
@@ -235,8 +238,8 @@ module.exports = class extends BaseDockerGenerator {
     };
   }
 
-  get end() {
-    if (useBlueprints) return;
+  get [END_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._end();
   }
 };

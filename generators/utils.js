@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -40,6 +40,7 @@ module.exports = {
   copyWebResource,
   renderContent,
   deepFind,
+  escapeRegExp,
   getJavadoc,
   buildEnumInfo,
   getEnumInfo,
@@ -63,6 +64,8 @@ module.exports = {
   vueAddPageProtractorConf,
   languageSnakeCase,
   languageToJavaLanguage,
+  addSectionsCondition,
+  mergeSections,
 };
 
 const databaseTypes = require('../jdl/jhipster/database-types');
@@ -487,10 +490,10 @@ function deepFind(obj, path, placeholder) {
  * Convert passed block of string to javadoc formatted string.
  *
  * @param {string} text text to convert to javadoc format
- * @param {number} indentSize indent size
+ * @param {number} indentSize indent size (default 0)
  * @returns javadoc formatted string
  */
-function getJavadoc(text, indentSize) {
+function getJavadoc(text, indentSize = 0) {
   if (!text) {
     text = '';
   }
@@ -520,10 +523,11 @@ function getEnumInfo(field, clientRootFolder) {
   const customValuesState = getCustomValuesState(enums);
   return {
     enumName: fieldType,
+    javadoc: field.fieldTypeJavadoc && getJavadoc(field.fieldTypeJavadoc),
     enumInstance: field.enumInstance,
     enums,
     ...customValuesState,
-    enumValues: getEnums(enums, customValuesState),
+    enumValues: getEnums(enums, customValuesState, field.fieldValuesJavadocs),
     clientRootFolder: clientRootFolder ? `${clientRootFolder}-` : '',
   };
 }
@@ -592,19 +596,28 @@ function getCustomValuesState(enumValues) {
   };
 }
 
-function getEnums(enums, customValuesState) {
+function getEnums(enums, customValuesState, comments) {
   if (customValuesState.withoutCustomValues) {
-    return enums.map(enumValue => ({ name: enumValue, value: enumValue }));
+    return enums.map(enumValue => ({
+      name: enumValue,
+      value: enumValue,
+      comment: comments && comments[enumValue] && getJavadoc(comments[enumValue], 4),
+    }));
   }
   return enums.map(enumValue => {
     if (!doesTheEnumValueHaveACustomValue(enumValue)) {
-      return { name: enumValue.trim(), value: enumValue.trim() };
+      return {
+        name: enumValue.trim(),
+        value: enumValue.trim(),
+        comment: comments && comments[enumValue] && getJavadoc(comments[enumValue], 4),
+      };
     }
     // eslint-disable-next-line no-unused-vars
     const matched = /\s*(.+?)\s*\((.+?)\)/.exec(enumValue);
     return {
       name: matched[1],
       value: matched[2],
+      comment: comments && comments[matched[1]] && getJavadoc(comments[matched[1]], 4),
     };
   });
 }
@@ -664,7 +677,10 @@ function getRandomHex(len = 50) {
  */
 function getBase64Secret(value = '', len = 50) {
   if (this && this.options && this.options.reproducibleTests) {
-    return `SECRET-${value}-${len}`;
+    if (value) {
+      return `SECRET-${value}-${len}`;
+    }
+    return `SECRET--${len}`;
   }
   return Buffer.from(value || getRandomHex(len)).toString('base64');
 }
@@ -779,7 +795,7 @@ function vueReplaceTranslation(generator, files) {
     const regexp = ['v-text', 'v-bind:placeholder', 'v-html', 'v-bind:title', 'v-bind:label', 'v-bind:value', 'v-bind:html']
       .map(s => `${s}="\\$t\\(.*?\\)"`)
       .join(')|(');
-    this.replaceContent(
+    replaceContent(
       {
         file: filePath,
         pattern: new RegExp(` ?(${regexp})`, 'g'),
@@ -881,4 +897,49 @@ function languageToJavaLanguage(language) {
   const langProp = languageSnakeCase(language);
   // Target file : change xx_yyyy_zz to xx_yyyy_ZZ to match java locales
   return langProp.replace(/_[a-z]+$/g, lang => lang.toUpperCase());
+}
+
+/**
+ * @private
+ * Utility function add condition to every block in addition to the already existing condition.
+ */
+function addSectionsCondition(files, commonCondition) {
+  return Object.fromEntries(
+    Object.entries(files).map(([sectionName, sectionValue]) => {
+      sectionValue = sectionValue.map(block => {
+        const { condition } = block;
+        let newCondition = commonCondition;
+        if (typeof condition === 'function') {
+          newCondition = (...args) => {
+            return commonCondition(...args) && condition(...args);
+          };
+        } else if (condition !== undefined) {
+          newCondition = (...args) => commonCondition(...args) && condition;
+        }
+        block = {
+          ...block,
+          condition: newCondition,
+        };
+        return block;
+      });
+      return [sectionName, sectionValue];
+    })
+  );
+}
+
+/**
+ * @private
+ * Utility function to merge sections (jhipster files structure)
+ * Merging { foo: [blocks1], bar: [block2]} and { foo: [blocks3], bar: [block4]}
+ * Results in { foo: [blocks1, block3], bar: [block2, block4]}
+ */
+function mergeSections(...allFiles) {
+  const generated = {};
+  for (const files of allFiles) {
+    for (const [sectionName, sectionValue] of Object.entries(files)) {
+      generated[sectionName] = generated[sectionName] || [];
+      generated[sectionName].push(...sectionValue);
+    }
+  }
+  return generated;
 }

@@ -1,4 +1,9 @@
-FROM ubuntu:20.04
+# syntax=docker/dockerfile:1
+FROM eclipse-temurin:11-focal
+
+# copy sources
+COPY . /home/jhipster/generator-jhipster
+
 RUN \
   # configure the "jhipster" user
   groupadd jhipster && \
@@ -19,14 +24,25 @@ RUN \
     bzip2 \
     fontconfig \
     libpng-dev \
-    sudo \
-    openjdk-11-jdk && \
-  update-java-alternatives -s java-1.11.0-openjdk-amd64 && \
-  # install node.js
-  wget https://nodejs.org/dist/v14.16.0/node-v14.16.0-linux-x64.tar.gz -O /tmp/node.tar.gz && \
+    sudo && \
+  ARCH="$(dpkg --print-architecture)"; \
+  case "${ARCH}" in \
+     aarch64|arm64) \
+       ARCH='arm64'; \
+       ;; \
+     amd64|x86_64) \
+       ARCH='x64'; \
+       ;; \
+     *) \
+       echo "Unsupported arch: ${ARCH}"; \
+       exit 1; \
+       ;; \
+  esac; \
+  JHI_NODE_VERSION="$(/home/jhipster/generator-jhipster/test-integration/scripts/99-print-node-version.sh)"; \
+  wget https://nodejs.org/dist/v$JHI_NODE_VERSION/node-v$JHI_NODE_VERSION-linux-$ARCH.tar.gz -O /tmp/node.tar.gz && \
   tar -C /usr/local --strip-components 1 -xzf /tmp/node.tar.gz && \
   # upgrade npm
-  npm install -g npm && \
+  npm install -g npm@7 && \
   # install yeoman
   npm install -g yo && \
   # cleanup
@@ -36,9 +52,6 @@ RUN \
     /var/lib/apt/lists/* \
     /tmp/* \
     /var/tmp/*
-
-# copy sources
-COPY . /home/jhipster/generator-jhipster
 
 RUN \
   # install jhipster

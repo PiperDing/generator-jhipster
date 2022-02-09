@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -17,25 +17,39 @@
  * limitations under the License.
  */
 const _ = require('lodash');
+
 const BaseBlueprintGenerator = require('../generator-base-blueprint');
+const {
+  INITIALIZING_PRIORITY,
+  PROMPTING_PRIORITY,
+  LOADING_PRIORITY,
+  PREPARING_PRIORITY,
+  DEFAULT_PRIORITY,
+  WRITING_PRIORITY,
+  POST_WRITING_PRIORITY,
+} = require('../../lib/constants/priorities.cjs').compat;
+
 const writeFiles = require('./files').writeFiles;
 const constants = require('../generator-constants');
 const { GENERATOR_CYPRESS } = require('../generator-list');
 const { CYPRESS } = require('../../jdl/jhipster/test-framework-types');
 
-let useBlueprints;
 /* eslint-disable consistent-return */
 module.exports = class extends BaseBlueprintGenerator {
-  constructor(args, opts) {
-    super(args, opts, { unique: 'namespace' });
+  constructor(args, options, features) {
+    super(args, options, { unique: 'namespace', ...features });
 
     if (this.options.help) {
       return;
     }
 
     this.loadRuntimeOptions();
+  }
 
-    useBlueprints = !this.fromBlueprint && this.instantiateBlueprints(GENERATOR_CYPRESS);
+  async _postConstruct() {
+    if (!this.fromBlueprint) {
+      await this.composeWithBlueprints(GENERATOR_CYPRESS);
+    }
   }
 
   // Public API method used by the getter and also by Blueprints
@@ -47,8 +61,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get initializing() {
-    if (useBlueprints) return;
+  get [INITIALIZING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._initializing();
   }
 
@@ -74,8 +88,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get prompting() {
-    if (useBlueprints) return;
+  get [PROMPTING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._prompting();
   }
 
@@ -94,8 +108,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get loading() {
-    if (useBlueprints) return;
+  get [LOADING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._loading();
   }
 
@@ -109,8 +123,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get preparing() {
-    if (useBlueprints) return;
+  get [PREPARING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._preparing();
   }
 
@@ -119,8 +133,8 @@ module.exports = class extends BaseBlueprintGenerator {
     return super._missingPreDefault();
   }
 
-  get default() {
-    if (useBlueprints) return;
+  get [DEFAULT_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._default();
   }
 
@@ -138,8 +152,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get writing() {
-    if (useBlueprints) return;
+  get [WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._writing();
   }
 
@@ -169,7 +183,7 @@ module.exports = class extends BaseBlueprintGenerator {
           },
           scripts: {
             'cypress:audits': 'cypress open --config-file cypress-audits.json',
-            'e2e:cypress:audits:headless': 'npm run e2e:cypress -- --headless --config-file cypress-audits.json',
+            'e2e:cypress:audits:headless': 'npm run e2e:cypress -- --config-file cypress-audits.json',
             // eslint-disable-next-line no-template-curly-in-string
             'e2e:cypress:audits': 'cypress run --browser chrome --record ${CYPRESS_ENABLE_RECORD:-false} --config-file cypress-audits.json',
           },
@@ -187,7 +201,7 @@ module.exports = class extends BaseBlueprintGenerator {
           scripts: {
             'clean-coverage': 'rimraf .nyc_output coverage',
             'pree2e:cypress:coverage': 'npm run clean coverage && npm run ci:server:await',
-            'e2e:cypress:coverage': 'npm run e2e:cypress',
+            'e2e:cypress:coverage': 'npm run e2e:cypress:headed',
             'poste2e:cypress:coverage': 'nyc report',
             'prewebapp:instrumenter': 'npm run clean-www && npm run clean-coverage',
             'webapp:instrumenter': 'ng build --configuration instrumenter',
@@ -226,8 +240,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get postWriting() {
-    if (useBlueprints) return;
+  get [POST_WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._postWriting();
   }
 };

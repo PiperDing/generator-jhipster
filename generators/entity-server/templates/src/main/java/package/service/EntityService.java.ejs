@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -16,7 +16,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -%>
-package <%= packageName %>.service;
+package <%= entityAbsolutePackage %>.service;
 
 <%_
 const instanceType = restClass;
@@ -26,9 +26,9 @@ const listOrFlux = (reactive) ? 'Flux' : 'List';
 const pageOrFlux = (reactive) ? 'Flux' : 'Page';
 _%>
 <%_ if (dtoMapstruct) { _%>
-import <%= packageName %>.service.dto.<%= dtoClass %>;
+import <%= entityAbsolutePackage %>.service.dto.<%= dtoClass %>;
 <%_ } else { _%>
-import <%= packageName %>.domain.<%= persistClass %>;
+import <%= entityAbsolutePackage %>.domain.<%= persistClass %>;
 <%_ } _%>
 <%_ if (!paginationNo || relationshipsContainEagerLoad) { _%>
 
@@ -53,7 +53,7 @@ import java.util.UUID;
 <%_ } _%>
 
 /**
- * Service Interface for managing {@link <% if (dtoMapstruct) { %><%= packageName %>.domain.<% } %><%= persistClass %>}.
+ * Service Interface for managing {@link <% if (dtoMapstruct) { %><%= entityAbsolutePackage %>.domain.<% } %><%= persistClass %>}.
  */
 public interface <%= entityClass %>Service {
 
@@ -71,7 +71,7 @@ public interface <%= entityClass %>Service {
      * @param <%= instanceName %> the entity to update partially.
      * @return the persisted entity.
      */
-<% if (!reactive) { %>Optional<<% } %><% if (reactive) { %>Mono<<% } %><%= instanceType %>> partialUpdate(<%= instanceType %> <%= instanceName %>);
+    <% if (reactive) { %>Mono<% } else { %>Optional<% } %><<%= instanceType %>> partialUpdate(<%= instanceType %> <%= instanceName %>);
 
     /**
      * Get all the <%= entityInstancePlural %>.
@@ -79,7 +79,7 @@ public interface <%= entityClass %>Service {
      * @param pageable the pagination information.<% } %>
      * @return the list of entities.
      */
-    <% if (!paginationNo) { %><%= pageOrFlux %><<%= instanceType %><% } else { %><%= listOrFlux %><<%= instanceType %><% } %>> findAll(<% if (!paginationNo) { %>Pageable pageable<% } %>);
+    <% if (paginationNo) { %><%= listOrFlux %><% } else { %><%= pageOrFlux %><% } %><<%= instanceType %>> findAll(<% if (!paginationNo) { %>Pageable pageable<% } %>);
 <%_ for (const relationship of relationships) { _%>
   <%_ if (relationship.relationshipOneToOne && !relationship.ownerSide) { _%>
     /**

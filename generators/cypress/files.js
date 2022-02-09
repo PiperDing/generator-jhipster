@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -22,7 +22,7 @@
  * For any other config an object { file:.., method:.., template:.. } can be used
  */
 
-const faker = require('faker');
+const faker = require('@faker-js/faker');
 
 const constants = require('../generator-constants');
 
@@ -79,6 +79,7 @@ const cypressFiles = {
 };
 module.exports = {
   writeFiles,
+  files: cypressFiles,
 };
 
 function writeFiles() {

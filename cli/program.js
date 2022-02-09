@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -27,18 +27,27 @@ const EnvironmentBuilder = require('./environment-builder');
 const SUB_GENERATORS = require('./commands');
 const JHipsterCommand = require('./jhipster-command');
 const { CLI_NAME, logger, getCommand, done } = require('./utils');
-const { version } = require('../package.json');
+const { version: JHIPSTER_VERSION } = require('../package.json');
 const { packageNameToNamespace } = require('../generators/utils');
+const { logo } = require('../lib/constants/logo.cjs');
 
 const JHIPSTER_NS = CLI_NAME;
 
 const moreInfo = `\n  For more info visit ${chalk.blue('https://www.jhipster.tech')}\n`;
 
-const createProgram = () => {
+const printJHipsterLogo = () => {
+  // eslint-disable-next-line no-console
+  console.log();
+  // eslint-disable-next-line no-console
+  console.log(logo);
+};
+
+const createProgram = ({ executableName = CLI_NAME, executableVersion = JHIPSTER_VERSION } = {}) => {
   return (
     new JHipsterCommand()
+      .name(executableName)
       .storeOptionsAsProperties(false)
-      .version(version)
+      .version(executableVersion)
       .addHelpText('after', moreInfo)
       // JHipster common options
       .option(
@@ -61,12 +70,14 @@ const createProgram = () => {
   );
 };
 
-const rejectExtraArgs = (program, cmd, extraArgs) => {
+const rejectExtraArgs = ({ program, command, extraArgs }) => {
   // if extraArgs exists: Unknown commands or unknown argument.
   const first = extraArgs[0];
-  if (cmd !== 'app') {
+  if (command.name() !== 'app') {
     logger.fatal(
-      `${chalk.yellow(cmd)} command doesn't take ${chalk.yellow(first)} argument. See '${chalk.white(`${CLI_NAME} ${cmd} --help`)}'.`
+      `${chalk.yellow(command.name())} command doesn't take ${chalk.yellow(first)} argument. See '${chalk.white(
+        `${program.name()} ${command.name()} --help`
+      )}'.`
     );
   }
   const availableCommands = program.commands.map(c => c._name);
@@ -80,20 +91,29 @@ const rejectExtraArgs = (program, cmd, extraArgs) => {
   logger.fatal(message);
 };
 
-const buildCommands = ({ program, commands = {}, envBuilder, env, loadCommand }) => {
+const buildCommands = ({
+  program,
+  commands = {},
+  envBuilder,
+  env,
+  loadCommand,
+  defaultCommand = 'app',
+  printLogo = printJHipsterLogo,
+  printBlueprintLogo = () => {},
+}) => {
   /* create commands */
   Object.entries(commands).forEach(([cmdName, opts]) => {
     program
-      .command(cmdName, '', { isDefault: cmdName === 'app' })
+      .command(cmdName, '', { isDefault: cmdName === defaultCommand })
       .description(opts.desc + (opts.blueprint ? chalk.yellow(` (blueprint: ${opts.blueprint})`) : ''))
       .addCommandArguments(opts.argument)
       .addCommandOptions(opts.options)
       .addHelpText('after', opts.help)
       .addAlias(opts.alias)
       .excessArgumentsCallback(function (receivedArgs) {
-        rejectExtraArgs(program, this.name(), receivedArgs);
+        rejectExtraArgs({ program, command: this, extraArgs: receivedArgs });
       })
-      .lazyBuildCommand(function (operands) {
+      .lazyBuildCommand(async function (operands) {
         logger.debug(`cmd: lazyBuildCommand ${cmdName} ${operands}`);
         const command = this;
         if (cmdName === 'run') {
@@ -103,26 +123,42 @@ const buildCommands = ({ program, commands = {}, envBuilder, env, loadCommand })
             namespace => `${namespace.startsWith(JHIPSTER_NS) ? '' : `${JHIPSTER_NS}-`}${namespace}`
           );
           envBuilder.lookupGenerators(command.generatorNamespaces.map(namespace => `generator-${namespace.split(':')[0]}`));
-          command.generatorNamespaces.forEach(namespace => {
-            if (!env.getPackagePath(namespace)) {
-              logger.fatal(chalk.red(`\nGenerator ${namespace} not found.\n`));
-            }
-            const generator = env.create(namespace, { options: { help: true } });
-            this.addGeneratorArguments(generator._arguments).addGeneratorOptions(generator._options);
-          });
+          await Promise.all(
+            command.generatorNamespaces.map(async namespace => {
+              if (!(await env.getPackagePath(namespace))) {
+                logger.fatal(chalk.red(`\nGenerator ${namespace} not found.\n`));
+              }
+              const generator = await env.create(namespace, { options: { help: true } });
+              this.addGeneratorArguments(generator._arguments).addGeneratorOptions(generator._options);
+            })
+          );
           return;
         }
         if (!opts.cliOnly || cmdName === 'jdl') {
           if (opts.blueprint) {
             // Blueprint only command.
-            const generator = env.create(`${packageNameToNamespace(opts.blueprint)}:${cmdName}`, { options: { help: true } });
+            const generator = await env.create(`${packageNameToNamespace(opts.blueprint)}:${cmdName}`, { options: { help: true } });
             command.addGeneratorArguments(generator._arguments).addGeneratorOptions(generator._options);
           } else {
             const generatorName = cmdName === 'jdl' ? 'app' : cmdName;
+            const dependencies = [];
             // Register jhipster upstream options.
             if (cmdName !== 'jdl') {
-              const generator = env.create(`${JHIPSTER_NS}:${cmdName}`, { options: { help: true } });
+              const helpOptions = { options: { help: true } };
+              const generator = await env.create(`${JHIPSTER_NS}:${cmdName}`, helpOptions);
               command.addGeneratorArguments(generator._arguments).addGeneratorOptions(generator._options);
+
+              const addDependenciesOptions = newDependencies =>
+                Promise.all(
+                  newDependencies.map(async dependency => {
+                    if (dependencies.includes(dependency)) return undefined;
+                    dependencies.push(dependency);
+                    const dependecyGenerator = await env.create(`${JHIPSTER_NS}:${dependency}`, helpOptions);
+                    command.addGeneratorOptions(dependecyGenerator._options);
+                    return addDependenciesOptions(await dependecyGenerator.getPossibleDependencies());
+                  })
+                );
+              await addDependenciesOptions(await generator.getPossibleDependencies());
 
               const usagePath = path.resolve(generator.sourceRoot(), '../USAGE');
               if (fs.existsSync(usagePath)) {
@@ -130,34 +166,39 @@ const buildCommands = ({ program, commands = {}, envBuilder, env, loadCommand })
               }
             }
             if (cmdName === 'jdl' || program.opts().fromJdl) {
-              const appGenerator = env.create(`${JHIPSTER_NS}:app`, { options: { help: true } });
+              const appGenerator = await env.create(`${JHIPSTER_NS}:app`, { options: { help: true } });
               command.addGeneratorOptions(appGenerator._options, chalk.gray(' (application)'));
 
-              const workspacesGenerator = env.create(`${JHIPSTER_NS}:workspaces`, { options: { help: true } });
+              const workspacesGenerator = await env.create(`${JHIPSTER_NS}:workspaces`, { options: { help: true } });
               command.addGeneratorOptions(workspacesGenerator._options, chalk.gray(' (workspaces)'));
             }
 
             // Register blueprint specific options.
-            envBuilder.getBlueprintsNamespaces().forEach(blueprintNamespace => {
-              const generatorNamespace = `${blueprintNamespace}:${generatorName}`;
-              if (!env.get(generatorNamespace)) {
-                return;
-              }
-              const blueprintName = blueprintNamespace.replace(/^jhipster-/, '');
-              try {
-                command.addGeneratorOptions(
-                  env.create(generatorNamespace, { options: { help: true } })._options,
-                  chalk.yellow(` (blueprint option: ${blueprintName})`)
-                );
-              } catch (error) {
-                logger.info(`Error parsing options for generator ${generatorNamespace}, error: ${error}`);
-              }
-            });
+            await Promise.all(
+              envBuilder
+                .getBlueprintsNamespaces()
+                .map(blueprintNamespace =>
+                  [generatorName, ...dependencies].map(async dependency => {
+                    const generatorNamespace = `${blueprintNamespace}:${generatorName}`;
+                    if (!(await env.get(generatorNamespace))) {
+                      return;
+                    }
+                    const blueprintName = blueprintNamespace.replace(/^jhipster-/, '');
+                    const blueprintGenerator = await env.create(generatorNamespace, { options: { help: true } });
+                    try {
+                      command.addGeneratorOptions(blueprintGenerator._options, chalk.yellow(` (blueprint option: ${blueprintName})`));
+                    } catch (error) {
+                      logger.info(`Error parsing options for generator ${generatorNamespace}, error: ${error}`);
+                    }
+                  })
+                )
+                .flat()
+            );
           }
         }
         command.addHelpText('after', moreInfo);
       })
-      .action((...everything) => {
+      .action(async (...everything) => {
         logger.debug('cmd: action');
         // [args, opts, command]
         const command = everything.pop();
@@ -166,6 +207,8 @@ const buildCommands = ({ program, commands = {}, envBuilder, env, loadCommand })
         const options = {
           ...program.opts(),
           ...cmdOptions,
+          commandName: cmdName,
+          blueprints: envBuilder.getBlueprintsOption(),
         };
         if (options.installPath) {
           // eslint-disable-next-line no-console
@@ -173,11 +216,14 @@ const buildCommands = ({ program, commands = {}, envBuilder, env, loadCommand })
           return undefined;
         }
 
+        printLogo();
+        printBlueprintLogo();
+
         if (opts.cliOnly) {
           logger.debug('Executing CLI only script');
           return loadCommand(cmdName)(args, options, env, envBuilder);
         }
-        env.composeWith('jhipster:bootstrap', options);
+        await env.composeWith('jhipster:bootstrap', options);
 
         if (cmdName === 'run') {
           return Promise.all(command.generatorNamespaces.map(generator => env.run(generator, options))).then(
@@ -193,17 +239,24 @@ const buildCommands = ({ program, commands = {}, envBuilder, env, loadCommand })
 };
 
 const buildJHipster = ({
-  program = createProgram(),
-  envBuilder = EnvironmentBuilder.createDefaultBuilder(),
+  executableName,
+  executableVersion,
+  program = createProgram({ executableName, executableVersion }),
+  blueprints,
+  lookups,
+  envBuilder = EnvironmentBuilder.create().prepare({ blueprints, lookups }),
   commands = { ...SUB_GENERATORS, ...envBuilder.getBlueprintCommands() },
+  printLogo,
+  printBlueprintLogo,
   env = envBuilder.getEnvironment(),
   /* eslint-disable-next-line global-require, import/no-dynamic-require */
   loadCommand = key => require(`./${key}`),
+  defaultCommand,
 } = {}) => {
   /* setup debugging */
   logger.init(program);
 
-  buildCommands({ program, commands, envBuilder, env, loadCommand });
+  buildCommands({ program, commands, envBuilder, env, loadCommand, defaultCommand, printLogo, printBlueprintLogo });
 
   return program;
 };
@@ -218,4 +271,7 @@ module.exports = {
   buildCommands,
   buildJHipster,
   runJHipster,
+  printJHipsterLogo,
+  done,
+  logger,
 };

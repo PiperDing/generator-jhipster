@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -17,22 +17,27 @@
  * limitations under the License.
  */
 /* eslint-disable consistent-return */
+const BaseBlueprintGenerator = require('../generator-base-blueprint');
+const { DEFAULT_PRIORITY, WRITING_PRIORITY } = require('../../lib/constants/priorities.cjs').compat;
+
 const writeFiles = require('./files').writeFiles;
 const utils = require('../utils');
-const { GENERATOR_ENTITY_I18N } = require('../generator-list');
-const BaseBlueprintGenerator = require('../generator-base-blueprint');
+const { GENERATOR_ENTITY_I_18_N } = require('../generator-list');
 
 /* constants used throughout */
-let useBlueprints;
 
 module.exports = class extends BaseBlueprintGenerator {
-  constructor(args, opts) {
-    super(args, opts);
+  constructor(args, options, features) {
+    super(args, options, features);
 
-    this.entity = opts.context;
-    this.jhipsterContext = opts.jhipsterContext || opts.context;
+    this.entity = this.options.context;
+    this.jhipsterContext = this.options.jhipsterContext || this.options.context;
+  }
 
-    useBlueprints = !this.fromBlueprint && this.instantiateBlueprints(GENERATOR_ENTITY_I18N, { context: opts.context });
+  async _postConstruct() {
+    if (!this.fromBlueprint) {
+      await this.composeWithBlueprints(GENERATOR_ENTITY_I_18_N, { context: this.options.context });
+    }
   }
 
   // Public API method used by the getter and also by Blueprints
@@ -46,8 +51,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get default() {
-    if (useBlueprints) return;
+  get [DEFAULT_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._default();
   }
 
@@ -56,8 +61,8 @@ module.exports = class extends BaseBlueprintGenerator {
     return { ...writeFiles(), ...super._missingPostWriting() };
   }
 
-  get writing() {
-    if (useBlueprints) return;
+  get [WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._writing();
   }
 };

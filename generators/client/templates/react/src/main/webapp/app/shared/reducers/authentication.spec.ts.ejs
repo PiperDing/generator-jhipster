@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -145,7 +145,7 @@ describe('Authentication reducer tests', () => {
 
   describe('Other cases', () => {
     it('should properly reset the current state when a logout is requested', () => {
-      <%_ if (authenticationTypeOauth2) { _%>const payload = { data: { idToken: 'xyz', logoutUrl: 'http://localhost:8080/logout' } };<%_ } _%>
+      <%_ if (authenticationTypeOauth2) { _%>const payload = { data: { logoutUrl: 'http://localhost:8080/logout' } };<%_ } _%>
       const toTest = authentication(undefined,
       <%_ if (authenticationTypeJwt) { _%>
       logoutSession()
@@ -218,7 +218,7 @@ describe('Authentication reducer tests', () => {
           type: getAccount.fulfilled.type,
           payload: resolvedObject
         },
-        updateLocale('en'),
+        updateLocale('<%= nativeLanguage %>'),
         <%_ } _%>
       ];
       await store.dispatch(getSession());

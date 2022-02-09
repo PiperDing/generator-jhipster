@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -16,11 +16,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const GRADLE_VERSION = '7.0.2';
+const GRADLE_VERSION = '7.3.1';
+const GRADLE = 'gradle';
+const GRADLE_DESCRIPTION = 'Gradle';
+const BUILD_DESTINATION_VALUE = 'build';
 
 module.exports = {
-  GRADLE: 'gradle',
-  GRADLE_DESCRIPTION: 'Gradle',
   GRADLE_VERSION,
-  BUILD_DESTINATION_VALUE: 'build',
+  GRADLE,
+  GRADLE_DESCRIPTION,
+  BUILD_DESTINATION_VALUE,
 };

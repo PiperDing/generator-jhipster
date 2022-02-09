@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -389,7 +389,7 @@ describe('Entities reducer tests', () => {
 
         }
       ];
-      await store.dispatch(partialUpdateEntity({ id: <%- generateTestEntityId(primaryKey.type) %> }));
+      await store.dispatch(partialUpdateEntity({ <%- primaryKey.name %>: <%- generateTestEntityId(primaryKey.type) %> }));
       expect(store.getActions()[0]).toMatchObject(expectedActions[0]);
       expect(store.getActions()[1]).toMatchObject(expectedActions[1]);
       <%_ if (!paginationInfiniteScroll) { _%>

@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -43,18 +43,15 @@
 <%_ } _%>
   });
 -&>
-package <%= packageName %>.domain;
+package <%= entityAbsolutePackage %>.domain;
 
 <&- fragments.staticImportSection() -&>
 <&- fragments.importSection() -&>
 <%_ if (relationshipsContainOtherSideIgnore) { _%>
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 <%_ } _%>
-<%_ if (!dtoMapstruct && typeof javadoc !== 'undefined') { _%>
-import io.swagger.annotations.ApiModel;
-<%_ } _%>
-<%_ if (!dtoMapstruct && importApiModelProperty) { _%>
-import io.swagger.annotations.ApiModelProperty;
+<%_ if (!dtoMapstruct && (typeof javadoc !== 'undefined' || importApiModelProperty)) { _%>
+import io.swagger.v3.oas.annotations.media.Schema;
 <%_ } _%>
 
 import java.io.Serializable;
@@ -77,8 +74,12 @@ import java.util.UUID;
 <%_ }
 Object.keys(uniqueEnums).forEach(function(element) { _%>
 
-import <%= packageName %>.domain.enumeration.<%= element %>;
+import <%= entityAbsolutePackage %>.domain.enumeration.<%= element %>;
 <%_ }); _%>
+
+<%_ for (const otherEntity of otherEntities.filter(otherEntity => otherEntity.entityPackage !== entityPackage)) { _%>
+import <%= otherEntity.entityAbsoluteClass %>;
+<%_ } _%>
 
 <%_ if (typeof javadoc === 'undefined') { _%>
 /**
@@ -87,7 +88,7 @@ import <%= packageName %>.domain.enumeration.<%= element %>;
 <%_ } else { _%>
 <%- formatAsClassJavadoc(javadoc) %>
   <%_ if (!dtoMapstruct) { _%>
-@ApiModel(description = "<%- formatAsApiDescription(javadoc) %>")
+@Schema(description = "<%- formatAsApiDescription(javadoc) %>")
   <%_ } _%>
 <%_ } _%>
 <&- fragments.annotationSection() -&>
@@ -107,7 +108,7 @@ public class <%= persistClass %> implements Serializable {
 <%- formatAsFieldJavadoc(field.javadoc) %>
   <%_ } _%>
   <%_ if (!dtoMapstruct && typeof field.javadoc !== 'undefined') { _%>
-    @ApiModelProperty(value = "<%- formatAsApiDescription(field.javadoc) %>"<% if (field.fieldValidationRequired) { %>, required = true<% } %>)
+    @Schema(description = "<%- formatAsApiDescription(field.javadoc) %>"<% if (field.fieldValidationRequired) { %>, required = true<% } %>)
   <%_ } _%>
 <&- fragments.field<%- field.fieldNameCapitalized %>AnnotationSection() -&>
     private <%= field.javaFieldType %> <%= field.fieldName %>;
@@ -126,7 +127,7 @@ for (relationship of relationships.filter(relationship => !relationship.embedded
   if (typeof relationship.javadoc !== 'undefined') { _%>
 <%- formatAsFieldJavadoc(relationship.javadoc) %>
     <%_ if (!dtoMapstruct) { _%>
-    @ApiModelProperty(value = "<%- formatAsApiDescription(relationship.javadoc) %>")
+    @Schema(description = "<%- formatAsApiDescription(relationship.javadoc) %>")
     <%_ } _%>
   <%_ } _%>
 <&- fragments.relationship<%- relationship.relationshipNameCapitalized %>AnnotationSection() -&>

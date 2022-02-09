@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -24,33 +24,62 @@ const { GATEWAY } = require('../../jdl/jhipster/application-types');
 
 const { CLIENT_MAIN_SRC_DIR, CLIENT_TEST_SRC_DIR, VUE_DIR } = constants;
 
-module.exports = {
-  writeFiles,
-  customizeFiles,
-};
-
 const vueFiles = {
   common: [
     {
       templates: [
         'package.json',
         'tsconfig.json',
+        'tsconfig.spec.json',
         '.postcssrc.js',
         '.eslintrc.js',
-        'webpack/env.js',
-        'webpack/dev.env.js',
-        'webpack/prod.env.js',
+        'webpack/config.js',
         'webpack/webpack.common.js',
         'webpack/webpack.dev.js',
         'webpack/webpack.prod.js',
         'webpack/vue.utils.js',
-        'webpack/loader.conf.js',
-        'webpack/utils.js',
       ],
     },
     {
       condition: generator => generator.protractorTests,
       templates: ['tsconfig.e2e.json'],
+    },
+  ],
+  entities: [
+    {
+      path: VUE_DIR,
+      templates: [
+        'entities/entities.component.ts',
+        'entities/entities.vue',
+        'entities/entities-menu.component.ts',
+        'entities/entities-menu.vue',
+        'router/entities.ts',
+      ],
+    },
+  ],
+  microfrontend: [
+    {
+      condition: generator => generator.microfrontend,
+      templates: ['webpack/webpack.microfrontend.js.jhi.vue'],
+    },
+    {
+      condition: generator => generator.microfrontend,
+      path: VUE_DIR,
+      templates: ['index.ts'],
+    },
+    {
+      condition: generator => generator.microfrontend,
+      path: CLIENT_TEST_SRC_DIR,
+      templates: [
+        'spec/app/microfrontends/entities-menu.component.ts',
+        'spec/app/microfrontends/entities-menu.vue',
+        'spec/app/microfrontends/entities-router.ts',
+      ],
+    },
+    {
+      condition: generator => generator.applicationTypeMicroservice,
+      path: CLIENT_TEST_SRC_DIR,
+      templates: ['spec/app/entities/entities-menu.spec.ts'],
     },
   ],
   sass: [
@@ -67,7 +96,9 @@ const vueFiles = {
         'app.component.ts',
         'shims-vue.d.ts',
         'constants.ts',
+        'declarations.d.ts',
         'main.ts',
+        'shared/alert/alert.service.ts',
         'shared/config/axios-interceptor.ts',
         'shared/config/config.ts',
         'shared/config/config-bootstrap-vue.ts',
@@ -76,7 +107,6 @@ const vueFiles = {
         'shared/security/authority.ts',
         'router/index.ts',
         'router/admin.ts',
-        'router/entities.ts',
         'router/pages.ts',
       ],
     },
@@ -212,7 +242,7 @@ const vueFiles = {
     {
       condition: generator => !generator.skipUserManagement || generator.authenticationType === OAUTH2,
       path: VUE_DIR,
-      templates: ['entities/user/user.oauth2.service.ts'],
+      templates: ['entities/user/user.service.ts'],
     },
   ],
   clientTestConfig: [
@@ -231,6 +261,7 @@ const vueFiles = {
         'spec/app/core/error/error.component.spec.ts',
         'spec/app/core/jhi-navbar/jhi-navbar.component.spec.ts',
         'spec/app/core/ribbon/ribbon.component.spec.ts',
+        'spec/app/shared/alert/alert.service.spec.ts',
         'spec/app/shared/config/axios-interceptor.spec.ts',
         'spec/app/shared/data/data-utils.service.spec.ts',
       ],
@@ -321,6 +352,22 @@ const vueFiles = {
   ],
 };
 
+function cleanup() {
+  if (!this.clientFrameworkVue) return;
+
+  if (this.isJhipsterVersionLessThan('7.3.1')) {
+    this.removeFile('webpack/env.js');
+    this.removeFile('webpack/dev.env.js');
+    this.removeFile('webpack/prod.env.js');
+    this.removeFile('webpack/utils.js');
+    this.removeFile('webpack/loader.conf.js');
+  }
+
+  if (this.isJhipsterVersionLessThan('7.4.2')) {
+    this.removeFile(`${VUE_DIR}entities/user/user.oauth2.service.ts`);
+  }
+}
+
 function writeFiles() {
   // write Vue files
   return this.writeFilesToDisk(vueFiles, 'vue');
@@ -336,6 +383,7 @@ function customizeFiles() {
       'app/core/jhi-navbar/jhi-navbar.vue',
       'app/core/ribbon/ribbon.vue',
       'app/shared/jhi-item-count.vue',
+      'app/entities/entities-menu.vue',
     ]);
     if (this.withAdminUi) {
       utils.vueReplaceTranslation(this, [
@@ -374,3 +422,10 @@ function customizeFiles() {
     }
   }
 }
+
+module.exports = {
+  files: vueFiles,
+  cleanup,
+  writeFiles,
+  customizeFiles,
+};

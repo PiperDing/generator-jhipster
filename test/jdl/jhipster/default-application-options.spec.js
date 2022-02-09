@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -315,11 +315,11 @@ describe('DefaultApplicationOptions', () => {
       it('should ignore the application type option', () => {
         expect(options.applicationType).to.equal('microservice');
       });
-      it('should ignore the client skipping option', () => {
-        expect(options.skipClient).to.be.true;
+      it('should not ignore the client skipping option', () => {
+        expect(options.skipClient).to.be.false;
       });
-      it('should remove the client framework option', () => {
-        expect(options.clientFramework).to.be.undefined;
+      it('should not remove the client framework option', () => {
+        expect(options.clientFramework).to.equal('react');
       });
       it('should remove the client theme option', () => {
         expect(options.clientTheme).to.be.undefined;
@@ -330,8 +330,8 @@ describe('DefaultApplicationOptions', () => {
       it('should remove the withAdminUi option', () => {
         expect(options.withAdminUi).to.be.undefined;
       });
-      it('should remove the server skipping option', () => {
-        expect(options.skipServer).to.be.undefined;
+      it('should not remove the server skipping option', () => {
+        expect(options.skipServer).not.to.be.undefined;
       });
     });
   });
@@ -387,12 +387,6 @@ describe('DefaultApplicationOptions', () => {
       });
       it('should set the search engine option to false', () => {
         expect(options.searchEngine).to.be.false;
-      });
-      it('should set the client skipping option to false', () => {
-        expect(options.skipClient).to.be.false;
-      });
-      it('should set the server skipping option to false', () => {
-        expect(options.skipServer).to.be.false;
       });
       it('should set the test frameworks option to nothing', () => {
         expect(options.testFrameworks).to.have.lengthOf(0);

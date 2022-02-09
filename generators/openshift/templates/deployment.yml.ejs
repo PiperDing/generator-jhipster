@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -188,9 +188,9 @@ objects:
               value: ${APPLICATION_NAME}-cassandra
 <%_ } _%>
 <%_ if (app.databaseTypeCouchbase) { _%>
-            - name: SPRING_COUCHBASE_BOOTSTRAP_HOSTS
+            - name: SPRING_COUCHBASE_CONNECTION_STRING
               value: ${APPLICATION_NAME}-couchbase
-            - name: SPRING_COUCHBASE_BUCKET_NAME
+            - name: JHIPSTER_DATABASE_COUCHBASE_BUCKET_NAME
               value: ${APPLICATION_NAME}
 <%_ } _%>
 <%_ if (app.searchEngineElasticsearch) { _%>

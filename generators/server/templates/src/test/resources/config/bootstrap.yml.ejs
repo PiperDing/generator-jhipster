@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,13 +12,13 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -%>
-<%_ if (serviceDiscoveryType === 'eureka') { _%>
+<%_ if (serviceDiscoveryEureka) { _%>
   spring:
     cloud:
       config:
         enabled: false
-  <%_ } _%>
-  <%_ if (serviceDiscoveryType === 'consul') { _%>
+<%_ } _%>
+<%_ if (serviceDiscoveryConsul) { _%>
   spring:
     cloud:
       consul:
@@ -28,4 +28,4 @@
         config:
           enabled: false
         enabled: false
-  <%_ } _%>
+<%_ } _%>

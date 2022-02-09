@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -16,14 +16,11 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -%>
-package <%= packageName %>.repository;
+package <%= entityAbsolutePackage %>.repository;
 
-import <%= packageName %>.domain.<%= persistClass %>;
+import <%= entityAbsolutePackage %>.domain.<%= persistClass %>;
 <%_ if (databaseTypeCassandra) { _%>
 import org.springframework.data.cassandra.repository.ReactiveCassandraRepository;
-<%_ } _%>
-<%_ if (databaseTypeCouchbase) { _%>
-import <%= packageName %>.repository.search.SearchCouchbaseRepository;
 <%_ } _%>
 <%_ if (databaseTypeCouchbase) { _%>
 import org.springframework.data.couchbase.core.query.Query;
@@ -38,7 +35,7 @@ import org.springframework.data.domain.Pageable;
 <%_ } _%>
 <%_ if (databaseTypeSql) { _%>
 import org.springframework.data.r2dbc.repository.Query;
-import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.data.relational.core.query.Criteria;
 <%_ } _%>
 <%_ if (databaseTypeMongodb) { _%>
@@ -64,10 +61,9 @@ import java.util.UUID;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface <%= entityClass %>Repository extends <% if (databaseTypeSql) { %>R2dbc<% } if (databaseTypeMongodb) { %>ReactiveMongo<% } if (databaseTypeCouchbase) { %>ReactiveN1qlCouchbase<% } if (databaseTypeNeo4j) { %>ReactiveNeo4j<% } if (databaseTypeCassandra) { %>ReactiveCassandra<% } %>Repository<<%= persistClass %>, <%= primaryKey.type %>><% if (searchEngineCouchbase) { %>, SearchCouchbaseRepository<<%= persistClass %>, <%= primaryKey.type %>><% } %><% if (databaseTypeSql) { %>, <%= entityClass %>RepositoryInternal<% } %> {
+public interface <%= entityClass %>Repository extends <% if (databaseTypeSql) { %>ReactiveCrud<% } if (databaseTypeMongodb) { %>ReactiveMongo<% } if (databaseTypeCouchbase) { %>ReactiveN1qlCouchbase<% } if (databaseTypeNeo4j) { %>ReactiveNeo4j<% } if (databaseTypeCassandra) { %>ReactiveCassandra<% } %>Repository<<%= persistClass %>, <%= primaryKey.type %>><% if (databaseTypeSql) { %>, <%= entityClass %>RepositoryInternal<% } %> {
 
 <%_ if (!paginationNo) { _%>
-
     Flux<<%= persistClass %>> findAllBy(Pageable pageable);
 <%_ } _%>
 <%_ if (relationshipsContainEagerLoad) { _%>
@@ -93,9 +89,8 @@ public interface <%= entityClass %>Repository extends <% if (databaseTypeSql) { 
     Mono<<%= persistClass %>> findOneWithEagerRelationships(<%= primaryKey.type %> id);
   <%_ } _%>
 <%_ } _%>
-<%_
-if (databaseTypeSql) {
-  if (fieldsContainOwnerManyToMany) { _%>
+<%_ if (databaseTypeSql) { _%>
+  <%_ if (fieldsContainOwnerManyToMany) { _%>
 
     @Override
     Mono<<%= persistClass %>> findOneWithEagerRelationships(<%= primaryKey.type %> id);
@@ -106,16 +101,12 @@ if (databaseTypeSql) {
     @Override
     Flux<<%= persistClass %>> findAllWithEagerRelationships(Pageable page);
 
-    @Override
-    Mono<Void> deleteById(Long id);
-
   <%_ } _%>
 
-  <%_
-  for (const relationship of relationships) {
+  <%_ for (const relationship of relationships) {
     let relationshipName = relationship.relationshipName;
-    let ownerSide = relationship.ownerSide;
-    if (relationship.relationshipManyToOne || (relationship.relationshipOneToOne && ownerSide)) { _%>
+    let ownerSide = relationship.ownerSide; _%>
+    <%_ if (relationship.relationshipManyToOne || (relationship.relationshipOneToOne && ownerSide)) { _%>
 
     @Query("SELECT * FROM <%= entityTableName %> entity WHERE entity.<%= getColumnName(relationshipName) %>_id = :id")
     Flux<<%= persistClass %>> findBy<%= relationship.relationshipNameCapitalized %>(<%= primaryKey.type %> id);
@@ -136,28 +127,30 @@ if (databaseTypeSql) {
     <%_ } _%>
   <%_ } _%>
 
-    // just to avoid having unambigous methods
+    @Override
+    <S extends <%= persistClass %>> Mono<S> save(S entity);
+
     @Override
     Flux<<%= persistClass %>> findAll();
 
     @Override
-    Mono<<%= persistClass %>> findById(Long id);
+    Mono<<%= persistClass %>> findById(<%= primaryKey.type %> id);
 
     @Override
-    <S extends <%= persistClass %>> Mono<S> save(S entity);
-
+    Mono<Void> deleteById(<%= primaryKey.type %> id);
 <%_ } _%>
 
 }
 <%_ if (databaseTypeSql) { _%>
 interface <%= entityClass %>RepositoryInternal {
-    <S extends <%= persistClass %>> Mono<S> insert(S entity);
     <S extends <%= persistClass %>> Mono<S> save(S entity);
-    Mono<Integer> update(<%= persistClass %> entity);
+
+    Flux<<%= persistClass %>> findAllBy(Pageable pageable);
 
     Flux<<%= persistClass %>> findAll();
+
     Mono<<%= persistClass %>> findById(<%= primaryKey.type %> id);
-    Flux<<%= persistClass %>> findAllBy(Pageable pageable);
+
     Flux<<%= persistClass %>> findAllBy(Pageable pageable, Criteria criteria);
 
   <%_ if (fieldsContainOwnerManyToMany) { _%>
@@ -168,7 +161,8 @@ interface <%= entityClass %>RepositoryInternal {
 
     Flux<<%= persistClass %>> findAllWithEagerRelationships(Pageable page);
 
-    Mono<Void> deleteById(Long id);
+    Mono<Void> deleteById(<%= primaryKey.type %> id);
+
   <%_ } _%>
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -20,7 +20,7 @@ const expect = require('expect');
 const path = require('path');
 
 const { basicTests, testBlueprintSupport } = require('../../test/support/index.cjs');
-const { requiredConfig, defaultConfig, reproducibleConfigForTests } = require('./config.cjs');
+const { defaultConfig, requiredConfig, reproducibleConfigForTests } = require('./config.cjs');
 const { GENERATOR_PROJECT_NAME } = require('../generator-list');
 
 const generatorPath = path.join(__dirname, 'index.cjs');
@@ -39,5 +39,5 @@ describe(`JHipster ${generator} generator`, () => {
     },
     generatorPath,
   });
-  describe('blueprint support', () => testBlueprintSupport('project-name'));
+  describe('blueprint support', () => testBlueprintSupport(generator));
 });

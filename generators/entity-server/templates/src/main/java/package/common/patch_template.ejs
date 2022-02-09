@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -24,16 +24,16 @@ const mapOrFlatMap = reactive ? 'flatMap' : 'map'
 const returnPrefix = (isService) ? 'return' : returnType + '<' + instanceType + '> result =';
 const mapper = entityInstance  + 'Mapper';
 _%>
-<%_ if(viaService) { _%>
-  <%_ if(!reactive) { _%>
-    Optional<<%= instanceType %>> result = <%= entityInstance %>Service.partialUpdate(<%= instanceName %>);
-  <%_ } else { _%>
+<%_ if (viaService) { _%>
+  <%_ if(reactive) { _%>
     Mono<<%= instanceType %>> result = <%= entityInstance %>Service.partialUpdate(<%= instanceName %>);
+  <%_ } else { _%>
+    Optional<<%= instanceType %>> result = <%= entityInstance %>Service.partialUpdate(<%= instanceName %>);
   <%_ } _%>
 <%_ } else { %>
 <%- returnPrefix %> <%= entityInstance %>Repository.findById(<%= instanceName %>.get<%= primaryKey.nameCapitalized %>())
-   .map(existing<%= entityClass %> -> {
-  <%_ if(dtoMapstruct) { _%>
+    .map(existing<%= entityClass %> -> {
+  <%_ if (dtoMapstruct) { _%>
        <%= mapper %>.partialUpdate(existing<%= entityClass %>, <%= instanceName %>);
   <%_ } else { _%>
     <%_ for (const field of fields.filter(field => !field.id && !field.transient)) { _%>
@@ -53,10 +53,10 @@ _%>
   <%_ if (searchEngineElasticsearch) { _%>
     .<%= mapOrFlatMap %>(saved<%= entityClass %> -> {
         <%= entityInstance %>SearchRepository.save(saved<%= entityClass %>);
-    <%_ if(!reactive) { %>
-        return saved<%= entityClass %>;
-    <%_ } else { %>
+    <%_ if(reactive) { %>
         return Mono.just(saved<%= entityClass %>);
+    <%_ } else { %>
+        return saved<%= entityClass %>;
     <%_ } %>
       })
   <%_ } _%>

@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -24,7 +24,10 @@ const fs = require('fs');
 const gitignore = require('parse-gitignore');
 const path = require('path');
 const childProcess = require('child_process');
+
 const BaseGenerator = require('../generator-base');
+const { INITIALIZING_PRIORITY, CONFIGURING_PRIORITY, DEFAULT_PRIORITY } = require('../../lib/constants/priorities.cjs').compat;
+
 const cleanup = require('../cleanup');
 const constants = require('../generator-constants');
 const statistics = require('../statistics');
@@ -40,8 +43,8 @@ const FIRST_CLI_SUPPORTED_VERSION = '4.5.1'; // The first version in which CLI s
 const SERVER_MAIN_RES_DIR = constants.SERVER_MAIN_RES_DIR;
 
 module.exports = class extends BaseGenerator {
-  constructor(args, opts) {
-    super(args, opts);
+  constructor(args, options, features) {
+    super(args, options, features);
 
     // This adds support for a `--target-version` flag
     this.option('target-version', {
@@ -89,15 +92,14 @@ module.exports = class extends BaseGenerator {
     // Used for isJhipsterVersionLessThan on cleanup.upgradeFiles
     this.jhipsterOldVersion = this.config.get('jhipsterVersion');
 
-    // Verify 6.6.0 app blueprint bug
-    if (!this.config.existed && !this.options.blueprints && !this.options.help) {
-      this.error(
-        'This seems to be an app blueprinted project with jhipster 6.6.0 bug (https://github.com/jhipster/generator-jhipster/issues/11045), you should pass --blueprints to jhipster upgrade commmand.'
+    if (!this.config.existed) {
+      throw new Error(
+        "Could not find a valid JHipster application configuration, check if the '.yo-rc.json' file exists and if the 'generator-jhipster' key exists inside it."
       );
     }
   }
 
-  get initializing() {
+  get [INITIALIZING_PRIORITY]() {
     return {
       validateFromCli() {
         this.checkInvocationFromCLI();
@@ -165,7 +167,7 @@ module.exports = class extends BaseGenerator {
       generatorCommand = `"${generatorDir.replace('\n', '')}/jhipster"`;
     }
     const skipChecksOption = this.skipChecks ? '--skip-checks' : '';
-    const regenerateCmd = `${generatorCommand} --with-entities --force --skip-install --skip-git --no-insight ${skipChecksOption}`;
+    const regenerateCmd = `${generatorCommand} --with-entities --force --skip-install --skip-git --ignore-errors --no-insight ${skipChecksOption}`;
     this.info(regenerateCmd);
     try {
       childProcess.execSync(regenerateCmd, { stdio: 'inherit' });
@@ -219,7 +221,7 @@ module.exports = class extends BaseGenerator {
     else this.error(`Something went wrong while installing ${npmPackage}! ${npmIntall.stdout} ${npmIntall.stderr}`);
   }
 
-  get configuring() {
+  get [CONFIGURING_PRIORITY]() {
     return {
       assertJHipsterProject() {
         if (!this.config.get('baseName')) {
@@ -424,7 +426,7 @@ module.exports = class extends BaseGenerator {
     };
   }
 
-  get default() {
+  get [DEFAULT_PRIORITY]() {
     return {
       insight() {
         statistics.sendSubGenEvent('generator', 'upgrade');

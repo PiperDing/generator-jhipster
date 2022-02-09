@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -20,14 +20,27 @@
 const chalk = require('chalk');
 const _ = require('lodash');
 const BaseBlueprintGenerator = require('../generator-base-blueprint');
+const {
+  INITIALIZING_PRIORITY,
+  PROMPTING_PRIORITY,
+  CONFIGURING_PRIORITY,
+  COMPOSING_PRIORITY,
+  DEFAULT_PRIORITY,
+  WRITING_PRIORITY,
+  INSTALL_PRIORITY,
+  END_PRIORITY,
+} = require('../../lib/constants/priorities.cjs').compat;
+
 const cleanup = require('../cleanup');
 const prompts = require('./prompts');
 const packagejs = require('../../package.json');
 const statistics = require('../statistics');
 const { appDefaultConfig } = require('../generator-defaults');
-const { JHIPSTER_CONFIG_DIR, GENERATOR_JHIPSTER } = require('../generator-constants');
+const { GENERATOR_APP } = require('../generator-list');
+const { GENERATOR_JHIPSTER } = require('../generator-constants');
 const { MICROSERVICE } = require('../../jdl/jhipster/application-types');
 const { OptionNames } = require('../../jdl/jhipster/application-options');
+const { NO: CLIENT_FRAMEWORK_NO } = require('../../jdl/jhipster/client-framework-types');
 
 const { JHI_PREFIX, BASE_NAME, JWT_SECRET_KEY, PACKAGE_NAME, PACKAGE_FOLDER, REMEMBER_ME_KEY } = OptionNames;
 const {
@@ -39,11 +52,9 @@ const {
   GENERATOR_SERVER,
 } = require('../generator-list');
 
-let useBlueprints;
-
 module.exports = class JHipsterAppGenerator extends BaseBlueprintGenerator {
-  constructor(args, opts) {
-    super(args, opts, { unique: 'namespace' });
+  constructor(args, options, features) {
+    super(args, options, { unique: 'namespace', ...features });
 
     this.option('defaults', {
       desc: 'Execute jhipster with default config',
@@ -206,12 +217,6 @@ module.exports = class JHipsterAppGenerator extends BaseBlueprintGenerator {
       type: Boolean,
     });
 
-    // This adds support for a `--skip-commit-hook` flag
-    this.option('skip-commit-hook', {
-      desc: 'Skip adding husky commit hooks',
-      type: Boolean,
-    });
-
     this.option('legacy-db-names', {
       desc: 'Generate database names with jhipster 6 compatibility.',
       type: Boolean,
@@ -256,8 +261,13 @@ module.exports = class JHipsterAppGenerator extends BaseBlueprintGenerator {
     });
 
     this.option('microfrontend', {
-      desc: 'Use experimental microfrontend support',
+      desc: 'Force generation of experimental microfrontend support',
       type: Boolean,
+    });
+
+    this.option('test-frameworks', {
+      desc: 'Test frameworks to be generated',
+      type: Array,
     });
 
     this.option('reactive', {
@@ -265,24 +275,14 @@ module.exports = class JHipsterAppGenerator extends BaseBlueprintGenerator {
       type: Boolean,
     });
 
+    this.option('enable-swagger-codegen', {
+      desc: 'API first development using OpenAPI-generator',
+      type: Boolean,
+    });
+
     // Just constructing help, stop here
     if (this.options.help) {
       return;
-    }
-
-    // Write new definitions to memfs
-    if (this.options.applicationWithEntities) {
-      this.config.set({
-        ...this.config.getAll(),
-        ...this.options.applicationWithEntities.config,
-      });
-      const entities = this.options.applicationWithEntities.entities.map(entity => {
-        const entityName = _.upperFirst(entity.name);
-        const file = this.destinationPath(JHIPSTER_CONFIG_DIR, `${entityName}.json`);
-        this.fs.writeJSON(file, { ...this.fs.readJSON(file), ...entity });
-        return entityName;
-      });
-      this.jhipsterConfig.entities = [...new Set((this.jhipsterConfig.entities || []).concat(entities))];
     }
 
     this.loadStoredAppOptions();
@@ -299,8 +299,12 @@ module.exports = class JHipsterAppGenerator extends BaseBlueprintGenerator {
     this.existingProject = this.jhipsterConfig.baseName !== undefined && this.jhipsterConfig.applicationType !== undefined;
     // preserve old jhipsterVersion value for cleanup which occurs after new config is written into disk
     this.jhipsterOldVersion = this.jhipsterConfig.jhipsterVersion;
+  }
 
-    useBlueprints = !this.fromBlueprint && this.instantiateBlueprints('app');
+  async _postConstruct() {
+    if (!this.fromBlueprint) {
+      await this.composeWithBlueprints(GENERATOR_APP);
+    }
   }
 
   _initializing() {
@@ -348,8 +352,8 @@ module.exports = class JHipsterAppGenerator extends BaseBlueprintGenerator {
     };
   }
 
-  get initializing() {
-    if (useBlueprints) {
+  get [INITIALIZING_PRIORITY]() {
+    if (this.delegateToBlueprint) {
       return;
     }
     return this._initializing();
@@ -363,8 +367,8 @@ module.exports = class JHipsterAppGenerator extends BaseBlueprintGenerator {
     };
   }
 
-  get prompting() {
-    if (useBlueprints) return;
+  get [PROMPTING_PRIORITY]() {
+    if (this.delegateToBlueprint) return;
     return this._prompting();
   }
 
@@ -376,7 +380,10 @@ module.exports = class JHipsterAppGenerator extends BaseBlueprintGenerator {
 
         this.configOptions.logo = false;
         if (this.jhipsterConfig.applicationType === MICROSERVICE) {
-          this.jhipsterConfig.skipClient = !this.jhipsterConfig.microfrontend;
+          this.jhipsterConfig.skipClient =
+            this.jhipsterConfig.skipClient ||
+            !this.jhipsterConfig.clientFramework ||
+            this.jhipsterConfig.clientFramework === CLIENT_FRAMEWORK_NO;
           this.jhipsterConfig.withAdminUi = false;
           this.jhipsterConfig.skipUserManagement = true;
         }
@@ -390,8 +397,8 @@ module.exports = class JHipsterAppGenerator extends BaseBlueprintGenerator {
     };
   }
 
-  get configuring() {
-    if (useBlueprints) return;
+  get [CONFIGURING_PRIORITY]() {
+    if (this.delegateToBlueprint) return;
     return this._configuring();
   }
 
@@ -408,16 +415,16 @@ module.exports = class JHipsterAppGenerator extends BaseBlueprintGenerator {
        * When composing in different tasks the result would be:
        * - composeCommon (app) -> initializing (common) -> prompting (common) -> ... -> composeServer (app) -> initializing (server) -> ...
        */
-      compose() {
-        this.composeWithJHipster(GENERATOR_COMMON, true);
+      async compose() {
+        await this.composeWithJHipster(GENERATOR_COMMON, true);
         if (!this.jhipsterConfig.skipServer) {
-          this.composeWithJHipster(GENERATOR_SERVER, true);
+          await this.composeWithJHipster(GENERATOR_SERVER, true);
         }
         if (!this.jhipsterConfig.skipClient) {
-          this.composeWithJHipster(GENERATOR_CLIENT, true);
+          await this.composeWithJHipster(GENERATOR_CLIENT, true);
         }
         if (!this.configOptions.skipI18n) {
-          this.composeWithJHipster(
+          await this.composeWithJHipster(
             GENERATOR_LANGUAGES,
             {
               regenerate: true,
@@ -447,26 +454,28 @@ module.exports = class JHipsterAppGenerator extends BaseBlueprintGenerator {
         this.config.set(config);
       },
 
-      composeEntities() {
+      async composeEntities() {
         if (!this.options.withEntities) return;
-        this.composeWithJHipster(GENERATOR_ENTITIES, { skipInstall: true }, true);
+        await this.composeWithJHipster(GENERATOR_ENTITIES, { skipInstall: true }, true);
       },
 
-      composePages() {
+      async composePages() {
         if (!this.jhipsterConfig.pages || this.jhipsterConfig.pages.length === 0 || this.configOptions.skipComposePage) return;
         this.configOptions.skipComposePage = true;
-        this.jhipsterConfig.pages.forEach(page => {
-          this.composeWithJHipster(page.generator || GENERATOR_PAGE, [page.name], {
-            skipInstall: true,
-            page,
-          });
-        });
+        await Promise.all(
+          this.jhipsterConfig.pages.map(page => {
+            return this.composeWithJHipster(page.generator || GENERATOR_PAGE, [page.name], {
+              skipInstall: true,
+              page,
+            });
+          })
+        );
       },
     };
   }
 
-  get composing() {
-    if (useBlueprints) return;
+  get [COMPOSING_PRIORITY]() {
+    if (this.delegateToBlueprint) return;
     return this._composing();
   }
 
@@ -484,8 +493,8 @@ module.exports = class JHipsterAppGenerator extends BaseBlueprintGenerator {
     };
   }
 
-  get default() {
-    if (useBlueprints) return;
+  get [DEFAULT_PRIORITY]() {
+    if (this.delegateToBlueprint) return;
     return this._default();
   }
 
@@ -500,8 +509,8 @@ module.exports = class JHipsterAppGenerator extends BaseBlueprintGenerator {
     };
   }
 
-  get writing() {
-    if (useBlueprints) return;
+  get [WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return;
     return this._writing();
   }
 
@@ -517,8 +526,8 @@ module.exports = class JHipsterAppGenerator extends BaseBlueprintGenerator {
     };
   }
 
-  get install() {
-    if (useBlueprints) return;
+  get [INSTALL_PRIORITY]() {
+    if (this.delegateToBlueprint) return;
     return this._install();
   }
 
@@ -561,8 +570,8 @@ module.exports = class JHipsterAppGenerator extends BaseBlueprintGenerator {
     };
   }
 
-  get end() {
-    if (useBlueprints) return;
+  get [END_PRIORITY]() {
+    if (this.delegateToBlueprint) return;
     return this._end();
   }
 

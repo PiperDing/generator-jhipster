@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -214,7 +214,7 @@ function getLatestSolutionStackName(callback) {
   }
 
   function filterCriteria(element) {
-    return element.includes('Tomcat 8');
+    return element.includes('Tomcat 8.5 Corretto 11');
   }
 }
 

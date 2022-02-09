@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -54,16 +54,16 @@
                 page: pageToLoad - 1,
                 query: this.currentSearch,
                 size: this.itemsPerPage,
-                sort: this.sort()}).subscribe(
-                    (res: HttpResponse<I<%= entityAngularName %>[]>) => {
+                sort: this.sort()}).subscribe({
+                    next: (res: HttpResponse<I<%= entityAngularName %>[]>) => {
                         this.isLoading = false;
                         this.onSuccess(res.body, res.headers, pageToLoad, !dontNavigate);
                     },
-                    () => {
+                    error: () => {
                         this.isLoading = false;
                         this.onError();
                     }
-                );
+                });
             return;
         }
 <%_ } _%>
@@ -71,16 +71,16 @@
         this.<%= entityInstance %>Service.query({
             page: pageToLoad - 1,
             size: this.itemsPerPage,
-            sort: this.sort()}).subscribe(
-                (res: HttpResponse<I<%= entityAngularName %>[]>) => {
+            sort: this.sort()}).subscribe({
+                next: (res: HttpResponse<I<%= entityAngularName %>[]>) => {
                     this.isLoading = false;
                     this.onSuccess(res.body, res.headers, pageToLoad, !dontNavigate);
                 },
-                () => {
+                error: () => {
                     this.isLoading = false;
                     this.onError();
                 }
-            );
+            });
     }
 
 <%_ if (searchEngine) { _%>

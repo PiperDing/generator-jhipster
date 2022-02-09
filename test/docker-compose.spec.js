@@ -3,6 +3,11 @@ const assert = require('yeoman-assert');
 const helpers = require('yeoman-test');
 const fse = require('fs-extra');
 const expect = require('expect');
+const monitoringTypes = require('../jdl/jhipster/monitoring-types');
+const { MICROSERVICE, MONOLITH } = require('../jdl/jhipster/application-types');
+const { PROMETHEUS } = require('../jdl/jhipster/monitoring-types');
+
+const NO_MONITORING = monitoringTypes.NO;
 
 const expectedFiles = {
   dockercompose: ['docker-compose.yml', 'central-server-config/application.yml'],
@@ -16,16 +21,16 @@ describe('JHipster Docker Compose Sub Generator', () => {
     before(async () => {
       runResult = await helpers
         .create(require.resolve('../generators/docker-compose'))
-        .inTmpDir(dir => {
-          fse.copySync(path.join(__dirname, './templates/compose/'), dir);
+        .doInDir(dir => {
+          fse.copySync(path.join(__dirname, './templates/compose/01-gateway'), path.join(dir, './01-gateway'));
         })
         .withOptions({ skipChecks: true, reproducibleTests: true })
         .withPrompts({
-          deploymentApplicationType: 'microservice',
+          deploymentApplicationType: MICROSERVICE,
           directoryPath: './',
           chosenApps: ['01-gateway'],
           clusteredDbApps: [],
-          monitoring: 'no',
+          monitoring: NO_MONITORING,
         })
         .run();
     });
@@ -50,16 +55,16 @@ describe('JHipster Docker Compose Sub Generator', () => {
     before(async () => {
       runResult = await helpers
         .create(require.resolve('../generators/docker-compose'))
-        .inTmpDir(dir => {
-          fse.copySync(path.join(__dirname, './templates/compose/'), dir);
+        .doInDir(dir => {
+          fse.copySync(path.join(__dirname, './templates/compose/02-mysql'), path.join(dir, './02-mysql'));
         })
         .withOptions({ skipChecks: true, reproducibleTests: true })
         .withPrompts({
-          deploymentApplicationType: 'microservice',
+          deploymentApplicationType: MICROSERVICE,
           directoryPath: './',
           chosenApps: ['02-mysql'],
           clusteredDbApps: [],
-          monitoring: 'no',
+          monitoring: NO_MONITORING,
         })
         .run();
     });
@@ -84,16 +89,16 @@ describe('JHipster Docker Compose Sub Generator', () => {
     before(async () => {
       runResult = await helpers
         .create(require.resolve('../generators/docker-compose'))
-        .inTmpDir(dir => {
-          fse.copySync(path.join(__dirname, './templates/compose/'), dir);
+        .doInDir(dir => {
+          fse.copySync(path.join(__dirname, './templates/compose/02-mysql'), path.join(dir, './02-mysql'));
         })
         .withOptions({ skipChecks: true, reproducibleTests: true })
         .withPrompts({
-          deploymentApplicationType: 'microservice',
+          deploymentApplicationType: MICROSERVICE,
           directoryPath: '.',
           chosenApps: ['02-mysql'],
           clusteredDbApps: [],
-          monitoring: 'no',
+          monitoring: NO_MONITORING,
         })
         .run();
     });
@@ -108,21 +113,22 @@ describe('JHipster Docker Compose Sub Generator', () => {
     });
   });
 
-  describe('gateway and one microservice', () => {
+  describe('gateway and one microservice, without monitoring', () => {
     let runResult;
     before(async () => {
       runResult = await helpers
         .create(require.resolve('../generators/docker-compose'))
-        .inTmpDir(dir => {
-          fse.copySync(path.join(__dirname, './templates/compose/'), dir);
+        .doInDir(dir => {
+          fse.copySync(path.join(__dirname, './templates/compose/01-gateway'), path.join(dir, './01-gateway'));
+          fse.copySync(path.join(__dirname, './templates/compose/02-mysql'), path.join(dir, './02-mysql'));
         })
         .withOptions({ skipChecks: true, reproducibleTests: true })
         .withPrompts({
-          deploymentApplicationType: 'microservice',
+          deploymentApplicationType: MICROSERVICE,
           directoryPath: './',
           chosenApps: ['01-gateway', '02-mysql'],
           clusteredDbApps: [],
-          monitoring: 'no',
+          monitoring: NO_MONITORING,
         })
         .run();
     });
@@ -147,12 +153,13 @@ describe('JHipster Docker Compose Sub Generator', () => {
     before(async () => {
       runResult = await helpers
         .create(require.resolve('../generators/docker-compose'))
-        .inTmpDir(dir => {
-          fse.copySync(path.join(__dirname, './templates/compose/'), dir);
+        .doInDir(dir => {
+          fse.copySync(path.join(__dirname, './templates/compose/01-gateway'), path.join(dir, './01-gateway'));
+          fse.copySync(path.join(__dirname, './templates/compose/02-mysql'), path.join(dir, './02-mysql'));
         })
         .withOptions({ skipChecks: true, reproducibleTests: true })
         .withPrompts({
-          deploymentApplicationType: 'microservice',
+          deploymentApplicationType: MICROSERVICE,
           directoryPath: './',
           chosenApps: ['01-gateway', '02-mysql'],
           clusteredDbApps: [],
@@ -183,48 +190,13 @@ describe('JHipster Docker Compose Sub Generator', () => {
     before(async () => {
       runResult = await helpers
         .create(require.resolve('../generators/docker-compose'))
-        .inTmpDir(dir => {
-          fse.copySync(path.join(__dirname, './templates/compose/'), dir);
+        .doInDir(dir => {
+          fse.copySync(path.join(__dirname, './templates/compose/01-gateway'), path.join(dir, './01-gateway'));
+          fse.copySync(path.join(__dirname, './templates/compose/02-mysql'), path.join(dir, './02-mysql'));
         })
         .withOptions({ skipChecks: true, reproducibleTests: true })
         .withPrompts({
-          deploymentApplicationType: 'microservice',
-          directoryPath: './',
-          chosenApps: ['01-gateway', '02-mysql'],
-          clusteredDbApps: [],
-        })
-        .run();
-    });
-    it('should match files snapshot', function () {
-      expect(runResult.getSnapshot()).toMatchSnapshot();
-    });
-    it('creates expected default files', () => {
-      assert.file(expectedFiles.dockercompose);
-    });
-    it('creates jhipster-registry content', () => {
-      assert.fileContent('docker-compose.yml', /jhipster-registry:8761\/config/);
-    });
-    it('no prometheus files', () => {
-      assert.noFile(expectedFiles.prometheus);
-    });
-    it('creates compose file without container_name, external_links, links', () => {
-      assert.noFileContent('docker-compose.yml', /container_name:/);
-      assert.noFileContent('docker-compose.yml', /external_links:/);
-      assert.noFileContent('docker-compose.yml', /links:/);
-    });
-  });
-
-  describe('gateway and one microservice', () => {
-    let runResult;
-    before(async () => {
-      runResult = await helpers
-        .create(require.resolve('../generators/docker-compose'))
-        .inTmpDir(dir => {
-          fse.copySync(path.join(__dirname, './templates/compose/'), dir);
-        })
-        .withOptions({ skipChecks: true, reproducibleTests: true })
-        .withPrompts({
-          deploymentApplicationType: 'microservice',
+          deploymentApplicationType: MICROSERVICE,
           directoryPath: './',
           chosenApps: ['01-gateway', '02-mysql'],
           clusteredDbApps: [],
@@ -255,16 +227,17 @@ describe('JHipster Docker Compose Sub Generator', () => {
     before(async () => {
       runResult = await helpers
         .create(require.resolve('../generators/docker-compose'))
-        .inTmpDir(dir => {
-          fse.copySync(path.join(__dirname, './templates/compose/'), dir);
+        .doInDir(dir => {
+          fse.copySync(path.join(__dirname, './templates/compose/01-gateway'), path.join(dir, './01-gateway'));
+          fse.copySync(path.join(__dirname, './templates/compose/02-mysql'), path.join(dir, './02-mysql'));
         })
         .withOptions({ skipChecks: true, reproducibleTests: true })
         .withPrompts({
-          deploymentApplicationType: 'microservice',
+          deploymentApplicationType: MICROSERVICE,
           directoryPath: './',
           chosenApps: ['01-gateway', '02-mysql'],
           clusteredDbApps: [],
-          monitoring: 'prometheus',
+          monitoring: PROMETHEUS,
         })
         .run();
     });
@@ -292,12 +265,16 @@ describe('JHipster Docker Compose Sub Generator', () => {
     before(async () => {
       runResult = await helpers
         .create(require.resolve('../generators/docker-compose'))
-        .inTmpDir(dir => {
-          fse.copySync(path.join(__dirname, './templates/compose/'), dir);
+        .doInDir(dir => {
+          fse.copySync(path.join(__dirname, './templates/compose/01-gateway'), path.join(dir, './01-gateway'));
+          fse.copySync(path.join(__dirname, './templates/compose/02-mysql'), path.join(dir, './02-mysql'));
+          fse.copySync(path.join(__dirname, './templates/compose/03-psql'), path.join(dir, './03-psql'));
+          fse.copySync(path.join(__dirname, './templates/compose/04-mongo'), path.join(dir, './04-mongo'));
+          fse.copySync(path.join(__dirname, './templates/compose/07-mariadb'), path.join(dir, './07-mariadb'));
         })
         .withOptions({ skipChecks: true, reproducibleTests: true })
         .withPrompts({
-          deploymentApplicationType: 'microservice',
+          deploymentApplicationType: MICROSERVICE,
           directoryPath: './',
           chosenApps: ['01-gateway', '02-mysql', '03-psql', '04-mongo', '07-mariadb'],
           clusteredDbApps: [],
@@ -325,12 +302,15 @@ describe('JHipster Docker Compose Sub Generator', () => {
     before(async () => {
       runResult = await helpers
         .create(require.resolve('../generators/docker-compose'))
-        .inTmpDir(dir => {
-          fse.copySync(path.join(__dirname, './templates/compose/'), dir);
+        .doInDir(dir => {
+          fse.copySync(path.join(__dirname, './templates/compose/01-gateway'), path.join(dir, './01-gateway'));
+          fse.copySync(path.join(__dirname, './templates/compose/02-mysql'), path.join(dir, './02-mysql'));
+          fse.copySync(path.join(__dirname, './templates/compose/03-psql'), path.join(dir, './03-psql'));
+          fse.copySync(path.join(__dirname, './templates/compose/04-mongo'), path.join(dir, './04-mongo'));
         })
         .withOptions({ skipChecks: true, reproducibleTests: true })
         .withPrompts({
-          deploymentApplicationType: 'microservice',
+          deploymentApplicationType: MICROSERVICE,
           directoryPath: './',
           chosenApps: ['01-gateway', '02-mysql', '03-psql', '04-mongo'],
           clusteredDbApps: ['04-mongo'],
@@ -358,12 +338,13 @@ describe('JHipster Docker Compose Sub Generator', () => {
     before(async () => {
       runResult = await helpers
         .create(require.resolve('../generators/docker-compose'))
-        .inTmpDir(dir => {
-          fse.copySync(path.join(__dirname, './templates/compose/'), dir);
+        .doInDir(dir => {
+          fse.copySync(path.join(__dirname, './templates/compose/01-gateway'), path.join(dir, './01-gateway'));
+          fse.copySync(path.join(__dirname, './templates/compose/05-cassandra'), path.join(dir, './05-cassandra'));
         })
         .withOptions({ skipChecks: true, reproducibleTests: true })
         .withPrompts({
-          deploymentApplicationType: 'microservice',
+          deploymentApplicationType: MICROSERVICE,
           directoryPath: './',
           chosenApps: ['01-gateway', '05-cassandra'],
           clusteredDbApps: [],
@@ -391,12 +372,12 @@ describe('JHipster Docker Compose Sub Generator', () => {
     before(async () => {
       runResult = await helpers
         .create(require.resolve('../generators/docker-compose'))
-        .inTmpDir(dir => {
-          fse.copySync(path.join(__dirname, './templates/compose/'), dir);
+        .doInDir(dir => {
+          fse.copySync(path.join(__dirname, './templates/compose/08-monolith'), path.join(dir, './08-monolith'));
         })
         .withOptions({ skipChecks: true, reproducibleTests: true })
         .withPrompts({
-          deploymentApplicationType: 'monolith',
+          deploymentApplicationType: MONOLITH,
           directoryPath: './',
           chosenApps: ['08-monolith'],
           clusteredDbApps: [],
@@ -421,12 +402,16 @@ describe('JHipster Docker Compose Sub Generator', () => {
     before(async () => {
       runResult = await helpers
         .create(require.resolve('../generators/docker-compose'))
-        .inTmpDir(dir => {
-          fse.copySync(path.join(__dirname, './templates/compose/'), dir);
+        .doInDir(dir => {
+          fse.copySync(path.join(__dirname, './templates/compose/01-gateway'), path.join(dir, './01-gateway'));
+          fse.copySync(path.join(__dirname, './templates/compose/02-mysql'), path.join(dir, './02-mysql'));
+          fse.copySync(path.join(__dirname, './templates/compose/03-psql'), path.join(dir, './03-psql'));
+          fse.copySync(path.join(__dirname, './templates/compose/10-couchbase'), path.join(dir, './10-couchbase'));
+          fse.copySync(path.join(__dirname, './templates/compose/07-mariadb'), path.join(dir, './07-mariadb'));
         })
         .withOptions({ skipChecks: true, reproducibleTests: true })
         .withPrompts({
-          deploymentApplicationType: 'microservice',
+          deploymentApplicationType: MICROSERVICE,
           directoryPath: './',
           chosenApps: ['01-gateway', '02-mysql', '03-psql', '10-couchbase', '07-mariadb'],
           clusteredDbApps: [],
@@ -454,12 +439,13 @@ describe('JHipster Docker Compose Sub Generator', () => {
     before(async () => {
       runResult = await helpers
         .create(require.resolve('../generators/docker-compose'))
-        .inTmpDir(dir => {
-          fse.copySync(path.join(__dirname, './templates/compose/'), dir);
+        .doInDir(dir => {
+          fse.copySync(path.join(__dirname, './templates/compose/01-gateway'), path.join(dir, './01-gateway'));
+          fse.copySync(path.join(__dirname, './templates/compose/10-couchbase'), path.join(dir, './10-couchbase'));
         })
         .withOptions({ skipChecks: true, reproducibleTests: true })
         .withPrompts({
-          deploymentApplicationType: 'microservice',
+          deploymentApplicationType: MICROSERVICE,
           directoryPath: './',
           chosenApps: ['01-gateway', '10-couchbase'],
           clusteredDbApps: ['10-couchbase'],
@@ -487,16 +473,16 @@ describe('JHipster Docker Compose Sub Generator', () => {
     before(async () => {
       runResult = await helpers
         .create(require.resolve('../generators/docker-compose'))
-        .inTmpDir(dir => {
-          fse.copySync(path.join(__dirname, './templates/compose/'), dir);
+        .doInDir(dir => {
+          fse.copySync(path.join(__dirname, './templates/compose/12-oracle'), path.join(dir, './12-oracle'));
         })
         .withOptions({ skipChecks: true, reproducibleTests: true })
         .withPrompts({
-          deploymentApplicationType: 'monolith',
+          deploymentApplicationType: MONOLITH,
           directoryPath: './',
           chosenApps: ['12-oracle'],
           clusteredDbApps: [],
-          monitoring: 'no',
+          monitoring: NO_MONITORING,
         })
         .run();
     });

@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -16,6 +16,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+const {
+  Priorities: { INITIALIZING_PRIORITY, COMPOSING_PRIORITY },
+} = require('generator-jhipster/support');
 const BaseBlueprintGenerator = require('../generator-base-blueprint');
 const { GENERATOR_ADD } = require('../generator-list');
 
@@ -23,8 +26,8 @@ const { GENERATOR_ADD } = require('../generator-list');
  * @experimental
  */
 module.exports = class extends BaseBlueprintGenerator {
-  constructor(args, opts) {
-    super(args, opts, { unique: 'namespace' });
+  constructor(args, options, features) {
+    super(args, options, { unique: 'namespace', ...features });
 
     this.argument('generators', {
       type: Array,
@@ -53,7 +56,7 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get initializing() {
+  get [INITIALIZING_PRIORITY]() {
     if (this.delegateToBlueprint) return {};
     return this._initializing();
   }
@@ -68,7 +71,7 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get composing() {
+  get [COMPOSING_PRIORITY]() {
     if (this.fromBlueprint) return {};
     return this._composing();
   }

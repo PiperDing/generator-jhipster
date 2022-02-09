@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -18,18 +18,29 @@
  */
 /* eslint-disable consistent-return */
 const chalk = require('chalk');
+
 const BaseBlueprintGenerator = require('../generator-base-blueprint');
+const {
+  INITIALIZING_PRIORITY,
+  PROMPTING_PRIORITY,
+  CONFIGURING_PRIORITY,
+  DEFAULT_PRIORITY,
+  WRITING_PRIORITY,
+  POST_WRITING_PRIORITY,
+  END_PRIORITY,
+} = require('../../lib/constants/priorities.cjs').compat;
+
 const prompts = require('./prompts');
 const { writeFiles: writeVueFiles, customizeFiles: customizeVueFiles } = require('./files-vue');
 const constants = require('../generator-constants');
+const { GENERATOR_PAGE } = require('../generator-list');
+const { PROTRACTOR } = require('../../jdl/jhipster/test-framework-types');
 
 const { VUE } = constants.SUPPORTED_CLIENT_FRAMEWORKS;
 
-let useBlueprints;
-
 module.exports = class extends BaseBlueprintGenerator {
-  constructor(args, opts) {
-    super(args, opts);
+  constructor(args, options, features) {
+    super(args, options, features);
 
     // This makes it possible to pass `pageName` by argument
     this.argument('pageName', {
@@ -59,8 +70,12 @@ module.exports = class extends BaseBlueprintGenerator {
     this.loadRuntimeOptions();
 
     this.rootGenerator = this.env.rootGenerator() === this;
+  }
 
-    useBlueprints = !this.fromBlueprint && this.instantiateBlueprints('page');
+  async _postConstruct() {
+    if (!this.fromBlueprint) {
+      await this.composeWithBlueprints(GENERATOR_PAGE);
+    }
   }
 
   _initializing() {
@@ -72,14 +87,14 @@ module.exports = class extends BaseBlueprintGenerator {
         this.skipClient = this.jhipsterConfig.skipClient;
         this.clientPackageManager = this.jhipsterConfig.clientPackageManager;
         this.enableTranslation = this.jhipsterConfig.enableTranslation;
-        this.protractorTests = this.jhipsterConfig.testFrameworks && this.jhipsterConfig.testFrameworks.includes('protractor');
+        this.protractorTests = this.jhipsterConfig.testFrameworks && this.jhipsterConfig.testFrameworks.includes(PROTRACTOR);
         this.clientFramework = this.jhipsterConfig.clientFramework;
       },
     };
   }
 
-  get initializing() {
-    if (useBlueprints) return;
+  get [INITIALIZING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._initializing();
   }
 
@@ -89,8 +104,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get prompting() {
-    if (useBlueprints) return;
+  get [PROMPTING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._prompting();
   }
 
@@ -107,8 +122,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get configuring() {
-    if (useBlueprints) return;
+  get [CONFIGURING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._configuring();
   }
 
@@ -127,8 +142,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get default() {
-    if (useBlueprints) return;
+  get [DEFAULT_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._default();
   }
 
@@ -144,8 +159,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get writing() {
-    if (useBlueprints) return;
+  get [WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._writing();
   }
 
@@ -162,8 +177,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get postWriting() {
-    if (useBlueprints) return;
+  get [POST_WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._postWriting();
   }
 
@@ -180,8 +195,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get end() {
-    if (useBlueprints) return;
+  get [END_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._end();
   }
 };

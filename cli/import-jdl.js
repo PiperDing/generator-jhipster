@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -158,8 +158,12 @@ function runGenerator(command, { cwd, fork, env }, generatorOptions = {}) {
     forceNoFiltering: undefined,
     unidirectionalRelationships: undefined,
     localConfigOnly: undefined,
+    commandName: undefined,
     fromJdl: true,
   };
+  if (!generatorOptions.blueprints) {
+    delete generatorOptions.blueprints;
+  }
 
   if (!fork) {
     const oldCwd = process.cwd();
@@ -432,8 +436,8 @@ class JDLProcessor {
         applicationWithEntities.config.applications = Object.fromEntries(
           relatedApplications.map(([baseName, config]) => {
             config.gatewayServerPort = gatewayServerPort;
-            const { serverPort, applicationIndex } = config;
-            return [baseName, { serverPort, applicationIndex }];
+            const { clientFramework, serverPort, applicationIndex, devServerPort } = config;
+            return [baseName, { clientFramework, serverPort, applicationIndex, devServerPort }];
           })
         );
       }

@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2021 the original author or authors from the JHipster project.
+# Copyright 2013-2022 the original author or authors from the JHipster project.
 #
 # This file is part of the JHipster project, see https://www.jhipster.tech/
 # for more information.
@@ -36,9 +36,25 @@ on:
     paths-ignore:
       - 'package*.json'
 jobs:
+  build-matrix:
+    runs-on: ubuntu-20.04
+    outputs:
+      matrix: ${{ steps.build.outputs.matrix }}
+      client: ${{ steps.build.outputs.client }}
+      server: ${{ steps.build.outputs.server }}
+      any: ${{ steps.build.outputs.any }}
+    steps:
+      - name: 'SETUP: Checkout generator-jhipster'
+        uses: actions/checkout@v2.4.0
+        with:
+          fetch-depth: 2
+      - name: 'Build matrix'
+        id: build
+        uses: ./.github/actions/build-matrix
   applications:
-    name: ${{ matrix.app-sample }}
+    name: ${{ matrix.suite }}
     runs-on: ${{ matrix.os }}
+    needs: build-matrix
     defaults:
       run:
         working-directory: ${{ github.workspace }}/app
@@ -48,34 +64,36 @@ jobs:
       !contains(github.event.pull_request.title, '[skip ci]') &&
       !contains(github.event.pull_request.title, '[ci skip]') &&
       github.event.action != 'closed' &&
-      !contains(github.event.pull_request.labels.*.name, 'pr: skip-ci')
+      !contains(github.event.pull_request.labels.*.name, 'pr: skip-ci') &&
+      needs.build-matrix.outputs.any != 'false'
     timeout-minutes: 40
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-20.04]
         cache: [angular]
-        app-sample:
+        suite:
           - blog-store
           - blog-store-microfrontend
+          - vue-blog-store-microfrontend
         include:
-          - app-sample: blog-store
-            environment: prod
+          - suite: blog-store
             extra-args: --workspaces --monorepository
             skip-backend-tests: 1
-            sonar-analyse: 0
-          - app-sample: blog-store-microfrontend
-            environment: prod
-            extra-args: --workspaces --monorepository --microfrontend
+            # Scripts wait for gateway to start, delay for microservices to start.
+            e2e-delay: 120
+          - suite: blog-store-microfrontend
+            extra-args: --workspaces --monorepository
             skip-backend-tests: 1
-            skip-frontend-tests: 0
-            sonar-analyse: 0
+          - suite: vue-blog-store-microfrontend
+            extra-args: --workspaces --monorepository
+            skip-backend-tests: 1
     steps:
       #----------------------------------------------------------------------
       # Install all tools and check configuration
       #----------------------------------------------------------------------
       - name: 'SETUP: Checkout generator-jhipster'
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v2.4.0
         with:
           path: generator-jhipster
           fetch-depth: 2
@@ -83,19 +101,19 @@ jobs:
         id: setup
         uses: ./generator-jhipster/.github/actions/setup
         with:
-          jdl-sample: ${{ matrix.app-sample }}
-          application-environment: ${{ matrix.environment }}
+          jdl-sample: ${{ matrix.jdl-files || matrix.suite }}
+          application-environment: ${{ matrix.environment || 'prod' }}
           application-packaging: ${{ (matrix.war == 1 && 'war') || 'jar' }}
           enable-testcontainers: ${{ matrix.testcontainers == 1 }}
-      - uses: actions/setup-node@v2.3.2
+      - uses: actions/setup-node@v2.5.1
         with:
           node-version: ${{ steps.setup.outputs.node-version }}
       - uses: actions/setup-java@v2
         with:
-          distribution: 'adopt'
+          distribution: 'temurin'
           java-version: ${{ steps.setup.outputs.java-version }}
       - name: 'SETUP: load npm cache'
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v2.1.7
         with:
           path: |
             ~/.npm
@@ -106,7 +124,7 @@ jobs:
             ${{ runner.os }}-node-${{ steps.setup.outputs.date }}-
             ${{ runner.os }}-node-${{ steps.setup.outputs.date }}
       - name: 'SETUP: load maven cache'
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v2.1.7
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ steps.setup.outputs.date }}-${{ hashFiles('generator-jhipster/**/pom.xml.ejs') }}
@@ -114,8 +132,8 @@ jobs:
             ${{ runner.os }}-maven-${{ steps.setup.outputs.date }}-
             ${{ runner.os }}-maven-${{ steps.setup.outputs.date }}
       - name: 'SETUP: load gradle cache'
-        if: contains(matrix.app-sample, 'gradle')
-        uses: actions/cache@v2.1.6
+        if: contains(matrix.suite, 'gradle')
+        uses: actions/cache@v2.1.7
         with:
           path: |
             ~/.gradle/caches
@@ -144,8 +162,6 @@ jobs:
         run: |
           git add .
           git commit -m "Commit workspaces"
-      - name: 'GENERATION: replace version in generated project'
-        run: $JHI_SCRIPTS/13-replace-version-generated-project.sh
       - name: 'GENERATION: jhipster info'
         run: $JHI_SCRIPTS/14-jhipster-info.sh
       #----------------------------------------------------------------------
@@ -170,10 +186,10 @@ jobs:
       #----------------------------------------------------------------------
       - name: 'TESTS: backend'
         id: backend
-        if: steps.compare.outputs.equals != 'true' && matrix.skip-backend-tests != 1
+        if: steps.compare.outputs.equals != 'true' && matrix.skip-backend-tests != 1 && needs.build-matrix.outputs.server != 'false'
         run: npm run ci:backend:test
       - name: 'TESTS: frontend'
-        if: steps.compare.outputs.equals != 'true'
+        if: steps.compare.outputs.equals != 'true' && matrix.skip-frontend-tests != 1 && needs.build-matrix.outputs.client != 'false'
         run: npm run ci:frontend:test
       - name: 'TESTS: packaging'
         if: steps.compare.outputs.equals != 'true'
@@ -181,6 +197,9 @@ jobs:
       - name: 'TESTS: Start docker-compose containers for e2e tests'
         if: steps.compare.outputs.equals != 'true'
         run: npm run ci:e2e:prepare
+      - name: 'E2E: Delay'
+        if: matrix.e2e-delay && steps.compare.outputs.equals != 'true'
+        run: sleep ${{matrix.e2e-delay}}
       - name: 'E2E: Run'
         id: e2e
         if: steps.compare.outputs.equals != 'true'
@@ -192,19 +211,19 @@ jobs:
         uses: actions/upload-artifact@v2
         if: always() && steps.backend.outcome == 'failure'
         with:
-          name: log-${{ matrix.app-sample }}
-          path: ${{ steps.setup.outputs.application-path }}/*/test-results/**/*.xml
+          name: log-${{ matrix.suite }}
+          path: ${{ steps.setup.outputs.application-path }}/**/test-results/**/*.xml
       - name: 'E2E: Store failure screenshots'
         uses: actions/upload-artifact@v2
         if: always() && steps.e2e.outcome == 'failure'
         with:
-          name: screenshots-${{ matrix.app-sample }}
-          path: ${{ steps.setup.outputs.application-path }}/*/cypress/screenshots
+          name: screenshots-${{ matrix.suite }}
+          path: ${{ steps.setup.outputs.application-path }}/**/cypress/screenshots
       - name: Dump docker logs on failure
         if: failure()
         uses: jwalton/gh-docker-logs@v2
       - name: 'ANALYSIS: Sonar analysis'
-        if: steps.compare.outputs.equals != 'true' && matrix.sonar-analyse != 0
+        if: steps.compare.outputs.equals != 'true' && matrix.sonar-analyse == 'true'
         run: $JHI_SCRIPTS/25-sonar-analyze.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

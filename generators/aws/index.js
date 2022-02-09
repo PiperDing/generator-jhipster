@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -18,6 +18,9 @@
  */
 const chalk = require('chalk');
 const BaseBlueprintGenerator = require('../generator-base-blueprint');
+const { INITIALIZING_PRIORITY, PROMPTING_PRIORITY, CONFIGURING_PRIORITY, DEFAULT_PRIORITY } =
+  require('../../lib/constants/priorities.cjs').compat;
+
 const prompts = require('./prompts');
 const AwsFactory = require('./lib/aws');
 const statistics = require('../statistics');
@@ -28,12 +31,12 @@ const { BUILD_TOOL, BASE_NAME, PROD_DATABASE_TYPE } = OptionNames;
 
 const { MYSQL, POSTGRESQL, MARIADB } = require('../../jdl/jhipster/database-types');
 
-let useBlueprints;
 /* eslint-disable consistent-return */
 module.exports = class extends BaseBlueprintGenerator {
-  constructor(args, options) {
-    super(args, options);
-    useBlueprints = !this.fromBlueprint && this.instantiateBlueprints(GENERATOR_AWS);
+  async _postConstruct() {
+    if (!this.fromBlueprint) {
+      await this.composeWithBlueprints(GENERATOR_AWS);
+    }
   }
 
   _initializing() {
@@ -89,8 +92,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get initializing() {
-    if (useBlueprints) return;
+  get [INITIALIZING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._initializing();
   }
 
@@ -98,8 +101,8 @@ module.exports = class extends BaseBlueprintGenerator {
     return prompts.prompting;
   }
 
-  get prompting() {
-    if (useBlueprints) return;
+  get [PROMPTING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._prompting();
   }
 
@@ -127,8 +130,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get configuring() {
-    if (useBlueprints) return;
+  get [CONFIGURING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._configuring();
   }
 
@@ -285,8 +288,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get default() {
-    if (useBlueprints) return;
+  get [DEFAULT_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._default();
   }
 };

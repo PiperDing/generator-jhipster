@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -24,6 +24,14 @@ const fs = require('fs');
 const path = require('path');
 const JHipsterDeploymentExporter = require('../../../jdl/exporters/jhipster-deployment-exporter');
 const JDLDeployment = require('../../../jdl/models/jdl-deployment');
+const { DeploymentTypes } = require('../../../jdl/jhipster/deployment-options');
+const { ServiceTypes } = require('../../../jdl/jhipster/kubernetes-platform-types');
+const { EUREKA } = require('../../../jdl/jhipster/service-discovery-types');
+const monitoringTypes = require('../../../jdl/jhipster/monitoring-types');
+
+const { DOCKERCOMPOSE, KUBERNETES } = DeploymentTypes;
+const NO_MONITORING = monitoringTypes.NO;
+const { LOAD_BALANCER } = ServiceTypes;
 
 describe('JHipsterDeploymentExporter', () => {
   describe('exportDeployments', () => {
@@ -43,12 +51,12 @@ describe('JHipsterDeploymentExporter', () => {
         before('common setup for both deployments', () => {
           returned = JHipsterDeploymentExporter.exportDeployments({
             'docker-compose': new JDLDeployment({
-              deploymentType: 'docker-compose',
+              deploymentType: DOCKERCOMPOSE,
               appsFolders: ['tata', 'titi'],
               dockerRepositoryName: 'test',
             }),
             kubernetes: new JDLDeployment({
-              deploymentType: 'kubernetes',
+              deploymentType: KUBERNETES,
               appsFolders: ['tata', 'titi'],
               dockerRepositoryName: 'test',
             }),
@@ -90,8 +98,8 @@ describe('JHipsterDeploymentExporter', () => {
               directoryPath: '../',
               dockerRepositoryName: 'test',
               gatewayType: 'SpringCloudGateway',
-              monitoring: 'no',
-              serviceDiscoveryType: 'eureka',
+              monitoring: NO_MONITORING,
+              serviceDiscoveryType: EUREKA,
             });
           });
         });
@@ -130,11 +138,11 @@ describe('JHipsterDeploymentExporter', () => {
               ingressDomain: '',
               istio: false,
               kubernetesNamespace: 'default',
-              kubernetesServiceType: 'LoadBalancer',
-              monitoring: 'no',
+              kubernetesServiceType: LOAD_BALANCER,
+              monitoring: NO_MONITORING,
               kubernetesUseDynamicStorage: false,
               kubernetesStorageClassName: '',
-              serviceDiscoveryType: 'eureka',
+              serviceDiscoveryType: EUREKA,
             });
           });
         });

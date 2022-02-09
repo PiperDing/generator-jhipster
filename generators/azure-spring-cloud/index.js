@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -20,6 +20,16 @@ const fs = require('fs');
 const exec = require('child_process').exec;
 const chalk = require('chalk');
 const BaseBlueprintGenerator = require('../generator-base-blueprint');
+const {
+  INITIALIZING_PRIORITY,
+  PROMPTING_PRIORITY,
+  CONFIGURING_PRIORITY,
+  LOADING_PRIORITY,
+  DEFAULT_PRIORITY,
+  WRITING_PRIORITY,
+  END_PRIORITY,
+} = require('../../lib/constants/priorities.cjs').compat;
+
 const statistics = require('../statistics');
 
 const constants = require('../generator-constants');
@@ -32,11 +42,10 @@ const NO_CACHE_PROVIDER = cacheTypes.NO;
 const { MAVEN } = require('../../jdl/jhipster/build-tool-types');
 const { GENERATOR_AZURE_SPRING_CLOUD } = require('../generator-list');
 
-let useBlueprints;
 /* eslint-disable consistent-return */
 module.exports = class extends BaseBlueprintGenerator {
-  constructor(args, opts) {
-    super(args, opts);
+  constructor(args, options, features) {
+    super(args, options, features);
 
     this.option('skip-build', {
       desc: 'Skips building the application',
@@ -52,7 +61,12 @@ module.exports = class extends BaseBlueprintGenerator {
 
     this.azureSpringCloudSkipBuild = this.options.skipBuild;
     this.azureSpringCloudSkipDeploy = this.options.skipDeploy || this.options.skipBuild;
-    useBlueprints = !this.fromBlueprint && this.instantiateBlueprints(GENERATOR_AZURE_SPRING_CLOUD);
+  }
+
+  async _postConstruct() {
+    if (!this.fromBlueprint) {
+      await this.composeWithBlueprints(GENERATOR_AZURE_SPRING_CLOUD);
+    }
   }
 
   _initializing() {
@@ -82,11 +96,14 @@ module.exports = class extends BaseBlueprintGenerator {
         this.azureSpringCloudAppName = this.config.get('azureSpringCloudAppName');
         this.azureSpringCloudDeploymentType = this.config.get('azureSpringCloudDeploymentType');
       },
+      loadConstants() {
+        this.JAVA_VERSION = constants.JAVA_VERSION;
+      },
     };
   }
 
-  get initializing() {
-    if (useBlueprints) return;
+  get [INITIALIZING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._initializing();
   }
 
@@ -251,8 +268,8 @@ ${chalk.red('az extension add --name spring-cloud')}`
     };
   }
 
-  get prompting() {
-    if (useBlueprints) return;
+  get [PROMPTING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._prompting();
   }
 
@@ -268,8 +285,8 @@ ${chalk.red('az extension add --name spring-cloud')}`
     };
   }
 
-  get configuring() {
-    if (useBlueprints) return;
+  get [CONFIGURING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._configuring();
   }
 
@@ -311,8 +328,8 @@ ${chalk.red('az extension add --name spring-cloud')}`
     };
   }
 
-  get default() {
-    if (useBlueprints) return;
+  get [DEFAULT_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._default();
   }
 
@@ -327,8 +344,8 @@ ${chalk.red('az extension add --name spring-cloud')}`
     };
   }
 
-  get loading() {
-    if (useBlueprints) return;
+  get [LOADING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._loading();
   }
 
@@ -355,8 +372,8 @@ ${chalk.red('az extension add --name spring-cloud')}`
     };
   }
 
-  get writing() {
-    if (useBlueprints) return;
+  get [WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._writing();
   }
 
@@ -481,8 +498,8 @@ for more detailed information.`
     };
   }
 
-  get end() {
-    if (useBlueprints) return;
+  get [END_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._end();
   }
 };

@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -151,6 +151,44 @@ describe('JDLToJSONFieldConverter', () => {
           expect(convertedField).to.deep.equal({
             fieldName: 'enumField',
             fieldType: 'CustomEnum',
+            fieldValues: 'AA,AB',
+          });
+        });
+      });
+      context('with field types being enums with comments', () => {
+        let convertedField;
+
+        before(() => {
+          const jdlObject = new JDLObject();
+          const entityA = new JDLEntity({
+            name: 'A',
+            comment: 'The best entity',
+          });
+          const enumType = new JDLEnum({
+            comment: 'enum comment',
+            name: 'CustomEnum',
+            values: ['AA', 'AB'].map(value => ({ key: value, comment: 'some comment' })),
+          });
+          const enumField = new JDLField({
+            name: 'enumField',
+            type: 'CustomEnum',
+          });
+          jdlObject.addEnum(enumType);
+          entityA.addField(enumField);
+          jdlObject.addEntity(entityA);
+          const returnedMap = convert(jdlObject);
+          convertedField = returnedMap.get('A')[0];
+        });
+
+        it('should convert them', () => {
+          expect(convertedField).to.deep.equal({
+            fieldName: 'enumField',
+            fieldType: 'CustomEnum',
+            fieldTypeJavadoc: 'enum comment',
+            fieldValuesJavadocs: {
+              AA: 'some comment',
+              AB: 'some comment',
+            },
             fieldValues: 'AA,AB',
           });
         });

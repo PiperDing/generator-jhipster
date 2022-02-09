@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -17,35 +17,37 @@
  * limitations under the License.
  */
 const { State } = require('mem-fs-editor');
-const filter = require('gulp-filter');
-const _ = require('lodash');
-const path = require('path');
 const {
-  createEachFileTransform,
+  createConflicterCheckTransform,
   createConflicterStatusTransform,
-  createYoRcTransform,
-  createYoResolveTransform,
-} = require('yeoman-environment/lib/util/transform');
+  createYoRcTransform: createForceYoRcTransform,
+  createYoResolveTransform: createApplyYoResolveTransform,
+  patternFilter,
+  patternSpy,
+} = require('yeoman-environment/transform');
 
 const { hasState, setModifiedFileState } = State;
 
 const BaseGenerator = require('../generator-base');
+const { LOADING_PRIORITY, PRE_CONFLICTS_PRIORITY } = require('../../lib/constants/priorities.cjs').compat;
+
 const { MultiStepTransform } = require('../../utils/multi-step-transform');
-const { defaultConfig } = require('../generator-defaults');
 const { prettierTransform, generatedAnnotationTransform } = require('../generator-transforms');
 const { formatDateForChangelog, prepareFieldForLiquibaseTemplates } = require('../../utils/liquibase');
-const { prepareEntityForTemplates, prepareEntityPrimaryKeyForTemplates, loadRequiredConfigIntoEntity } = require('../../utils/entity');
+const { prepareEntityForTemplates, prepareEntityPrimaryKeyForTemplates } = require('../../utils/entity');
 const { prepareFieldForTemplates } = require('../../utils/field');
+const { createUserEntity } = require('../../utils/user');
 const { OAUTH2 } = require('../../jdl/jhipster/authentication-types');
-const { SQL } = require('../../jdl/jhipster/database-types');
 const { CommonDBTypes } = require('../../jdl/jhipster/field-types');
 
-const { STRING: TYPE_STRING, LONG: TYPE_LONG } = CommonDBTypes;
+const { LONG: TYPE_LONG } = CommonDBTypes;
 
 module.exports = class extends BaseGenerator {
-  constructor(args, options) {
-    super(args, options, { unique: 'namespace', customCommitTask: true });
+  constructor(args, options, features) {
+    super(args, options, { unique: 'namespace', customCommitTask: true, ...features });
+  }
 
+  _postConstruct() {
     /*
      * When testing a generator with yeoman-test using 'withLocalConfig(localConfig)', it instantiates the
      * generator and then executes generator.config.defaults(localConfig).
@@ -65,9 +67,9 @@ module.exports = class extends BaseGenerator {
       this.config.set(this.options.localConfig);
     }
 
-    if (this.options.withGeneratedFlag !== undefined) {
-      this.jhipsterConfig.withGeneratedFlag = this.options.withGeneratedFlag;
-    }
+    if (this.options.help) return;
+
+    this.loadStoredAppOptions();
 
     // Load common runtime options.
     this.parseCommonRuntimeOptions();
@@ -78,7 +80,6 @@ module.exports = class extends BaseGenerator {
       createUserManagementEntities() {
         this._createUserManagementEntities();
       },
-
       loadClientPackageManager() {
         if (this.jhipsterConfig.clientPackageManager) {
           this.env.options.nodePackageManager = this.jhipsterConfig.clientPackageManager;
@@ -87,7 +88,7 @@ module.exports = class extends BaseGenerator {
     };
   }
 
-  get loading() {
+  get [LOADING_PRIORITY]() {
     return this._loading();
   }
 
@@ -99,22 +100,22 @@ module.exports = class extends BaseGenerator {
           this.debug('Skipping commit prettier');
           return;
         }
-        await this._commitSharedFs(this.env.sharedFs.stream().pipe(filter(['.prettierrc**', '.prettierignore'])), true);
+        await this._commitSharedFs(this.env.sharedFs.stream().pipe(patternFilter('**/{.prettierrc**,.prettierignore}')), true);
       },
       async commitFiles() {
         if (this.options.skipCommit) {
           this.debug('Skipping commit files');
           return;
         }
-        await this._commitSharedFs();
         this.env.sharedFs.once('change', () => {
           this._queueCommit();
         });
+        await this._commitSharedFs();
       },
     };
   }
 
-  get preConflicts() {
+  get [PRE_CONFLICTS_PRIORITY]() {
     return this._preConflicts();
   }
 
@@ -126,11 +127,11 @@ module.exports = class extends BaseGenerator {
     this.queueTask(
       {
         method: async () => {
-          await this._commitSharedFs();
           this.debug('Adding queueCommit event listener');
           this.env.sharedFs.once('change', () => {
             this._queueCommit();
           });
+          await this._commitSharedFs();
         },
       },
       {
@@ -145,62 +146,57 @@ module.exports = class extends BaseGenerator {
    * @param {Stream} [stream] - files stream, defaults to this.sharedFs.stream().
    * @return {Promise}
    */
-  _commitSharedFs(stream = this.env.sharedFs.stream(), skipPrettier = this.options.skipPrettier) {
-    return new Promise((resolve, reject) => {
-      this.env.sharedFs.each(file => {
-        if (
-          file.contents &&
-          (path.basename(file.path) === '.yo-rc.json' ||
-            (path.extname(file.path) === '.json' && path.basename(path.dirname(file.path)) === '.jhipster'))
-        ) {
-          if (!hasState(file) && !this.options.reproducibleTests) {
-            setModifiedFileState(file);
-          }
+  async _commitSharedFs(stream = this.env.sharedFs.stream(), skipPrettier = this.options.skipPrettier) {
+    const { skipYoResolve } = this.options;
+    const { withGeneratedFlag } = this.jhipsterConfig;
+
+    // JDL writes directly to disk, set the file as modified so prettier will be applied
+    stream = stream.pipe(
+      patternSpy(file => {
+        if (file.contents && !hasState(file) && !this.options.reproducibleTests) {
+          setModifiedFileState(file);
         }
-      });
-      const transformStreams = [
-        // multi-step changes the file path, should be executed earlier in the pipeline
-        new MultiStepTransform(),
-        createYoResolveTransform(this.env.conflicter),
-        createYoRcTransform(),
-        createEachFileTransform(file => {
-          if (path.extname(file.path) === '.json' && path.basename(path.dirname(file.path)) === '.jhipster') {
-            file.conflicter = 'force';
-          }
-          return file;
-        }),
-      ];
+      }, '**/{.yo-rc.json,.jhipster/*.json}').name('jhipster:config-files:modify')
+    );
 
-      if (this.jhipsterConfig.withGeneratedFlag) {
-        transformStreams.push(generatedAnnotationTransform(this));
-      }
+    const conflicterStatus = {
+      fileActions: [
+        {
+          key: 'i',
+          name: 'ignore, do not overwrite and remember (experimental)',
+          value: ({ relativeFilePath }) => {
+            this.env.fs.append(`${this.env.cwd}/.yo-resolve`, `${relativeFilePath} skip`, { create: true });
+            return 'skip';
+          },
+        },
+      ],
+    };
 
-      if (!skipPrettier) {
-        const prettierOptions = { packageJson: true, java: !this.skipServer && !this.jhipsterConfig.skipServer };
-        // Prettier is clever, it uses correct rules and correct parser according to file extension.
-        const filterPatternForPrettier = `{,.,**/,**/.,.jhipster/**/}*.{${this.getPrettierExtensions()}}`;
-        // docker-compose modifies .yo-rc.json from others folder, match them all.
-        const prettierFilter = filter(['**/.yo-rc.json', filterPatternForPrettier], { restore: true });
-        // this pipe will pass through (restore) anything that doesn't match typescriptFilter
-        transformStreams.push(prettierFilter, prettierTransform(prettierOptions, this, this.options.ignoreErrors), prettierFilter.restore);
-      }
+    const createApplyPrettierTransform = () => {
+      const prettierOptions = { packageJson: true, java: !this.skipServer && !this.jhipsterConfig.skipServer };
+      // Prettier is clever, it uses correct rules and correct parser according to file extension.
+      const ignoreErrors = this.options.commandName === 'upgrade' || this.options.ignoreErrors;
+      return prettierTransform(prettierOptions, this, ignoreErrors);
+    };
 
-      transformStreams.push(
-        createEachFileTransform(file => this.env.conflicter.checkForCollision(file), { ordered: false, maxParallel: 10 }),
-        createConflicterStatusTransform()
-      );
+    const createForceWriteConfigFiles = () =>
+      patternSpy(file => {
+        file.conflicter = 'force';
+      }, '**/.jhipster/*.json').name('jhipster:config-files:force');
 
-      this.env.fs.commit(transformStreams, stream, (error, value) => {
-        if (error) {
-          reject(error);
-          return;
-        }
+    const transformStreams = [
+      // multi-step changes the file path, should be executed earlier in the pipeline
+      new MultiStepTransform(),
+      ...(skipYoResolve ? [] : [createApplyYoResolveTransform(this.env.conflicter)]),
+      createForceYoRcTransform(),
+      createForceWriteConfigFiles(),
+      ...(withGeneratedFlag ? [generatedAnnotationTransform(this)] : []),
+      ...(skipPrettier ? [] : [createApplyPrettierTransform()]),
+      createConflicterCheckTransform(this.env.conflicter, conflicterStatus),
+      createConflicterStatusTransform(),
+    ];
 
-        // Force to empty Conflicter queue.
-        this.env.conflicter.queue.once('end', () => resolve(value));
-        this.env.conflicter.queue.run();
-      });
-    });
+    await this.env.fs.commit(transformStreams, stream);
   }
 
   _createUserManagementEntities() {
@@ -216,70 +212,7 @@ module.exports = class extends BaseGenerator {
     const changelogDateDate = this.jhipsterConfig.creationTimestamp ? new Date(this.jhipsterConfig.creationTimestamp) : new Date();
     const changelogDate = formatDateForChangelog(changelogDateDate);
 
-    const userEntityDefinition = this.readEntityJson('User');
-    if (userEntityDefinition) {
-      if (userEntityDefinition.relationships && userEntityDefinition.relationships.length > 0) {
-        this.warning('Relationships on the User entity side will be disregarded');
-      }
-      if (userEntityDefinition.fields && userEntityDefinition.fields.some(field => field.fieldName !== 'id')) {
-        this.warning('Fields on the User entity side (other than id) will be disregarded');
-      }
-    }
-
-    // Create entity definition for built-in entity to make easier to deal with relationships.
-    const user = {
-      name: 'User',
-      builtIn: true,
-      entityTableName: `${this.getTableName(this.jhipsterConfig.jhiPrefix)}_user`,
-      relationships: [],
-      changelogDate,
-      fields: userEntityDefinition ? userEntityDefinition.fields || [] : [],
-    };
-
-    loadRequiredConfigIntoEntity(user, this.jhipsterConfig);
-    // Fallback to defaults for test cases.
-    loadRequiredConfigIntoEntity(user, defaultConfig);
-
-    const oauth2 = user.authenticationType === OAUTH2;
-    const userIdType = oauth2 || user.databaseType !== SQL ? TYPE_STRING : this.getPkType(user.databaseType);
-    const fieldValidateRulesMaxlength = userIdType === TYPE_STRING ? 100 : undefined;
-
-    let idField = user.fields.find(field => field.fieldName === 'id');
-    if (!idField) {
-      idField = {};
-      user.fields.unshift(idField);
-    }
-    _.defaults(idField, {
-      fieldName: 'id',
-      fieldType: userIdType,
-      fieldValidateRulesMaxlength,
-      fieldTranslationKey: 'global.field.id',
-      fieldNameHumanized: 'ID',
-      id: true,
-      builtIn: true,
-    });
-
-    if (!user.fields.some(field => field.fieldName === 'login')) {
-      user.fields.push({
-        fieldName: 'login',
-        fieldType: TYPE_STRING,
-        builtIn: true,
-      });
-    }
-
-    if (!user.fields.some(field => field.fieldName === 'firstName')) {
-      user.fields.push({
-        fieldName: 'firstName',
-        fieldType: TYPE_STRING,
-      });
-    }
-
-    if (!user.fields.some(field => field.fieldName === 'lastName')) {
-      user.fields.push({
-        fieldName: 'lastName',
-        fieldType: TYPE_STRING,
-      });
-    }
+    const user = createUserEntity.call(this, { changelogDate });
 
     prepareEntityForTemplates(user, this);
     prepareEntityPrimaryKeyForTemplates(user, this);
@@ -290,6 +223,8 @@ module.exports = class extends BaseGenerator {
     });
     this.configOptions.sharedEntities.User = user;
 
+    const oauth2 = user.authenticationType === OAUTH2;
+    const userIdType = user.primaryKey.type;
     const liquibaseFakeData = oauth2
       ? []
       : [

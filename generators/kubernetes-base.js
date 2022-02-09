@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -144,4 +144,5 @@ function setupHelmConstants() {
   this.HELM_MYSQL = constants.HELM_MYSQL;
   this.HELM_POSTGRESQL = constants.HELM_POSTGRESQL;
   this.HELM_MOGODB_REPLICASET = constants.HELM_MOGODB_REPLICASET;
+  this.HELM_COUCHBASE_OPERATOR = constants.HELM_COUCHBASE_OPERATOR;
 }

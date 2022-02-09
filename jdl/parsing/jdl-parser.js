@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -329,6 +329,9 @@ module.exports = class JDLParser extends CstParser {
 
   enumDeclaration() {
     this.RULE('enumDeclaration', () => {
+      this.OPTION(() => {
+        this.CONSUME(LexerTokens.JAVADOC);
+      });
       this.CONSUME(LexerTokens.ENUM);
       this.CONSUME(LexerTokens.NAME);
       this.CONSUME(LexerTokens.LCURLY);

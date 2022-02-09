@@ -6,15 +6,17 @@ const { exec, fork } = require('child_process');
 const path = require('path');
 const sinon = require('sinon');
 const Environment = require('yeoman-environment');
+const helpers = require('yeoman-test');
 
 const { createProgram, buildJHipster } = require('../../cli/program');
 const { getJHipsterCli, prepareTempDir, copyFakeBlueprint, copyBlueprint, lnYeoman } = require('../utils/utils');
 const { logger } = require('../../cli/utils');
+const BaseGenerator = require('../../generators/generator-base');
 
 const jhipsterCli = require.resolve(path.join(__dirname, '..', '..', 'cli', 'cli.js'));
 
 const mockCli = (opts = {}) => {
-  opts = { ...opts, program: createProgram() };
+  opts = { printLogo: () => {}, ...opts, program: createProgram() };
   opts.loadCommand = key => opts[`./${key}`];
   const program = buildJHipster(opts);
   const { argv } = opts;
@@ -91,9 +93,9 @@ describe('jhipster cli', () => {
 
   describe('with mocked generator command', () => {
     const commands = { mocked: {} };
-    const generator = { mocked: {} };
+    let generator;
     let oldArgv;
-    let callback;
+    let runArgs;
     before(() => {
       oldArgv = process.argv;
     });
@@ -101,32 +103,28 @@ describe('jhipster cli', () => {
       process.argv = oldArgv;
     });
     beforeEach(() => {
-      generator.mocked = {
-        _options: {
-          foo: {
-            description: 'Foo',
-          },
-          'foo-bar': {
-            description: 'Foo bar',
-          },
+      generator = new (helpers.createDummyGenerator(BaseGenerator))({ env: Environment.createEnv() });
+      generator._options = {
+        foo: {
+          description: 'Foo',
         },
-        sourceRoot: () => '',
+        'foo-bar': {
+          description: 'Foo bar',
+        },
       };
       sandbox.stub(Environment.prototype, 'run').callsFake((...args) => {
-        callback(...args);
+        runArgs = args;
         return Promise.resolve();
       });
       sandbox.stub(Environment.prototype, 'composeWith');
-      sandbox.stub(Environment.prototype, 'create').returns(generator.mocked);
+      sandbox.stub(Environment.prototype, 'create').returns(generator);
     });
 
     const commonTests = () => {
-      it('should pass a defined command', done => {
-        callback = (command, _options) => {
-          expect(command).to.not.be.undefined;
-          done();
-        };
-        return mockCli({ commands });
+      it('should pass a defined command', async () => {
+        await mockCli({ commands });
+        const [command] = runArgs;
+        expect(command).to.not.be.undefined;
       });
     };
 
@@ -137,51 +135,46 @@ describe('jhipster cli', () => {
 
       commonTests();
 
-      it('should forward options', done => {
-        callback = (command, options) => {
-          expect(command).to.be.equal('jhipster:mocked');
-          expect(options.foo).to.be.true;
-          expect(options.fooBar).to.be.true;
-          done();
-        };
-        return mockCli({ commands });
+      it('should forward options', async () => {
+        await mockCli({ commands });
+        const [command, options] = runArgs;
+        expect(command).to.be.equal('jhipster:mocked');
+        expect(options.foo).to.be.true;
+        expect(options.fooBar).to.be.true;
       });
     });
 
     describe('with argument', () => {
       beforeEach(() => {
-        generator.mocked._arguments = [{ name: 'name' }];
+        generator._arguments = [{ name: 'name' }];
         process.argv = ['jhipster', 'jhipster', 'mocked', 'Foo', '--foo', '--foo-bar'];
       });
 
       commonTests();
 
-      it('should forward argument and options', done => {
-        callback = (command, options) => {
-          expect(command).to.be.equal('jhipster:mocked Foo');
-          expect(options.foo).to.be.true;
-          expect(options.fooBar).to.be.true;
-          done();
-        };
-        return mockCli({ commands });
+      it('should forward argument and options', async () => {
+        await mockCli({ commands });
+        const [command, options] = runArgs;
+        expect(command).to.be.equal('jhipster:mocked Foo');
+        expect(options.foo).to.be.true;
+        expect(options.fooBar).to.be.true;
       });
     });
 
     describe('with variable arguments', () => {
       beforeEach(() => {
-        generator.mocked._arguments = [{ name: 'name', type: Array }];
+        generator._arguments = [{ name: 'name', type: Array }];
         process.argv = ['jhipster', 'jhipster', 'mocked', 'Foo', 'Bar', '--foo', '--foo-bar'];
       });
 
       commonTests();
 
-      it('should forward argument and options', done => {
-        callback = (command, options) => {
-          expect(command).to.be.equal('jhipster:mocked Foo Bar');
-          expect(options.foo).to.be.true;
-          expect(options.fooBar).to.be.true;
-          done();
-        };
+      it('should forward argument and options', async () => {
+        await mockCli({ commands });
+        const [command, options] = runArgs;
+        expect(command).to.be.equal('jhipster:mocked Foo Bar');
+        expect(options.foo).to.be.true;
+        expect(options.fooBar).to.be.true;
         return mockCli({ commands });
       });
     });
@@ -223,10 +216,9 @@ describe('jhipster cli', () => {
     });
 
     const commonTests = () => {
-      it('should pass a defined environment', done => {
+      it('should pass a defined environment', async () => {
         const cb = (_args, _options, env) => {
           expect(env).to.not.be.undefined;
-          done();
         };
         return mockCli({ commands, './mocked': cb });
       });
@@ -242,14 +234,13 @@ describe('jhipster cli', () => {
 
       commonTests();
 
-      it('should forward argument and options', done => {
+      it('should forward argument and options', async () => {
         const cb = (args, options) => {
           expect(args).to.eql(['Foo']);
           expect(options.foo).to.be.true;
           expect(options.fooBar).to.be.true;
-          done();
         };
-        return mockCli({ commands, './mocked': cb });
+        await mockCli({ commands, './mocked': cb });
       });
     });
 
@@ -263,14 +254,13 @@ describe('jhipster cli', () => {
 
       commonTests();
 
-      it('should forward argument and options', done => {
+      it('should forward argument and options', async () => {
         const cb = (args, options) => {
           expect(args).to.eql(['Foo']);
           expect(options.foo).to.be.false;
           expect(options.fooBar).to.be.false;
-          done();
         };
-        return mockCli({ commands, './mocked': cb });
+        await mockCli({ commands, './mocked': cb });
       });
     });
 
@@ -284,14 +274,13 @@ describe('jhipster cli', () => {
 
       commonTests();
 
-      it('should forward argument and options', done => {
+      it('should forward argument and options', async () => {
         const cb = (args, options, env) => {
           expect(args).to.eql([['Foo', 'Bar']]);
           expect(options.foo).to.be.true;
           expect(options.fooBar).to.be.true;
-          done();
         };
-        return mockCli({ commands, './mocked': cb });
+        await mockCli({ commands, './mocked': cb });
       });
     });
 
@@ -304,12 +293,11 @@ describe('jhipster cli', () => {
 
       commonTests();
 
-      it('should forward argument and options', done => {
+      it('should forward argument and options', async () => {
         const cb = (args, options, env) => {
           expect(args).to.eql([]);
           expect(options.foo).to.be.true;
           expect(options.fooBar).to.be.true;
-          done();
         };
         return mockCli({ commands, './mocked': cb });
       });
@@ -489,7 +477,7 @@ describe('jhipster cli', () => {
         });
 
         it('should print usage', () => {
-          expect(stdout.includes('Usage: cli run jhipster:app [options]')).to.be.true;
+          expect(stdout.includes('Usage: jhipster run jhipster:app [options]')).to.be.true;
         });
         it('should print options', () => {
           expect(stdout.includes('--application-type <value>')).to.be.true;
@@ -516,7 +504,7 @@ describe('jhipster cli', () => {
         });
 
         it('should print usage', () => {
-          expect(stdout.includes('Usage: cli run cli:foo [options]')).to.be.true;
+          expect(stdout.includes('Usage: jhipster run cli:foo [options]')).to.be.true;
         });
         it('should print options', () => {
           expect(stdout.includes('--foo-bar')).to.be.true;

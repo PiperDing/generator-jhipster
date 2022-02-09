@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -74,6 +74,7 @@ const files = {
       path: ANGULAR_DIR,
       templates: [
         // entities
+        'entities/entity-navbar-items.ts',
         'entities/entity-routing.module.ts',
         // home module
         'home/home.module.ts',
@@ -382,7 +383,11 @@ const files = {
     {
       condition: generator => generator.enableTranslation,
       path: ANGULAR_DIR,
-      templates: ['shared/language/find-language-from-key.pipe.ts', 'shared/language/translate.directive.ts'],
+      templates: [
+        'shared/language/translation.module.ts',
+        'shared/language/find-language-from-key.pipe.ts',
+        'shared/language/translate.directive.ts',
+      ],
     },
   ],
   angularAuthService: [
@@ -422,6 +427,7 @@ const files = {
         'admin/configuration/configuration.service.spec.ts',
         'admin/health/modal/health-modal.component.spec.ts',
         'admin/health/health.component.spec.ts',
+        'admin/health/health.service.spec.ts',
         'admin/logs/logs.component.spec.ts',
         'admin/logs/logs.service.spec.ts',
         'admin/metrics/metrics.component.spec.ts',
@@ -459,11 +465,16 @@ const files = {
       path: ANGULAR_DIR,
       templates: [
         'account/activate/activate.component.spec.ts',
+        'account/activate/activate.service.spec.ts',
         'account/password/password.component.spec.ts',
+        'account/password/password.service.spec.ts',
         'account/password/password-strength-bar/password-strength-bar.component.spec.ts',
         'account/password-reset/init/password-reset-init.component.spec.ts',
+        'account/password-reset/init/password-reset-init.service.spec.ts',
         'account/password-reset/finish/password-reset-finish.component.spec.ts',
+        'account/password-reset/finish/password-reset-finish.service.spec.ts',
         'account/register/register.component.spec.ts',
+        'account/register/register.service.spec.ts',
         'account/settings/settings.component.spec.ts',
       ],
     },

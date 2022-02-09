@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -54,10 +54,8 @@ _%>
         <%_ const enumPrefix = frontendAppName + '.'+ fieldType; _%>
                         <option [ngValue]="null"><% if (enableTranslation) { %>{{ '<%= enumPrefix %>.null' | translate }}<% } %></option>
         <%_ const values = field.enumValues;
-            for (key in values) {
-                const enumValue = values[key]; _%>
-                        <option value="<%= enumValue.name %>"><% if (enableTranslation) { %>{{ '<%= enumPrefix %>.<%= enumValue.name %>' | translate }}<% } else { %><%= enumValue.value %><% } %></option>
-        <%_ } _%>
+            const enumImports = generateEntityClientEnumImports(fields); _%> 
+                        <option *ngFor="let <%= _.lowerFirst(fieldType) %> of <%- _.lowerFirst(fieldType) %>Values" [value]="<%= _.lowerFirst(fieldType) %>"><% if (enableTranslation) { %>{{ '<%= enumPrefix %>.' + <%= _.lowerFirst(fieldType) %> | translate }}<% } else { %><%= _.lowerFirst(fieldType) %><% } %></option>
                     </select>
     <%_ } else { _%>
         <%_ if (field.fieldTypeBinary && !field.blobContentTypeText) { _%>

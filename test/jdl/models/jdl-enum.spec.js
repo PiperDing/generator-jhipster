@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -53,6 +53,27 @@ describe('JDLEnum', () => {
 
     it('should return the values separated by a comma', () => {
       expect(result).to.equal('A (aaaa),B');
+    });
+  });
+  describe('getValueJavadocs', () => {
+    let result;
+
+    before(() => {
+      const jdlEnum = new JDLEnum({
+        name: 'Toto',
+        values: [
+          { key: 'A', value: 'aaaa', comment: 'first comment' },
+          { key: 'B', comment: 'second comment' },
+        ],
+      });
+      result = jdlEnum.getValueJavadocs();
+    });
+
+    it('returns the comments by enum value', () => {
+      expect(result).to.deep.equal({
+        A: 'first comment',
+        B: 'second comment',
+      });
     });
   });
   describe('toString', () => {

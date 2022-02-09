@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -20,8 +20,12 @@ const os = require('os');
 const childProcess = require('child_process');
 const chalk = require('chalk');
 const glob = require('glob');
-const prompts = require('./prompts');
+
 const BaseBlueprintGenerator = require('../generator-base-blueprint');
+const { INITIALIZING_PRIORITY, PROMPTING_PRIORITY, CONFIGURING_PRIORITY, DEFAULT_PRIORITY, END_PRIORITY } =
+  require('../../lib/constants/priorities.cjs').compat;
+
+const prompts = require('./prompts');
 const statistics = require('../statistics');
 const { MEMCACHED } = require('../../jdl/jhipster/cache-types');
 const { GRADLE, MAVEN } = require('../../jdl/jhipster/build-tool-types');
@@ -35,12 +39,12 @@ const NO_DATABASE_TYPE = databaseTypes.NO;
 
 const exec = childProcess.exec;
 
-let useBlueprints;
 /* eslint-disable consistent-return */
 module.exports = class extends BaseBlueprintGenerator {
-  constructor(args, options) {
-    super(args, options);
-    useBlueprints = !this.fromBlueprint && this.instantiateBlueprints(GENERATOR_CLOUDFOUNDRY);
+  async _postConstruct() {
+    if (!this.fromBlueprint) {
+      await this.composeWithBlueprints(GENERATOR_CLOUDFOUNDRY);
+    }
   }
 
   _initializing() {
@@ -65,8 +69,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get initializing() {
-    if (useBlueprints) return;
+  get [INITIALIZING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._initializing();
   }
 
@@ -74,8 +78,8 @@ module.exports = class extends BaseBlueprintGenerator {
     return prompts.prompting;
   }
 
-  get prompting() {
-    if (useBlueprints) return;
+  get [PROMPTING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._prompting();
   }
 
@@ -114,8 +118,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get configuring() {
-    if (useBlueprints) return;
+  get [CONFIGURING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._configuring();
   }
 
@@ -181,8 +185,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get default() {
-    if (useBlueprints) return;
+  get [DEFAULT_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._default();
   }
 
@@ -231,8 +235,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get end() {
-    if (useBlueprints) return;
+  get [END_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._end();
   }
 };

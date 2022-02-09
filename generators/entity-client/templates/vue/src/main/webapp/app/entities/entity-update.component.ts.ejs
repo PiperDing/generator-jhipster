@@ -51,6 +51,8 @@ import { DATE_TIME_LONG_FORMAT } from '@/shared/date/filters';
   <%_ } _%>
 <%_ } _%>
 
+import AlertService from '@/shared/alert/alert.service';
+
 <%_ const importEntitiesSeen = [entityAngularName];
   let hasManyToMany = false;
   for (relationship of relationships) { _%>
@@ -64,18 +66,22 @@ import { DATE_TIME_LONG_FORMAT } from '@/shared/date/filters';
       hasManyToMany = true;
     } _%>
     <%_ if (!importEntitiesSeen.includes(otherEntityAngularName)) { _%>
-      <% if (relationship.otherEntityUser && !authenticationTypeOauth2) { %>
-import UserService from '@/admin/user-management/user-management.service';
-  <% } else if (relationship.otherEntityUser && authenticationTypeOauth2) { %>
-import UserOAuth2Service from '@/entities/user/user.oauth2.service';
-  <% } else if (!relationship.otherEntityUser) { %>
+      <% if (relationship.otherEntityUser && (!skipUserManagement || authenticationTypeOauth2)) { %>
+import UserService from '@/entities/user/user.service';
+      <% } else { %>
 import <%= otherEntityAngularName %>Service from '@/entities/<%= otherEntityClientRootFolder %><%= otherEntityFolderName %>/<%= otherEntityFileName %>.service';
 import { I<%= otherEntityAngularName %> } from '@/shared/model/<%= otherEntityModelName %>.model';
-  <% } %>
+      <% } %>
+    <%_ } _%>
+    <%_ importEntitiesSeen.push(otherEntityAngularName); _%>
+  <%_ } _%>
 <%_ } _%>
-<%_ importEntitiesSeen.push(otherEntityAngularName); } } _%>
 import { I<%= entityAngularName %>, <%= entityAngularName %> } from '@/shared/model/<%= entityModelFileName %>.model';
 import <%= entityAngularName %>Service from './<%= entityFileName %>.service';
+<%_ const enumImports = generateEntityClientEnumImports(fields); _%>
+<%_ enumImports.forEach( (importedPath, importedType) => { _%>
+import { <%- importedType %> } from '<%- importedPath %>';
+<%_ }); _%>
 
 const validations: any = {
   <%= entityInstance %>: {
@@ -111,7 +117,7 @@ _%>
 <%_ } _%>
 <%_ for (relationship of relationships) { _%>
   <%_ if (relationship.relationshipValidate && relationship.relationshipRequired) { _%>
-    <%= relationship.relationshipFieldName %>: {
+    <%= relationship.collection ? relationship.relationshipFieldNamePlural : relationship.relationshipFieldName %>: {
       required
     },
   <%_ } _%>
@@ -124,6 +130,8 @@ _%>
 })
 export default class <%= entityAngularName %>Update extends <% if (fieldsContainBlob) { %>mixins(JhiDataUtils)<% } else { %>Vue<% } %> {
   @Inject('<%= entityInstance %>Service') private <%= entityInstance %>Service: () => <%= entityAngularName %>Service;
+  @Inject('alertService') private alertService: () => AlertService;
+
   public <%= entityInstance %>: I<%= entityAngularName %> = new <%= entityAngularName %>();
   <%_
     const entitiesSeen = [entityAngularName];
@@ -134,16 +142,21 @@ export default class <%= entityAngularName %>Update extends <% if (fieldsContain
         const otherEntityAngularName = relationship.otherEntityAngularName;
   _%>
   <%_ if (!entitiesSeen.includes(otherEntityAngularName)) { %>
-  <%_ if (otherEntityAngularName === 'User' && authenticationType === 'oauth2') { _%>
-  @Inject('userOAuth2Service') private userOAuth2Service: () => UserOAuth2Service;
-  <%_ } else {_%>
+      <% if (relationship.otherEntityUser && (!skipUserManagement || authenticationTypeOauth2)) { %>
+  @Inject('userService') private userService: () => UserService;
+      <% } else { %>
   @Inject('<%= otherEntityName %>Service') private <%= otherEntityName %>Service: () => <%= otherEntityAngularName %>Service;
-  <%_ } _%>
-  <%_ } _%>
-  <%_ if (!entitiesSeen.includes(otherEntityNamePlural)) { %>
+      <%_ } _%>
+    <%_ } _%>
+    <%_ if (!entitiesSeen.includes(otherEntityNamePlural)) { %>
   public <%= otherEntityNamePlural %> : <% if (otherEntityAngularName === 'User') { %>Array<any><%_ } else { _%>I<%= otherEntityAngularName %>[]<%_ } _%> = [];
+    <%_ } _%>
+    <%_ entitiesSeen.push(otherEntityAngularName);entitiesSeen.push(otherEntityNamePlural); _%>
   <%_ } _%>
-  <%_ entitiesSeen.push(otherEntityAngularName);entitiesSeen.push(otherEntityNamePlural); } } _%>
+<%_ } _%>
+  <%_ enumImports.forEach( (importedPath, importedType) => { _%>
+  public <%- _.lowerFirst(importedType) %>Values : string[] = Object.keys(<%- importedType %>);
+  <%_ }); _%>
   public isSaving = false;
   public currentLanguage = '';
 
@@ -199,7 +212,10 @@ export default class <%= entityAngularName %>Update extends <% if (fieldsContain
           variant: 'info',
           solid: true,
           autoHideDelay: 5000,
-        });
+        })
+      }).catch(error => {
+          this.isSaving = false;
+          this.alertService().showHttpError(this,error.response);
       });
     } else {
       this.<%= entityInstance %>Service().create(this.<%= entityInstance %>).then((param) => {
@@ -217,7 +233,10 @@ export default class <%= entityAngularName %>Update extends <% if (fieldsContain
           solid: true,
           autoHideDelay: 5000,
         });
-      });
+      }).catch(error => {
+          this.isSaving = false;
+          this.alertService().showHttpError(this,error.response);
+      });;
     }
   }
 
@@ -264,6 +283,8 @@ _%>
       res.<%= fieldName %> = new Date(res.<%= fieldName %>);
 <%_ } } _%>
       this.<%= entityInstance %> = res;
+    }).catch(error => {
+      this.alertService().showHttpError(this,error.response);
     });
   }
 
@@ -298,24 +319,22 @@ _%>
           if (!entitiesSet.has(otherEntityName)) {
             entitiesSet.add(otherEntityName);
     _%>
-    <%_ if (otherEntityAngularName === 'User' && authenticationType === 'oauth2') { _%>
-    this.userOAuth2Service().retrieve().then((res) => {
-    <%_ } else {_%>
+      <% if (relationship.otherEntityUser && (!skipUserManagement || authenticationTypeOauth2)) { %>
+    this.userService().retrieve().then((res) => {
+      <%_ } else { _%>
     this.<%= otherEntityName %>Service().retrieve().then((res) => {
-    <%_ } _%>
+      <%_ } _%>
       this.<%= otherEntityNamePlural %> = res.data;
     });
-    <%_ } } } _%>
+      <%_ } _%>
+    <%_ } _%>
+  <%_ } _%>
   }
 
   <%_ if (hasManyToMany) { _%>
   public getSelected(selectedVals, option) : any {
     if (selectedVals) {
-      for (let i = 0; i < selectedVals.length; i++) {
-        if (option.id === selectedVals[i].id) {
-          return selectedVals[i];
-        }
-      }
+      return selectedVals.find(value => option.id === value.id) ?? option;
     }
     return option;
   }

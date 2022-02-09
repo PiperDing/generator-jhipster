@@ -28,7 +28,7 @@ describe('JHipster OpenShift Sub Generator', () => {
       runResult = await helpers
         .create(require.resolve('../generators/openshift'))
         .inTmpDir(dir => {
-          fse.copySync(path.join(__dirname, './templates/compose/'), dir);
+          fse.copySync(path.join(__dirname, './templates/compose/01-gateway'), path.join(dir, './01-gateway'));
         })
         .withOptions({ skipChecks: true, reproducibleTests: true })
         .withPrompts({
@@ -65,7 +65,8 @@ describe('JHipster OpenShift Sub Generator', () => {
       runResult = await helpers
         .create(require.resolve('../generators/openshift'))
         .inTmpDir(dir => {
-          fse.copySync(path.join(__dirname, './templates/compose/'), dir);
+          fse.copySync(path.join(__dirname, './templates/compose/01-gateway'), path.join(dir, './01-gateway'));
+          fse.copySync(path.join(__dirname, './templates/compose/02-mysql'), path.join(dir, './02-mysql'));
         })
         .withOptions({ skipChecks: true, reproducibleTests: true })
         .withPrompts({
@@ -96,49 +97,14 @@ describe('JHipster OpenShift Sub Generator', () => {
     });
   });
 
-  describe('gateway and one microservice with mysql', () => {
-    let runResult;
-    before(async () => {
-      runResult = await helpers
-        .create(require.resolve('../generators/openshift'))
-        .inTmpDir(dir => {
-          fse.copySync(path.join(__dirname, './templates/compose/'), dir);
-        })
-        .withOptions({ skipChecks: true, reproducibleTests: true })
-        .withPrompts({
-          deploymentApplicationType: 'microservice',
-          directoryPath: './',
-          chosenApps: ['01-gateway', '02-mysql'],
-          dockerRepositoryName: 'ocrepo',
-          dockerPushCommand: 'docker push',
-          openshiftNamespace: 'default',
-        })
-        .run();
-    });
-    it('should match files snapshot', function () {
-      expect(runResult.getSnapshot()).toMatchSnapshot();
-    });
-    it('creates expected registry files', () => {
-      assert.file(expectedFiles.eurekaregistry);
-    });
-    it('creates expected scc files', () => {
-      assert.file(expectedFiles.sccconfig);
-    });
-    it('creates expected gateway files', () => {
-      assert.file(expectedFiles.applcgw);
-    });
-    it('creates expected msmysql files', () => {
-      assert.file(expectedFiles.msmysql);
-    });
-  });
-
   describe('two microservices backed by mysql and postgres without gateway', () => {
     let runResult;
     before(async () => {
       runResult = await helpers
         .create(require.resolve('../generators/openshift'))
         .inTmpDir(dir => {
-          fse.copySync(path.join(__dirname, './templates/compose/'), dir);
+          fse.copySync(path.join(__dirname, './templates/compose/02-mysql'), path.join(dir, './02-mysql'));
+          fse.copySync(path.join(__dirname, './templates/compose/03-psql'), path.join(dir, './03-psql'));
         })
         .withOptions({ skipChecks: true, reproducibleTests: true })
         .withPrompts({
@@ -178,7 +144,12 @@ describe('JHipster OpenShift Sub Generator', () => {
       runResult = await helpers
         .create(require.resolve('../generators/openshift'))
         .inTmpDir(dir => {
-          fse.copySync(path.join(__dirname, './templates/compose/'), dir);
+          fse.copySync(path.join(__dirname, './templates/compose/01-gateway'), path.join(dir, './01-gateway'));
+          fse.copySync(path.join(__dirname, './templates/compose/02-mysql'), path.join(dir, './02-mysql'));
+          fse.copySync(path.join(__dirname, './templates/compose/03-psql'), path.join(dir, './03-psql'));
+          fse.copySync(path.join(__dirname, './templates/compose/04-mongo'), path.join(dir, './04-mongo'));
+          fse.copySync(path.join(__dirname, './templates/compose/05-cassandra'), path.join(dir, './05-cassandra'));
+          fse.copySync(path.join(__dirname, './templates/compose/07-mariadb'), path.join(dir, './07-mariadb'));
         })
         .withOptions({ skipChecks: true, reproducibleTests: true })
         .withPrompts({
@@ -226,7 +197,7 @@ describe('JHipster OpenShift Sub Generator', () => {
       runResult = await helpers
         .create(require.resolve('../generators/openshift'))
         .inTmpDir(dir => {
-          fse.copySync(path.join(__dirname, './templates/compose/'), dir);
+          fse.copySync(path.join(__dirname, './templates/compose/08-monolith'), path.join(dir, './08-monolith'));
         })
         .withOptions({ skipChecks: true, reproducibleTests: true })
         .withPrompts({
@@ -243,36 +214,6 @@ describe('JHipster OpenShift Sub Generator', () => {
       expect(runResult.getSnapshot()).toMatchSnapshot();
     });
     it('creates expected monolith files', () => {
-      assert.file(expectedFiles.monolith);
-    });
-    it('creates expected scc files', () => {
-      assert.file(expectedFiles.sccconfig);
-    });
-  });
-
-  describe('monolith application', () => {
-    let runResult;
-    before(async () => {
-      runResult = await helpers
-        .create(require.resolve('../generators/openshift'))
-        .inTmpDir(dir => {
-          fse.copySync(path.join(__dirname, './templates/compose/'), dir);
-        })
-        .withOptions({ skipChecks: true, reproducibleTests: true })
-        .withPrompts({
-          deploymentApplicationType: 'monolith',
-          directoryPath: './',
-          chosenApps: ['08-monolith'],
-          dockerRepositoryName: 'ocrepo',
-          dockerPushCommand: 'docker push',
-          openshiftNamespace: 'default',
-        })
-        .run();
-    });
-    it('should match files snapshot', function () {
-      expect(runResult.getSnapshot()).toMatchSnapshot();
-    });
-    it('creates expected default files', () => {
       assert.file(expectedFiles.monolith);
     });
     it('creates expected scc files', () => {

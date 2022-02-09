@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -21,7 +21,7 @@ const { OAUTH2, SESSION } = require('../../jdl/jhipster/authentication-types');
 const { GATEWAY } = require('../../jdl/jhipster/application-types');
 const constants = require('../generator-constants');
 
-const { CLIENT_TEST_SRC_DIR, REACT_DIR } = constants;
+const { CLIENT_MAIN_SRC_DIR, CLIENT_TEST_SRC_DIR, REACT_DIR } = constants;
 
 /**
  * The default is to use a file path string. It implies use of the template method.
@@ -31,12 +31,12 @@ const files = {
   common: [
     {
       templates: [
-        '.npmrc',
         'package.json',
         '.eslintrc.json',
         'tsconfig.json',
         'tsconfig.test.json',
         'jest.conf.js',
+        'webpack/environment.js',
         'webpack/webpack.common.js',
         'webpack/webpack.dev.js',
         'webpack/webpack.prod.js',
@@ -337,7 +337,19 @@ const files = {
 module.exports = {
   writeFiles,
   files,
+  cleanup,
 };
+
+function cleanup() {
+  if (!this.clientFrameworkReact) return;
+
+  if (this.isJhipsterVersionLessThan('7.4.0') && this.enableI18nRTL) {
+    this.removeFile(`${CLIENT_MAIN_SRC_DIR}content/scss/rtl.scss`);
+  }
+  if (this.isJhipsterVersionLessThan('7.4.1')) {
+    this.removeFile('.npmrc');
+  }
+}
 
 function writeFiles() {
   // write React files

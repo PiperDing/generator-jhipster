@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -17,7 +17,10 @@
  * limitations under the License.
  */
 const chalk = require('chalk');
+
 const BaseGenerator = require('../generator-base');
+const { DEFAULT_PRIORITY } = require('../../lib/constants/priorities.cjs').compat;
+
 const statistics = require('../statistics');
 const { GENERATOR_EXPORT_JDL } = require('../generator-list');
 const { OptionNames } = require('../../jdl/jhipster/application-options');
@@ -26,8 +29,8 @@ const JSONToJDLConverter = require('../../jdl/converters/json-to-jdl-converter')
 const { BASE_NAME } = OptionNames;
 
 module.exports = class extends BaseGenerator {
-  constructor(args, opts) {
-    super(args, opts);
+  constructor(args, options, features) {
+    super(args, options, features);
 
     this.argument('jdlFile', { type: String, required: false });
 
@@ -38,7 +41,7 @@ module.exports = class extends BaseGenerator {
     this.jdlFile = this.options.jdlFile || `${this.baseName}.jdl`;
   }
 
-  get default() {
+  get [DEFAULT_PRIORITY]() {
     return {
       validateFromCli() {
         this.checkInvocationFromCLI();

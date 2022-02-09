@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -19,8 +19,9 @@
 const expect = require('expect');
 const path = require('path');
 
-const { basicTests, testBlueprintSupport } = require('../../test/support/index.cjs');
 const { skipPrettierHelpers: helpers } = require('../../test/utils/utils');
+
+const { basicTests, testBlueprintSupport } = require('../../test/support/index.cjs');
 const { requiredConfig, defaultConfig } = require('./config.cjs');
 const { GENERATOR_SPRING_BOOT } = require('../generator-list');
 
@@ -37,7 +38,7 @@ describe(`JHipster ${generator} generator`, () => {
     customPrompts: {},
     generatorPath,
   });
-  describe('blueprint support', () => testBlueprintSupport('spring-boot'));
+  describe('blueprint support', () => testBlueprintSupport(generator));
   describe('with', () => {
     describe('default config', () => {
       let runResult;

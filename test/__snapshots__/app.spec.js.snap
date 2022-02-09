@@ -11,7 +11,7 @@ Object {
   ".gitignore": Object {
     "stateCleared": "modified",
   },
-  ".huskyrc": Object {
+  ".husky/pre-commit": Object {
     "stateCleared": "modified",
   },
   ".lintstagedrc.js": Object {
@@ -107,6 +107,9 @@ Object {
   "src/main/docker/sonar.yml": Object {
     "stateCleared": "modified",
   },
+  "src/main/docker/zipkin.yml": Object {
+    "stateCleared": "modified",
+  },
   "src/main/java/com/mycompany/myapp/ApplicationWebXml.java": Object {
     "stateCleared": "modified",
   },
@@ -171,6 +174,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/domain/package-info.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/java/com/mycompany/myapp/management/SecurityMetersService.java": Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/repository/AuthorityRepository.java": Object {
@@ -353,10 +359,10 @@ Object {
   "src/main/resources/templates/mail/passwordResetEmail.html": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/ArchTest.java": Object {
+  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
+  "src/test/java/com/mycompany/myapp/TechnicalStructureTest.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/config/NoOpMailConfiguration.java": Object {
@@ -369,6 +375,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/config/timezone/HibernateTimeZoneIT.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/java/com/mycompany/myapp/management/SecurityMetersServiceTests.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/repository/timezone/DateTimeWrapper.java": Object {
@@ -384,6 +393,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/JWTFilterTest.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderSecurityMetersTests.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderTest.java": Object {
@@ -434,6 +446,9 @@ Object {
   "src/test/resources/i18n/messages_fr.properties": Object {
     "stateCleared": "modified",
   },
+  "src/test/resources/junit-platform.properties": Object {
+    "stateCleared": "modified",
+  },
   "src/test/resources/logback.xml": Object {
     "stateCleared": "modified",
   },
@@ -454,7 +469,7 @@ Object {
   ".gitignore": Object {
     "stateCleared": "modified",
   },
-  ".huskyrc": Object {
+  ".husky/pre-commit": Object {
     "stateCleared": "modified",
   },
   ".lintstagedrc.js": Object {
@@ -488,12 +503,6 @@ Object {
     "stateCleared": "modified",
   },
   "mvnw.cmd": Object {
-    "stateCleared": "modified",
-  },
-  "npmw": Object {
-    "stateCleared": "modified",
-  },
-  "npmw.cmd": Object {
     "stateCleared": "modified",
   },
   "package.json": Object {
@@ -535,6 +544,9 @@ Object {
   "src/main/docker/sonar.yml": Object {
     "stateCleared": "modified",
   },
+  "src/main/docker/zipkin.yml": Object {
+    "stateCleared": "modified",
+  },
   "src/main/java/com/mycompany/myapp/ApplicationWebXml.java": Object {
     "stateCleared": "modified",
   },
@@ -599,6 +611,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/domain/package-info.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/java/com/mycompany/myapp/management/SecurityMetersService.java": Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/repository/AuthorityRepository.java": Object {
@@ -781,10 +796,10 @@ Object {
   "src/main/resources/templates/mail/passwordResetEmail.html": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/ArchTest.java": Object {
+  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
+  "src/test/java/com/mycompany/myapp/TechnicalStructureTest.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/config/NoOpMailConfiguration.java": Object {
@@ -797,6 +812,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/config/timezone/HibernateTimeZoneIT.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/java/com/mycompany/myapp/management/SecurityMetersServiceTests.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/repository/timezone/DateTimeWrapper.java": Object {
@@ -812,6 +830,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/JWTFilterTest.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderSecurityMetersTests.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderTest.java": Object {
@@ -862,6 +883,9 @@ Object {
   "src/test/resources/i18n/messages_fr.properties": Object {
     "stateCleared": "modified",
   },
+  "src/test/resources/junit-platform.properties": Object {
+    "stateCleared": "modified",
+  },
   "src/test/resources/logback.xml": Object {
     "stateCleared": "modified",
   },
@@ -891,7 +915,7 @@ Object {
   ".gitignore": Object {
     "stateCleared": "modified",
   },
-  ".huskyrc": Object {
+  ".husky/pre-commit": Object {
     "stateCleared": "modified",
   },
   ".lintstagedrc.js": Object {
@@ -948,6 +972,9 @@ Object {
   "src/main/webapp/app/account/activate/activate.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/activate/activate.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/activate/activate.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -963,6 +990,9 @@ Object {
   "src/main/webapp/app/account/password-reset/finish/password-reset-finish.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/password-reset/finish/password-reset-finish.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/password-reset/finish/password-reset-finish.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -976,6 +1006,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/password-reset/init/password-reset-init.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/account/password-reset/init/password-reset-init.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/password-reset/init/password-reset-init.service.ts": Object {
@@ -1005,6 +1038,9 @@ Object {
   "src/main/webapp/app/account/password/password.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/password/password.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/password/password.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -1021,6 +1057,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/register/register.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/account/register/register.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/register/register.service.ts": Object {
@@ -1096,6 +1135,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/admin/health/health.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/admin/health/health.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/admin/health/health.service.ts": Object {
@@ -1380,6 +1422,9 @@ Object {
   "src/main/webapp/app/core/util/parse-links.service.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/entities/entity-navbar-items.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/entities/entity-routing.module.ts": Object {
     "stateCleared": "modified",
   },
@@ -1537,6 +1582,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/shared/language/translate.directive.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/shared/language/translation.module.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/shared/pagination/item-count.component.spec.ts": Object {
@@ -1802,7 +1850,7 @@ Object {
   ".gitignore": Object {
     "stateCleared": "modified",
   },
-  ".huskyrc": Object {
+  ".husky/pre-commit": Object {
     "stateCleared": "modified",
   },
   ".lintstagedrc.js": Object {
@@ -1892,6 +1940,9 @@ Object {
   "src/main/docker/sonar.yml": Object {
     "stateCleared": "modified",
   },
+  "src/main/docker/zipkin.yml": Object {
+    "stateCleared": "modified",
+  },
   "src/main/java/com/mycompany/myapp/ApplicationWebXml.java": Object {
     "stateCleared": "modified",
   },
@@ -1959,6 +2010,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/domain/package-info.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/java/com/mycompany/myapp/management/SecurityMetersService.java": Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/repository/AuthorityRepository.java": Object {
@@ -2168,6 +2222,9 @@ Object {
   "src/main/webapp/app/account/activate/activate.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/activate/activate.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/activate/activate.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -2183,6 +2240,9 @@ Object {
   "src/main/webapp/app/account/password-reset/finish/password-reset-finish.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/password-reset/finish/password-reset-finish.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/password-reset/finish/password-reset-finish.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -2196,6 +2256,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/password-reset/init/password-reset-init.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/account/password-reset/init/password-reset-init.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/password-reset/init/password-reset-init.service.ts": Object {
@@ -2225,6 +2288,9 @@ Object {
   "src/main/webapp/app/account/password/password.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/password/password.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/password/password.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -2241,6 +2307,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/register/register.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/account/register/register.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/register/register.service.ts": Object {
@@ -2316,6 +2385,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/admin/health/health.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/admin/health/health.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/admin/health/health.service.ts": Object {
@@ -2600,6 +2672,9 @@ Object {
   "src/main/webapp/app/core/util/parse-links.service.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/entities/entity-navbar-items.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/entities/entity-routing.module.ts": Object {
     "stateCleared": "modified",
   },
@@ -2757,6 +2832,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/shared/language/translate.directive.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/shared/language/translation.module.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/shared/pagination/item-count.component.spec.ts": Object {
@@ -2978,10 +3056,10 @@ Object {
   "src/main/webapp/swagger-ui/index.html": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/ArchTest.java": Object {
+  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
+  "src/test/java/com/mycompany/myapp/TechnicalStructureTest.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/config/NoOpMailConfiguration.java": Object {
@@ -2999,6 +3077,9 @@ Object {
   "src/test/java/com/mycompany/myapp/config/timezone/HibernateTimeZoneIT.java": Object {
     "stateCleared": "modified",
   },
+  "src/test/java/com/mycompany/myapp/management/SecurityMetersServiceTests.java": Object {
+    "stateCleared": "modified",
+  },
   "src/test/java/com/mycompany/myapp/repository/timezone/DateTimeWrapper.java": Object {
     "stateCleared": "modified",
   },
@@ -3012,6 +3093,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/JWTFilterTest.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderSecurityMetersTests.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderTest.java": Object {
@@ -3063,6 +3147,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/test/resources/i18n/messages_fr.properties": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/resources/junit-platform.properties": Object {
     "stateCleared": "modified",
   },
   "src/test/resources/logback.xml": Object {
@@ -3118,7 +3205,7 @@ Object {
   ".gitignore": Object {
     "stateCleared": "modified",
   },
-  ".huskyrc": Object {
+  ".husky/pre-commit": Object {
     "stateCleared": "modified",
   },
   ".lintstagedrc.js": Object {
@@ -3217,6 +3304,9 @@ Object {
   "src/main/docker/sonar.yml": Object {
     "stateCleared": "modified",
   },
+  "src/main/docker/zipkin.yml": Object {
+    "stateCleared": "modified",
+  },
   "src/main/java/com/mycompany/myapp/ApplicationWebXml.java": Object {
     "stateCleared": "modified",
   },
@@ -3284,6 +3374,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/domain/package-info.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/java/com/mycompany/myapp/management/SecurityMetersService.java": Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/repository/AuthorityRepository.java": Object {
@@ -3475,6 +3568,9 @@ Object {
   "src/main/webapp/app/account/activate/activate.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/activate/activate.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/activate/activate.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -3490,6 +3586,9 @@ Object {
   "src/main/webapp/app/account/password-reset/finish/password-reset-finish.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/password-reset/finish/password-reset-finish.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/password-reset/finish/password-reset-finish.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -3503,6 +3602,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/password-reset/init/password-reset-init.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/account/password-reset/init/password-reset-init.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/password-reset/init/password-reset-init.service.ts": Object {
@@ -3532,6 +3634,9 @@ Object {
   "src/main/webapp/app/account/password/password.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/password/password.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/password/password.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -3548,6 +3653,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/register/register.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/account/register/register.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/register/register.service.ts": Object {
@@ -3623,6 +3731,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/admin/health/health.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/admin/health/health.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/admin/health/health.service.ts": Object {
@@ -3907,6 +4018,9 @@ Object {
   "src/main/webapp/app/core/util/parse-links.service.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/entities/entity-navbar-items.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/entities/entity-routing.module.ts": Object {
     "stateCleared": "modified",
   },
@@ -4064,6 +4178,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/shared/language/translate.directive.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/shared/language/translation.module.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/shared/pagination/item-count.component.spec.ts": Object {
@@ -4285,10 +4402,16 @@ Object {
   "src/main/webapp/swagger-ui/index.html": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/ArchTest.java": Object {
+  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
+  "src/test/java/com/mycompany/myapp/MongoDbTestContainerExtension.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/java/com/mycompany/myapp/TechnicalStructureTest.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/java/com/mycompany/myapp/TestContainersSpringContextCustomizerFactory.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/config/NoOpMailConfiguration.java": Object {
@@ -4303,6 +4426,9 @@ Object {
   "src/test/java/com/mycompany/myapp/config/WebConfigurerTestController.java": Object {
     "stateCleared": "modified",
   },
+  "src/test/java/com/mycompany/myapp/management/SecurityMetersServiceTests.java": Object {
+    "stateCleared": "modified",
+  },
   "src/test/java/com/mycompany/myapp/security/DomainUserDetailsServiceIT.java": Object {
     "stateCleared": "modified",
   },
@@ -4310,6 +4436,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/JWTFilterTest.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderSecurityMetersTests.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderTest.java": Object {
@@ -4351,6 +4480,9 @@ Object {
   "src/test/java/com/mycompany/myapp/web/rest/errors/ExceptionTranslatorTestController.java": Object {
     "stateCleared": "modified",
   },
+  "src/test/resources/META-INF/spring.factories": Object {
+    "stateCleared": "modified",
+  },
   "src/test/resources/config/application.yml": Object {
     "stateCleared": "modified",
   },
@@ -4358,6 +4490,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/test/resources/i18n/messages_fr.properties": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/resources/junit-platform.properties": Object {
     "stateCleared": "modified",
   },
   "src/test/resources/logback.xml": Object {
@@ -4410,7 +4545,7 @@ Object {
   ".gitignore": Object {
     "stateCleared": "modified",
   },
-  ".huskyrc": Object {
+  ".husky/pre-commit": Object {
     "stateCleared": "modified",
   },
   ".lintstagedrc.js": Object {
@@ -4498,6 +4633,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/docker/sonar.yml": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/docker/zipkin.yml": Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/ApplicationWebXml.java": Object {
@@ -4770,6 +4908,9 @@ Object {
   "src/main/webapp/app/account/activate/activate.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/activate/activate.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/activate/activate.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -4785,6 +4926,9 @@ Object {
   "src/main/webapp/app/account/password-reset/finish/password-reset-finish.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/password-reset/finish/password-reset-finish.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/password-reset/finish/password-reset-finish.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -4798,6 +4942,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/password-reset/init/password-reset-init.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/account/password-reset/init/password-reset-init.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/password-reset/init/password-reset-init.service.ts": Object {
@@ -4827,6 +4974,9 @@ Object {
   "src/main/webapp/app/account/password/password.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/password/password.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/password/password.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -4843,6 +4993,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/register/register.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/account/register/register.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/register/register.service.ts": Object {
@@ -4936,6 +5089,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/admin/health/health.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/admin/health/health.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/admin/health/health.service.ts": Object {
@@ -5214,6 +5370,9 @@ Object {
   "src/main/webapp/app/core/util/parse-links.service.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/entities/entity-navbar-items.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/entities/entity-routing.module.ts": Object {
     "stateCleared": "modified",
   },
@@ -5371,6 +5530,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/shared/language/translate.directive.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/shared/language/translation.module.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/shared/pagination/item-count.component.spec.ts": Object {
@@ -5592,10 +5754,10 @@ Object {
   "src/main/webapp/swagger-ui/index.html": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/ArchTest.java": Object {
+  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
+  "src/test/java/com/mycompany/myapp/TechnicalStructureTest.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/config/NoOpMailConfiguration.java": Object {
@@ -5668,6 +5830,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/test/resources/i18n/messages_fr.properties": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/resources/junit-platform.properties": Object {
     "stateCleared": "modified",
   },
   "src/test/resources/logback.xml": Object {
@@ -5720,7 +5885,7 @@ Object {
   ".gitignore": Object {
     "stateCleared": "modified",
   },
-  ".huskyrc": Object {
+  ".husky/pre-commit": Object {
     "stateCleared": "modified",
   },
   ".lintstagedrc.js": Object {
@@ -5810,6 +5975,9 @@ Object {
   "src/main/docker/sonar.yml": Object {
     "stateCleared": "modified",
   },
+  "src/main/docker/zipkin.yml": Object {
+    "stateCleared": "modified",
+  },
   "src/main/java/com/mycompany/myapp/ApplicationWebXml.java": Object {
     "stateCleared": "modified",
   },
@@ -5877,6 +6045,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/domain/package-info.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/java/com/mycompany/myapp/management/SecurityMetersService.java": Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/repository/AuthorityRepository.java": Object {
@@ -6086,6 +6257,9 @@ Object {
   "src/main/webapp/app/account/activate/activate.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/activate/activate.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/activate/activate.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -6101,6 +6275,9 @@ Object {
   "src/main/webapp/app/account/password-reset/finish/password-reset-finish.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/password-reset/finish/password-reset-finish.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/password-reset/finish/password-reset-finish.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -6114,6 +6291,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/password-reset/init/password-reset-init.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/account/password-reset/init/password-reset-init.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/password-reset/init/password-reset-init.service.ts": Object {
@@ -6143,6 +6323,9 @@ Object {
   "src/main/webapp/app/account/password/password.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/password/password.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/password/password.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -6159,6 +6342,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/register/register.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/account/register/register.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/register/register.service.ts": Object {
@@ -6234,6 +6420,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/admin/health/health.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/admin/health/health.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/admin/health/health.service.ts": Object {
@@ -6518,6 +6707,9 @@ Object {
   "src/main/webapp/app/core/util/parse-links.service.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/entities/entity-navbar-items.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/entities/entity-routing.module.ts": Object {
     "stateCleared": "modified",
   },
@@ -6675,6 +6867,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/shared/language/translate.directive.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/shared/language/translation.module.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/shared/pagination/item-count.component.spec.ts": Object {
@@ -6896,10 +7091,10 @@ Object {
   "src/main/webapp/swagger-ui/index.html": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/ArchTest.java": Object {
+  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
+  "src/test/java/com/mycompany/myapp/TechnicalStructureTest.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/config/NoOpMailConfiguration.java": Object {
@@ -6917,6 +7112,9 @@ Object {
   "src/test/java/com/mycompany/myapp/config/timezone/HibernateTimeZoneIT.java": Object {
     "stateCleared": "modified",
   },
+  "src/test/java/com/mycompany/myapp/management/SecurityMetersServiceTests.java": Object {
+    "stateCleared": "modified",
+  },
   "src/test/java/com/mycompany/myapp/repository/timezone/DateTimeWrapper.java": Object {
     "stateCleared": "modified",
   },
@@ -6930,6 +7128,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/JWTFilterTest.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderSecurityMetersTests.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderTest.java": Object {
@@ -6981,6 +7182,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/test/resources/i18n/messages_fr.properties": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/resources/junit-platform.properties": Object {
     "stateCleared": "modified",
   },
   "src/test/resources/logback.xml": Object {
@@ -7033,7 +7237,7 @@ Object {
   ".gitignore": Object {
     "stateCleared": "modified",
   },
-  ".huskyrc": Object {
+  ".husky/pre-commit": Object {
     "stateCleared": "modified",
   },
   ".lintstagedrc.js": Object {
@@ -7123,6 +7327,9 @@ Object {
   "src/main/docker/sonar.yml": Object {
     "stateCleared": "modified",
   },
+  "src/main/docker/zipkin.yml": Object {
+    "stateCleared": "modified",
+  },
   "src/main/java/com/mycompany/myapp/ApplicationWebXml.java": Object {
     "stateCleared": "modified",
   },
@@ -7190,6 +7397,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/domain/package-info.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/java/com/mycompany/myapp/management/SecurityMetersService.java": Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/repository/AuthorityRepository.java": Object {
@@ -7399,6 +7609,9 @@ Object {
   "src/main/webapp/app/account/activate/activate.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/activate/activate.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/activate/activate.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -7414,6 +7627,9 @@ Object {
   "src/main/webapp/app/account/password-reset/finish/password-reset-finish.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/password-reset/finish/password-reset-finish.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/password-reset/finish/password-reset-finish.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -7427,6 +7643,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/password-reset/init/password-reset-init.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/account/password-reset/init/password-reset-init.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/password-reset/init/password-reset-init.service.ts": Object {
@@ -7456,6 +7675,9 @@ Object {
   "src/main/webapp/app/account/password/password.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/password/password.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/password/password.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -7472,6 +7694,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/register/register.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/account/register/register.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/register/register.service.ts": Object {
@@ -7547,6 +7772,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/admin/health/health.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/admin/health/health.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/admin/health/health.service.ts": Object {
@@ -7831,6 +8059,9 @@ Object {
   "src/main/webapp/app/core/util/parse-links.service.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/entities/entity-navbar-items.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/entities/entity-routing.module.ts": Object {
     "stateCleared": "modified",
   },
@@ -7988,6 +8219,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/shared/language/translate.directive.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/shared/language/translation.module.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/shared/pagination/item-count.component.spec.ts": Object {
@@ -8209,10 +8443,10 @@ Object {
   "src/main/webapp/swagger-ui/index.html": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/ArchTest.java": Object {
+  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
+  "src/test/java/com/mycompany/myapp/TechnicalStructureTest.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/config/NoOpMailConfiguration.java": Object {
@@ -8230,6 +8464,9 @@ Object {
   "src/test/java/com/mycompany/myapp/config/timezone/HibernateTimeZoneIT.java": Object {
     "stateCleared": "modified",
   },
+  "src/test/java/com/mycompany/myapp/management/SecurityMetersServiceTests.java": Object {
+    "stateCleared": "modified",
+  },
   "src/test/java/com/mycompany/myapp/repository/timezone/DateTimeWrapper.java": Object {
     "stateCleared": "modified",
   },
@@ -8243,6 +8480,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/JWTFilterTest.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderSecurityMetersTests.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderTest.java": Object {
@@ -8296,6 +8536,9 @@ Object {
   "src/test/resources/i18n/messages_fr.properties": Object {
     "stateCleared": "modified",
   },
+  "src/test/resources/junit-platform.properties": Object {
+    "stateCleared": "modified",
+  },
   "src/test/resources/logback.xml": Object {
     "stateCleared": "modified",
   },
@@ -8346,7 +8589,7 @@ Object {
   ".gitignore": Object {
     "stateCleared": "modified",
   },
-  ".huskyrc": Object {
+  ".husky/pre-commit": Object {
     "stateCleared": "modified",
   },
   ".lintstagedrc.js": Object {
@@ -8412,6 +8655,12 @@ Object {
   "ngsw-config.json": Object {
     "stateCleared": "modified",
   },
+  "npmw": Object {
+    "stateCleared": "modified",
+  },
+  "npmw.cmd": Object {
+    "stateCleared": "modified",
+  },
   "package.json": Object {
     "stateCleared": "modified",
   },
@@ -8449,6 +8698,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/docker/sonar.yml": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/docker/zipkin.yml": Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/ApplicationWebXml.java": Object {
@@ -8518,6 +8770,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/domain/package-info.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/java/com/mycompany/myapp/management/SecurityMetersService.java": Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/repository/AuthorityRepository.java": Object {
@@ -8727,6 +8982,9 @@ Object {
   "src/main/webapp/app/account/activate/activate.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/activate/activate.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/activate/activate.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -8742,6 +9000,9 @@ Object {
   "src/main/webapp/app/account/password-reset/finish/password-reset-finish.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/password-reset/finish/password-reset-finish.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/password-reset/finish/password-reset-finish.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -8755,6 +9016,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/password-reset/init/password-reset-init.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/account/password-reset/init/password-reset-init.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/password-reset/init/password-reset-init.service.ts": Object {
@@ -8784,6 +9048,9 @@ Object {
   "src/main/webapp/app/account/password/password.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/password/password.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/password/password.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -8800,6 +9067,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/register/register.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/account/register/register.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/register/register.service.ts": Object {
@@ -8875,6 +9145,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/admin/health/health.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/admin/health/health.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/admin/health/health.service.ts": Object {
@@ -9159,6 +9432,9 @@ Object {
   "src/main/webapp/app/core/util/parse-links.service.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/entities/entity-navbar-items.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/entities/entity-routing.module.ts": Object {
     "stateCleared": "modified",
   },
@@ -9316,6 +9592,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/shared/language/translate.directive.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/shared/language/translation.module.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/shared/pagination/item-count.component.spec.ts": Object {
@@ -9537,10 +9816,10 @@ Object {
   "src/main/webapp/swagger-ui/index.html": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/ArchTest.java": Object {
+  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
+  "src/test/java/com/mycompany/myapp/TechnicalStructureTest.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/config/NoOpMailConfiguration.java": Object {
@@ -9558,6 +9837,9 @@ Object {
   "src/test/java/com/mycompany/myapp/config/timezone/HibernateTimeZoneIT.java": Object {
     "stateCleared": "modified",
   },
+  "src/test/java/com/mycompany/myapp/management/SecurityMetersServiceTests.java": Object {
+    "stateCleared": "modified",
+  },
   "src/test/java/com/mycompany/myapp/repository/timezone/DateTimeWrapper.java": Object {
     "stateCleared": "modified",
   },
@@ -9571,6 +9853,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/JWTFilterTest.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderSecurityMetersTests.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderTest.java": Object {
@@ -9624,6 +9909,9 @@ Object {
   "src/test/resources/i18n/messages_fr.properties": Object {
     "stateCleared": "modified",
   },
+  "src/test/resources/junit-platform.properties": Object {
+    "stateCleared": "modified",
+  },
   "src/test/resources/logback.xml": Object {
     "stateCleared": "modified",
   },
@@ -9671,7 +9959,7 @@ Object {
   ".gitignore": Object {
     "stateCleared": "modified",
   },
-  ".huskyrc": Object {
+  ".husky/pre-commit": Object {
     "stateCleared": "modified",
   },
   ".lintstagedrc.js": Object {
@@ -9684,9 +9972,6 @@ Object {
     "stateCleared": "modified",
   },
   ".mvn/wrapper/maven-wrapper.properties": Object {
-    "stateCleared": "modified",
-  },
-  ".npmrc": Object {
     "stateCleared": "modified",
   },
   ".prettierignore": Object {
@@ -9761,6 +10046,9 @@ Object {
   "src/main/docker/sonar.yml": Object {
     "stateCleared": "modified",
   },
+  "src/main/docker/zipkin.yml": Object {
+    "stateCleared": "modified",
+  },
   "src/main/java/com/mycompany/myapp/ApplicationWebXml.java": Object {
     "stateCleared": "modified",
   },
@@ -9828,6 +10116,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/domain/package-info.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/java/com/mycompany/myapp/management/SecurityMetersService.java": Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/repository/AuthorityRepository.java": Object {
@@ -10475,10 +10766,10 @@ Object {
   "src/main/webapp/swagger-ui/index.html": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/ArchTest.java": Object {
+  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
+  "src/test/java/com/mycompany/myapp/TechnicalStructureTest.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/config/NoOpMailConfiguration.java": Object {
@@ -10496,6 +10787,9 @@ Object {
   "src/test/java/com/mycompany/myapp/config/timezone/HibernateTimeZoneIT.java": Object {
     "stateCleared": "modified",
   },
+  "src/test/java/com/mycompany/myapp/management/SecurityMetersServiceTests.java": Object {
+    "stateCleared": "modified",
+  },
   "src/test/java/com/mycompany/myapp/repository/timezone/DateTimeWrapper.java": Object {
     "stateCleared": "modified",
   },
@@ -10509,6 +10803,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/JWTFilterTest.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderSecurityMetersTests.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderTest.java": Object {
@@ -10562,6 +10859,9 @@ Object {
   "src/test/resources/i18n/messages_fr.properties": Object {
     "stateCleared": "modified",
   },
+  "src/test/resources/junit-platform.properties": Object {
+    "stateCleared": "modified",
+  },
   "src/test/resources/logback.xml": Object {
     "stateCleared": "modified",
   },
@@ -10572,6 +10872,9 @@ Object {
     "stateCleared": "modified",
   },
   "tsconfig.test.json": Object {
+    "stateCleared": "modified",
+  },
+  "webpack/environment.js": Object {
     "stateCleared": "modified",
   },
   "webpack/logo-jhipster.png": Object {
@@ -10612,7 +10915,7 @@ Object {
   ".gitignore": Object {
     "stateCleared": "modified",
   },
-  ".huskyrc": Object {
+  ".husky/pre-commit": Object {
     "stateCleared": "modified",
   },
   ".lintstagedrc.js": Object {
@@ -10702,6 +11005,9 @@ Object {
   "src/main/docker/sonar.yml": Object {
     "stateCleared": "modified",
   },
+  "src/main/docker/zipkin.yml": Object {
+    "stateCleared": "modified",
+  },
   "src/main/java/com/mycompany/myapp/ApplicationWebXml.java": Object {
     "stateCleared": "modified",
   },
@@ -10769,6 +11075,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/domain/package-info.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/java/com/mycompany/myapp/management/SecurityMetersService.java": Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/repository/AuthorityRepository.java": Object {
@@ -10978,6 +11287,9 @@ Object {
   "src/main/webapp/app/account/activate/activate.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/activate/activate.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/activate/activate.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -10993,6 +11305,9 @@ Object {
   "src/main/webapp/app/account/password-reset/finish/password-reset-finish.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/password-reset/finish/password-reset-finish.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/password-reset/finish/password-reset-finish.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -11006,6 +11321,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/password-reset/init/password-reset-init.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/account/password-reset/init/password-reset-init.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/password-reset/init/password-reset-init.service.ts": Object {
@@ -11035,6 +11353,9 @@ Object {
   "src/main/webapp/app/account/password/password.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/password/password.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/password/password.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -11051,6 +11372,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/register/register.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/account/register/register.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/register/register.service.ts": Object {
@@ -11126,6 +11450,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/admin/health/health.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/admin/health/health.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/admin/health/health.service.ts": Object {
@@ -11410,6 +11737,9 @@ Object {
   "src/main/webapp/app/core/util/parse-links.service.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/entities/entity-navbar-items.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/entities/entity-routing.module.ts": Object {
     "stateCleared": "modified",
   },
@@ -11567,6 +11897,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/shared/language/translate.directive.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/shared/language/translation.module.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/shared/pagination/item-count.component.spec.ts": Object {
@@ -11788,10 +12121,10 @@ Object {
   "src/main/webapp/swagger-ui/index.html": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/ArchTest.java": Object {
+  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
+  "src/test/java/com/mycompany/myapp/TechnicalStructureTest.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/config/NoOpMailConfiguration.java": Object {
@@ -11809,6 +12142,9 @@ Object {
   "src/test/java/com/mycompany/myapp/config/timezone/HibernateTimeZoneIT.java": Object {
     "stateCleared": "modified",
   },
+  "src/test/java/com/mycompany/myapp/management/SecurityMetersServiceTests.java": Object {
+    "stateCleared": "modified",
+  },
   "src/test/java/com/mycompany/myapp/repository/timezone/DateTimeWrapper.java": Object {
     "stateCleared": "modified",
   },
@@ -11822,6 +12158,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/JWTFilterTest.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderSecurityMetersTests.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderTest.java": Object {
@@ -11875,6 +12214,9 @@ Object {
   "src/test/resources/i18n/messages_fr.properties": Object {
     "stateCleared": "modified",
   },
+  "src/test/resources/junit-platform.properties": Object {
+    "stateCleared": "modified",
+  },
   "src/test/resources/logback.xml": Object {
     "stateCleared": "modified",
   },
@@ -11925,7 +12267,7 @@ Object {
   ".gitignore": Object {
     "stateCleared": "modified",
   },
-  ".huskyrc": Object {
+  ".husky/pre-commit": Object {
     "stateCleared": "modified",
   },
   ".lintstagedrc.js": Object {
@@ -12015,6 +12357,9 @@ Object {
   "src/main/docker/sonar.yml": Object {
     "stateCleared": "modified",
   },
+  "src/main/docker/zipkin.yml": Object {
+    "stateCleared": "modified",
+  },
   "src/main/java/com/mycompany/myapp/ApplicationWebXml.java": Object {
     "stateCleared": "modified",
   },
@@ -12082,6 +12427,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/domain/package-info.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/java/com/mycompany/myapp/management/SecurityMetersService.java": Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/repository/AuthorityRepository.java": Object {
@@ -12288,6 +12636,9 @@ Object {
   "src/main/webapp/app/account/activate/activate.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/activate/activate.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/activate/activate.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -12303,6 +12654,9 @@ Object {
   "src/main/webapp/app/account/password-reset/finish/password-reset-finish.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/password-reset/finish/password-reset-finish.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/password-reset/finish/password-reset-finish.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -12316,6 +12670,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/password-reset/init/password-reset-init.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/account/password-reset/init/password-reset-init.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/password-reset/init/password-reset-init.service.ts": Object {
@@ -12345,6 +12702,9 @@ Object {
   "src/main/webapp/app/account/password/password.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/password/password.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/password/password.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -12361,6 +12721,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/register/register.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/account/register/register.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/register/register.service.ts": Object {
@@ -12436,6 +12799,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/admin/health/health.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/admin/health/health.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/admin/health/health.service.ts": Object {
@@ -12720,6 +13086,9 @@ Object {
   "src/main/webapp/app/core/util/parse-links.service.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/entities/entity-navbar-items.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/entities/entity-routing.module.ts": Object {
     "stateCleared": "modified",
   },
@@ -12877,6 +13246,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/shared/language/translate.directive.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/shared/language/translation.module.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/shared/pagination/item-count.component.spec.ts": Object {
@@ -13053,16 +13425,10 @@ Object {
   "src/main/webapp/swagger-ui/index.html": Object {
     "stateCleared": "modified",
   },
-  "src/test/features/gitkeep": Object {
-    "stateCleared": "modified",
-  },
-  "src/test/features/user/user.feature": Object {
-    "stateCleared": "modified",
-  },
-  "src/test/java/com/mycompany/myapp/ArchTest.java": Object {
-    "stateCleared": "modified",
-  },
   "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/java/com/mycompany/myapp/TechnicalStructureTest.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/config/NoOpMailConfiguration.java": Object {
@@ -13092,6 +13458,9 @@ Object {
   "src/test/java/com/mycompany/myapp/cucumber/stepdefs/UserStepDefs.java": Object {
     "stateCleared": "modified",
   },
+  "src/test/java/com/mycompany/myapp/management/SecurityMetersServiceTests.java": Object {
+    "stateCleared": "modified",
+  },
   "src/test/java/com/mycompany/myapp/repository/timezone/DateTimeWrapper.java": Object {
     "stateCleared": "modified",
   },
@@ -13105,6 +13474,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/JWTFilterTest.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderSecurityMetersTests.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderTest.java": Object {
@@ -13146,16 +13518,22 @@ Object {
   "src/test/java/com/mycompany/myapp/web/rest/errors/ExceptionTranslatorTestController.java": Object {
     "stateCleared": "modified",
   },
+  "src/test/resources/com/mycompany/myapp/cucumber/gitkeep": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/resources/com/mycompany/myapp/cucumber/user.feature": Object {
+    "stateCleared": "modified",
+  },
   "src/test/resources/config/application-testcontainers.yml": Object {
     "stateCleared": "modified",
   },
   "src/test/resources/config/application.yml": Object {
     "stateCleared": "modified",
   },
-  "src/test/resources/cucumber.properties": Object {
+  "src/test/resources/i18n/messages_en.properties": Object {
     "stateCleared": "modified",
   },
-  "src/test/resources/i18n/messages_en.properties": Object {
+  "src/test/resources/junit-platform.properties": Object {
     "stateCleared": "modified",
   },
   "src/test/resources/logback.xml": Object {
@@ -13208,7 +13586,7 @@ Object {
   ".gitignore": Object {
     "stateCleared": "modified",
   },
-  ".huskyrc": Object {
+  ".husky/pre-commit": Object {
     "stateCleared": "modified",
   },
   ".lintstagedrc.js": Object {
@@ -13298,6 +13676,9 @@ Object {
   "src/main/docker/sonar.yml": Object {
     "stateCleared": "modified",
   },
+  "src/main/docker/zipkin.yml": Object {
+    "stateCleared": "modified",
+  },
   "src/main/java/com/mycompany/myapp/ApplicationWebXml.java": Object {
     "stateCleared": "modified",
   },
@@ -13365,6 +13746,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/domain/package-info.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/java/com/mycompany/myapp/management/SecurityMetersService.java": Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/repository/AuthorityRepository.java": Object {
@@ -13571,6 +13955,9 @@ Object {
   "src/main/webapp/app/account/activate/activate.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/activate/activate.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/activate/activate.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -13586,6 +13973,9 @@ Object {
   "src/main/webapp/app/account/password-reset/finish/password-reset-finish.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/password-reset/finish/password-reset-finish.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/password-reset/finish/password-reset-finish.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -13599,6 +13989,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/password-reset/init/password-reset-init.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/account/password-reset/init/password-reset-init.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/password-reset/init/password-reset-init.service.ts": Object {
@@ -13628,6 +14021,9 @@ Object {
   "src/main/webapp/app/account/password/password.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/password/password.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/password/password.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -13644,6 +14040,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/register/register.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/account/register/register.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/register/register.service.ts": Object {
@@ -13719,6 +14118,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/admin/health/health.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/admin/health/health.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/admin/health/health.service.ts": Object {
@@ -14003,6 +14405,9 @@ Object {
   "src/main/webapp/app/core/util/parse-links.service.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/entities/entity-navbar-items.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/entities/entity-routing.module.ts": Object {
     "stateCleared": "modified",
   },
@@ -14160,6 +14565,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/shared/language/translate.directive.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/shared/language/translation.module.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/shared/pagination/item-count.component.spec.ts": Object {
@@ -14336,10 +14744,10 @@ Object {
   "src/main/webapp/swagger-ui/index.html": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/ArchTest.java": Object {
+  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
+  "src/test/java/com/mycompany/myapp/TechnicalStructureTest.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/config/NoOpMailConfiguration.java": Object {
@@ -14357,6 +14765,9 @@ Object {
   "src/test/java/com/mycompany/myapp/config/timezone/HibernateTimeZoneIT.java": Object {
     "stateCleared": "modified",
   },
+  "src/test/java/com/mycompany/myapp/management/SecurityMetersServiceTests.java": Object {
+    "stateCleared": "modified",
+  },
   "src/test/java/com/mycompany/myapp/repository/timezone/DateTimeWrapper.java": Object {
     "stateCleared": "modified",
   },
@@ -14370,6 +14781,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/JWTFilterTest.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderSecurityMetersTests.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderTest.java": Object {
@@ -14432,6 +14846,9 @@ Object {
   "src/test/resources/i18n/messages_en.properties": Object {
     "stateCleared": "modified",
   },
+  "src/test/resources/junit-platform.properties": Object {
+    "stateCleared": "modified",
+  },
   "src/test/resources/logback.xml": Object {
     "stateCleared": "modified",
   },
@@ -14485,7 +14902,7 @@ Object {
   ".gitignore": Object {
     "stateCleared": "modified",
   },
-  ".huskyrc": Object {
+  ".husky/pre-commit": Object {
     "stateCleared": "modified",
   },
   ".lintstagedrc.js": Object {
@@ -14575,6 +14992,9 @@ Object {
   "src/main/docker/sonar.yml": Object {
     "stateCleared": "modified",
   },
+  "src/main/docker/zipkin.yml": Object {
+    "stateCleared": "modified",
+  },
   "src/main/java/com/mycompany/myapp/ApplicationWebXml.java": Object {
     "stateCleared": "modified",
   },
@@ -14642,6 +15062,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/domain/package-info.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/java/com/mycompany/myapp/management/SecurityMetersService.java": Object {
     "stateCleared": "modified",
   },
   "src/main/java/com/mycompany/myapp/repository/AuthorityRepository.java": Object {
@@ -14851,6 +15274,9 @@ Object {
   "src/main/webapp/app/account/activate/activate.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/activate/activate.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/activate/activate.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -14866,6 +15292,9 @@ Object {
   "src/main/webapp/app/account/password-reset/finish/password-reset-finish.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/password-reset/finish/password-reset-finish.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/password-reset/finish/password-reset-finish.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -14879,6 +15308,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/password-reset/init/password-reset-init.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/account/password-reset/init/password-reset-init.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/password-reset/init/password-reset-init.service.ts": Object {
@@ -14908,6 +15340,9 @@ Object {
   "src/main/webapp/app/account/password/password.route.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/account/password/password.service.spec.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/account/password/password.service.ts": Object {
     "stateCleared": "modified",
   },
@@ -14924,6 +15359,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/register/register.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/account/register/register.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/account/register/register.service.ts": Object {
@@ -14999,6 +15437,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/admin/health/health.route.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/admin/health/health.service.spec.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/admin/health/health.service.ts": Object {
@@ -15283,6 +15724,9 @@ Object {
   "src/main/webapp/app/core/util/parse-links.service.ts": Object {
     "stateCleared": "modified",
   },
+  "src/main/webapp/app/entities/entity-navbar-items.ts": Object {
+    "stateCleared": "modified",
+  },
   "src/main/webapp/app/entities/entity-routing.module.ts": Object {
     "stateCleared": "modified",
   },
@@ -15440,6 +15884,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/shared/language/translate.directive.ts": Object {
+    "stateCleared": "modified",
+  },
+  "src/main/webapp/app/shared/language/translation.module.ts": Object {
     "stateCleared": "modified",
   },
   "src/main/webapp/app/shared/pagination/item-count.component.spec.ts": Object {
@@ -15664,10 +16111,10 @@ Object {
   "src/main/webapp/swagger-ui/index.html": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/ArchTest.java": Object {
+  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
     "stateCleared": "modified",
   },
-  "src/test/java/com/mycompany/myapp/IntegrationTest.java": Object {
+  "src/test/java/com/mycompany/myapp/TechnicalStructureTest.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/config/NoOpMailConfiguration.java": Object {
@@ -15685,6 +16132,9 @@ Object {
   "src/test/java/com/mycompany/myapp/config/timezone/HibernateTimeZoneIT.java": Object {
     "stateCleared": "modified",
   },
+  "src/test/java/com/mycompany/myapp/management/SecurityMetersServiceTests.java": Object {
+    "stateCleared": "modified",
+  },
   "src/test/java/com/mycompany/myapp/repository/timezone/DateTimeWrapper.java": Object {
     "stateCleared": "modified",
   },
@@ -15698,6 +16148,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/JWTFilterTest.java": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderSecurityMetersTests.java": Object {
     "stateCleared": "modified",
   },
   "src/test/java/com/mycompany/myapp/security/jwt/TokenProviderTest.java": Object {
@@ -15749,6 +16202,9 @@ Object {
     "stateCleared": "modified",
   },
   "src/test/resources/i18n/messages_en.properties": Object {
+    "stateCleared": "modified",
+  },
+  "src/test/resources/junit-platform.properties": Object {
     "stateCleared": "modified",
   },
   "src/test/resources/logback.xml": Object {

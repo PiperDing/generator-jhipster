@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -21,6 +21,7 @@
 import { shallowMount, createLocalVue, Wrapper } from '@vue/test-utils';
 import sinon, { SinonStubbedInstance } from 'sinon';
 import Router from 'vue-router';
+import { ToastPlugin } from 'bootstrap-vue';
 
 <%_ let dayJsIncluded = false;
   for (field of fields.filter(field => !field.id)) { _%>
@@ -44,10 +45,8 @@ import <%= entityAngularName %>Service from '@/entities/<%= entityFolderName %>/
     const otherEntityFolderName = relationship.otherEntityFileName;
     const otherEntityClientRootFolder = relationship.otherEntityClientRootFolder; _%>
     <%_ if (!importEntitiesSeen.includes(otherEntityAngularName)) { _%>
-      <% if (relationship.otherEntityUser && !authenticationTypeOauth2) { %>
-import UserService from '@/admin/user-management/user-management.service';
-      <%_ } else if (relationship.otherEntityUser && authenticationTypeOauth2) { _%>
-import UserOAuth2Service from '@/entities/user/user.oauth2.service';
+      <% if (relationship.otherEntityUser && (!skipUserManagement || authenticationTypeOauth2)) { %>
+import UserService from '@/entities/user/user.service';
       <% } else if (!relationship.otherEntityUser) { %>
 import <%= otherEntityAngularName %>Service from '@/entities/<%= otherEntityClientRootFolder %><%= otherEntityFolderName %>/<%= otherEntityFileName %>.service';
       <%_ } _%>
@@ -55,6 +54,7 @@ import <%= otherEntityAngularName %>Service from '@/entities/<%= otherEntityClie
     <%_ importEntitiesSeen.push(otherEntityAngularName); _%>
   <%_ } _%>
 <%_ } _%>
+import AlertService from '@/shared/alert/alert.service';
 
 const localVue = createLocalVue();
 
@@ -65,6 +65,7 @@ const i18n = config.initI18N(localVue);
 const store = config.initVueXStore(localVue);
 const router = new Router();
 localVue.use(Router);
+localVue.use(ToastPlugin);
 localVue.component('font-awesome-icon', {});
 localVue.component('b-input-group', {});
 localVue.component('b-input-group-prepend', {});
@@ -90,6 +91,7 @@ describe('Component Tests', () => {
         router,
         provide: {
           <%= entityInstance %>Service: () => <%= entityInstance %>ServiceStub,
+          alertService: () => new AlertService(),
 <%_
   const entitiesSeen = [entityAngularName];
   for (relationship of relationships) { _%>
@@ -97,10 +99,13 @@ describe('Component Tests', () => {
       const otherEntityName = relationship.otherEntityName;
       const otherEntityAngularName = relationship.otherEntityAngularName; _%>
     <%_ if (!entitiesSeen.includes(otherEntityAngularName)) { %>
-      <%_ if (relationship.otherEntityUser && authenticationTypeOauth2) { _%>
-          userOAuth2Service: () => new UserOAuth2Service(),
+      <% if (relationship.otherEntityUser && (!skipUserManagement || authenticationTypeOauth2)) { %>
+          userService: () => new UserService(),
       <%_ } else { _%>
-          <%= otherEntityName %>Service: () => new <%= otherEntityAngularName %>Service(),
+          <%= otherEntityName %>Service: () =>
+            sinon.createStubInstance<<%= otherEntityAngularName %>Service>(<%= otherEntityAngularName %>Service, {
+              retrieve: sinon.stub().resolves({}),
+            } as any),
       <%_ } _%>
     <%_ } _%>
     <%_ entitiesSeen.push(otherEntityAngularName); _%>

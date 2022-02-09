@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -25,8 +25,6 @@ import { DEBUG_INFO_ENABLED } from 'app/app.constants';
 import { Authority } from 'app/config/authority.constants';
 
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
-
-const LAYOUT_ROUTES = [navbarRoute, ...errorRoute];
 
 @NgModule({
   imports: [
@@ -54,7 +52,20 @@ const LAYOUT_ROUTES = [navbarRoute, ...errorRoute];
           loadChildren: () => import('./login/login.module').then(m => m.LoginModule),
         },
 <%_ } _%>
-        ...LAYOUT_ROUTES,
+        {
+          path: '<%= applicationTypeMicroservice ? lowercaseBaseName : '' %>',
+          loadChildren: () => import(`./entities/entity-routing.module`).then(m => m.EntityRoutingModule),
+        },
+<%_ if (applicationTypeGateway) { _%>
+  <%_ for (const remote of microfrontends) { _%>
+        {
+          path: '<%= remote.lowercaseBaseName %>',
+          loadChildren: () => import(`<%= remote.lowercaseBaseName %>/entity-routing`).then(m => m.EntityRoutingModule),
+        },
+  <%_ } _%>
+<%_ } _%>
+        navbarRoute,
+        ...errorRoute,
       ],
       { enableTracing: DEBUG_INFO_ENABLED }
     ),

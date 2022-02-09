@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -20,8 +20,12 @@ const chalk = require('chalk');
 const shelljs = require('shelljs');
 const jsyaml = require('js-yaml');
 const pathjs = require('path');
-const writeFiles = require('./files').writeFiles;
+
 const BaseDockerGenerator = require('../generator-base-docker');
+const { INITIALIZING_PRIORITY, PROMPTING_PRIORITY, CONFIGURING_PRIORITY, LOADING_PRIORITY, PREPARING_PRIORITY, WRITING_PRIORITY } =
+  require('../../lib/constants/priorities.cjs').compat;
+
+const writeFiles = require('./files').writeFiles;
 const { GATEWAY, MONOLITH } = require('../../jdl/jhipster/application-types');
 const { PROMETHEUS } = require('../../jdl/jhipster/monitoring-types');
 const { EUREKA } = require('../../jdl/jhipster/service-discovery-types');
@@ -34,13 +38,12 @@ const { GENERATOR_DOCKER_COMPOSE } = require('../generator-list');
 
 const NO_DATABASE = databaseTypes.NO;
 
-let useBlueprints;
-
 /* eslint-disable consistent-return */
 module.exports = class extends BaseDockerGenerator {
-  constructor(args, options) {
-    super(args, options);
-    useBlueprints = !this.fromBlueprint && this.instantiateBlueprints(GENERATOR_DOCKER_COMPOSE);
+  async _postConstruct() {
+    if (!this.fromBlueprint) {
+      await this.composeWithBlueprints(GENERATOR_DOCKER_COMPOSE);
+    }
   }
 
   _initializing() {
@@ -80,8 +83,8 @@ module.exports = class extends BaseDockerGenerator {
     };
   }
 
-  get initializing() {
-    if (useBlueprints) return;
+  get [INITIALIZING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._initializing();
   }
 
@@ -89,8 +92,8 @@ module.exports = class extends BaseDockerGenerator {
     return super._prompting();
   }
 
-  get prompting() {
-    if (useBlueprints) return;
+  get [PROMPTING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._prompting();
   }
 
@@ -117,8 +120,8 @@ module.exports = class extends BaseDockerGenerator {
     };
   }
 
-  get configuring() {
-    if (useBlueprints) return;
+  get [CONFIGURING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._configuring();
   }
 
@@ -263,8 +266,8 @@ module.exports = class extends BaseDockerGenerator {
     };
   }
 
-  get preparing() {
-    if (useBlueprints) return;
+  get [PREPARING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._preparing();
   }
 
@@ -276,8 +279,8 @@ module.exports = class extends BaseDockerGenerator {
     };
   }
 
-  get loading() {
-    if (useBlueprints) return;
+  get [LOADING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._loading();
   }
 
@@ -285,8 +288,8 @@ module.exports = class extends BaseDockerGenerator {
     return writeFiles();
   }
 
-  get writing() {
-    if (useBlueprints) return;
+  get [WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._writing();
   }
 
@@ -313,7 +316,7 @@ module.exports = class extends BaseDockerGenerator {
   }
 
   end() {
-    if (useBlueprints) return;
+    if (this.delegateToBlueprint) return {};
     return this._end();
   }
 };

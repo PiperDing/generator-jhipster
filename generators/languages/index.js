@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -19,21 +19,33 @@
 /* eslint-disable consistent-return */
 const chalk = require('chalk');
 const _ = require('lodash');
+
 const BaseBlueprintGenerator = require('../generator-base-blueprint');
+const {
+  INITIALIZING_PRIORITY,
+  PROMPTING_PRIORITY,
+  CONFIGURING_PRIORITY,
+  LOADING_PRIORITY,
+  PREPARING_PRIORITY,
+  DEFAULT_PRIORITY,
+  WRITING_PRIORITY,
+  POST_WRITING_PRIORITY,
+} = require('../../lib/constants/priorities.cjs').compat;
+
 const prompts = require('./prompts');
 const statistics = require('../statistics');
 const constants = require('../generator-constants');
 const { translationDefaultConfig } = require('../generator-defaults');
+const { GENERATOR_LANGUAGES } = require('../generator-list');
+const { clientI18nFiles } = require('./files');
 
 const ANGULAR = constants.SUPPORTED_CLIENT_FRAMEWORKS.ANGULAR;
 const REACT = constants.SUPPORTED_CLIENT_FRAMEWORKS.REACT;
 const VUE = constants.SUPPORTED_CLIENT_FRAMEWORKS.VUE;
 
-let useBlueprints;
-
 module.exports = class extends BaseBlueprintGenerator {
-  constructor(args, opts) {
-    super(args, opts, { unique: 'namespace' });
+  constructor(args, options, features) {
+    super(args, options, { unique: 'namespace', ...features });
 
     this.option('skip-prompts', {
       desc: 'Skip prompts',
@@ -88,10 +100,12 @@ module.exports = class extends BaseBlueprintGenerator {
         }
       });
     }
+  }
 
-    useBlueprints =
-      !this.fromBlueprint &&
-      this.instantiateBlueprints('languages', { languages: this.languagesToApply, arguments: this.options.languages });
+  async _postConstruct() {
+    if (!this.fromBlueprint) {
+      await this.composeWithBlueprints('languages', { languages: this.languagesToApply, arguments: this.options.languages });
+    }
   }
 
   // Public API method used by the getter and also by Blueprints
@@ -115,8 +129,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get initializing() {
-    if (useBlueprints) return;
+  get [INITIALIZING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._initializing();
   }
 
@@ -128,8 +142,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get prompting() {
-    if (useBlueprints) return;
+  get [PROMPTING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._prompting();
   }
 
@@ -167,14 +181,17 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get configuring() {
-    if (useBlueprints) return;
+  get [CONFIGURING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._configuring();
   }
 
   // Public API method used by the getter and also by Blueprints
   _loading() {
     return {
+      setDefaultConfig() {
+        this.setConfigDefaults();
+      },
       getSharedConfigOptions() {
         this.loadAppConfig();
         this.loadDerivedAppConfig();
@@ -182,14 +199,13 @@ module.exports = class extends BaseBlueprintGenerator {
         this.loadDerivedClientConfig();
         this.loadPlatformConfig();
         this.loadServerConfig();
-        this.loadDerivedServerConfig();
         this.loadTranslationConfig();
       },
     };
   }
 
-  get loading() {
-    if (useBlueprints) return;
+  get [LOADING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._loading();
   }
 
@@ -205,14 +221,12 @@ module.exports = class extends BaseBlueprintGenerator {
 
         // Make dist dir available in templates
         this.BUILD_DIR = this.getBuildDirectoryForBuildTool(this.buildTool);
-
-        this.capitalizedBaseName = _.upperFirst(this.baseName);
       },
     };
   }
 
-  get preparing() {
-    if (useBlueprints) return;
+  get [PREPARING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._preparing();
   }
 
@@ -221,30 +235,47 @@ module.exports = class extends BaseBlueprintGenerator {
       ...super._missingPreDefault(),
 
       insight() {
-        statistics.sendSubGenEvent('generator', 'languages');
+        statistics.sendSubGenEvent('generator', GENERATOR_LANGUAGES);
       },
     };
   }
 
-  get default() {
-    if (useBlueprints) return;
+  get [DEFAULT_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._default();
   }
 
   // Public API method used by the getter and also by Blueprints
   _writing() {
     return {
+      async writeClientTranslations() {
+        if (this.skipClient) return;
+        // make it Promise.all() when `this.lang = lang;` can be dropped.
+        for (const lang of this.languagesToApply) {
+          this.lang = lang;
+          await this.writeFiles({ sections: clientI18nFiles });
+        }
+      },
       translateFile() {
         this.languagesToApply.forEach(language => {
-          if (!this.skipClient) {
-            this.installI18nClientFilesByLanguage(this, constants.CLIENT_MAIN_SRC_DIR, language);
-          }
           if (!this.skipServer) {
             this.installI18nServerFilesByLanguage(this, constants.SERVER_MAIN_RES_DIR, language, constants.SERVER_TEST_RES_DIR);
           }
           statistics.sendSubGenEvent('languages/language', language);
         });
       },
+
+      ...super._missingPostWriting(),
+    };
+  }
+
+  get [WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
+    return this._writing();
+  }
+
+  _postWriting() {
+    return {
       write() {
         if (!this.skipClient) {
           this.updateLanguagesInDayjsConfiguation(this.languages);
@@ -272,8 +303,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get writing() {
-    if (useBlueprints) return;
-    return this._writing();
+  get [POST_WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
+    return this._postWriting();
   }
 };

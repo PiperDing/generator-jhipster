@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2021 the original author or authors from the JHipster project.
+# Copyright 2013-2022 the original author or authors from the JHipster project.
 #
 # This file is part of the JHipster project, see https://www.jhipster.tech/
 # for more information.
@@ -40,16 +40,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node_version: [14.16.0]
+        node_version: [16.13.1]
         os: [ubuntu-20.04]
         cache: [other]
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2.3.2
+      - uses: actions/checkout@v2.4.0
+      - uses: actions/setup-node@v2.5.1
         with:
           node-version: ${{ matrix.node_version }}
       - name: 'SETUP: load npm cache'
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v2.1.7
         with:
           path: |
             ~/.npm

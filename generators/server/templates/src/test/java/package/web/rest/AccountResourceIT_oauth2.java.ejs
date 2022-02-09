@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -20,19 +20,19 @@ package <%= packageName %>.web.rest;
 
 import static <%= packageName %>.test.util.OAuth2TestUtil.TEST_USER_LOGIN;
 import static <%= packageName %>.test.util.OAuth2TestUtil.registerAuthenticationToken;
-<%_ if (!reactive) { _%>
+<%_ if (reactive) { _%>
+import static <%= packageName %>.test.util.OAuth2TestUtil.authenticationToken;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.*;
+<%_ } else { _%>
 import static <%= packageName %>.test.util.OAuth2TestUtil.testAuthenticationToken;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-<%_ } else { _%>
-import static <%= packageName %>.test.util.OAuth2TestUtil.authenticationToken;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.*;
-    <%_ if (searchEngine === 'elasticsearch') { _%>
+  <%_ if (searchEngineElasticsearch) { _%>
 import static org.mockito.Mockito.*;
-    <%_ } _%>
+  <%_ } _%>
 <%_ } _%>
 
-<%_ if (databaseType === 'cassandra') { _%>
+<%_ if (databaseTypeCassandra) { _%>
 import <%= packageName %>.AbstractCassandraTest;
 <%_ } _%>
 import <%= packageName %>.IntegrationTest;
@@ -42,53 +42,44 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-<%_ if (!reactive) { _%>
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.test.context.TestSecurityContextHolder;
-import org.springframework.test.web.servlet.MockMvc;
-    <%_ if (databaseType === 'sql' && !reactive) { _%>
-import org.springframework.transaction.annotation.Transactional;
-    <%_ } _%>
-
-<%_ } else { _%>
+<%_ if (reactive) { _%>
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.test.web.reactive.server.WebTestClient;
-    <%_ if (searchEngine === 'elasticsearch') { _%>
+  <%_ if (searchEngineElasticsearch) { _%>
 import reactor.core.publisher.Mono;
-    <%_ } _%>
+  <%_ } _%>
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+<%_ } else { _%>
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.test.context.TestSecurityContextHolder;
+import org.springframework.test.web.servlet.MockMvc;
+  <%_ if (databaseTypeSql && !reactive) { _%>
+import org.springframework.transaction.annotation.Transactional;
+  <%_ } _%>
+
 <%_ } _%>
 
 /**
  * Integration tests for the {@link AccountResource} REST controller.
  */
-<%_ if (!reactive) { _%>
-@AutoConfigureMockMvc
+<%_ if (reactive) { _%>
+@AutoConfigureWebTestClient(timeout = IntegrationTest.DEFAULT_TIMEOUT)
 <%_ } else { _%>
-@AutoConfigureWebTestClient
+@AutoConfigureMockMvc
 <%_ } _%>
 @WithMockUser(value = TEST_USER_LOGIN)
 @IntegrationTest
-class AccountResourceIT <% if (databaseType === 'cassandra') { %>extends AbstractCassandraTest <% } %>{
-<%_ if (!reactive) { _%>
-    @Autowired
-    private MockMvc restAccountMockMvc;
+class AccountResourceIT <% if (databaseTypeCassandra) { %>extends AbstractCassandraTest <% } %>{
 
-    @Autowired
-    OAuth2AuthorizedClientService authorizedClientService;
-
-    @Autowired
-    ClientRegistration clientRegistration;
-    <%_ } else { _%>
-
+<%_ if (reactive) { _%>
     private Map<String, Object> claims;
 
     @Autowired
@@ -99,6 +90,15 @@ class AccountResourceIT <% if (databaseType === 'cassandra') { %>extends Abstrac
 
     @Autowired
     private ClientRegistration clientRegistration;
+<%_ } else { _%>
+    @Autowired
+    private MockMvc restAccountMockMvc;
+
+    @Autowired
+    OAuth2AuthorizedClientService authorizedClientService;
+
+    @Autowired
+    ClientRegistration clientRegistration;
 <%_ } _%>
 
 <%_ if (reactive) { _%>
@@ -111,22 +111,12 @@ class AccountResourceIT <% if (databaseType === 'cassandra') { %>extends Abstrac
     }
 
 <%_ } _%>
-    @Test<% if (databaseType === 'sql' && !reactive) { %>
-    @Transactional<% } %>
+    @Test
+<%_ if (databaseTypeSql && !reactive) { _%>
+    @Transactional
+<%_ } _%>
     void testGetExistingAccount() <% if (!reactive) { %>throws Exception <% } %>{
-<%_ if (!reactive) { _%>
-        TestSecurityContextHolder
-            .getContext()
-            .setAuthentication(registerAuthenticationToken(authorizedClientService, clientRegistration, testAuthenticationToken()));
-
-        restAccountMockMvc.perform(get("/api/account")
-            .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.login").value(TEST_USER_LOGIN))
-            .andExpect(jsonPath("$.email").value("john.doe@jhipster.com"))
-            .andExpect(jsonPath("$.authorities").value(AuthoritiesConstants.ADMIN));
-<%_ } else { _%>
+<%_ if (reactive) { _%>
         webTestClient
             .mutateWith(mockAuthentication(registerAuthenticationToken(authorizedClientService, clientRegistration, authenticationToken(claims))))
             .mutateWith(csrf())
@@ -139,44 +129,62 @@ class AccountResourceIT <% if (databaseType === 'cassandra') { %>extends Abstrac
             .jsonPath("$.login").isEqualTo("jane")
             .jsonPath("$.email").isEqualTo("jane.doe@jhipster.com")
             .jsonPath("$.authorities").isEqualTo(AuthoritiesConstants.ADMIN);
+<%_ } else { _%>
+        TestSecurityContextHolder
+            .getContext()
+            .setAuthentication(registerAuthenticationToken(authorizedClientService, clientRegistration, testAuthenticationToken()));
+
+        restAccountMockMvc.perform(get("/api/account")
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(jsonPath("$.login").value(TEST_USER_LOGIN))
+            .andExpect(jsonPath("$.email").value("john.doe@jhipster.com"))
+            .andExpect(jsonPath("$.authorities").value(AuthoritiesConstants.ADMIN));
 <%_ } _%>
     }
 
     @Test
     void testGetUnknownAccount() <% if (!reactive) { %>throws Exception <% } %>{
-    <%_ if (!reactive) { _%>
-        restAccountMockMvc.perform(get("/api/account")
-            .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isInternalServerError());
-    <%_ } else { _%>
+<%_ if (reactive) { _%>
         webTestClient.get().uri("/api/account")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus().is5xxServerError();
-    <%_ } _%>
+<%_ } else { _%>
+        restAccountMockMvc.perform(get("/api/account")
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isInternalServerError());
+<%_ } _%>
     }
 
     @Test
     @WithUnauthenticatedMockUser
-    <%_ if (!reactive) { _%>
     void testNonAuthenticatedUser() <% if (!reactive) { %>throws Exception <% } %>{
-        restAccountMockMvc.perform(get("/api/authenticate")
-            .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(content().string(""));
-    <%_ } else { _%>
-    void testNonAuthenticatedUser() {
+<%_ if (reactive) { _%>
         webTestClient.get().uri("/api/authenticate")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus().isOk()
             .expectBody().isEmpty();
-    <%_ } _%>
+<%_ } else { _%>
+        restAccountMockMvc.perform(get("/api/authenticate")
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().string(""));
+<%_ } _%>
     }
 
     @Test
-    <%_ if (!reactive) { _%>
     void testAuthenticatedUser() <% if (!reactive) { %>throws Exception <% } %>{
+<%_ if (reactive) { _%>
+        webTestClient
+            .get().uri("/api/authenticate")
+            .accept(MediaType.APPLICATION_JSON)
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(String.class).isEqualTo(TEST_USER_LOGIN);
+<%_ } else { _%>
         restAccountMockMvc.perform(get("/api/authenticate")
             .with(request -> {
                 request.setRemoteUser(TEST_USER_LOGIN);
@@ -185,14 +193,6 @@ class AccountResourceIT <% if (databaseType === 'cassandra') { %>extends Abstrac
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(content().string(TEST_USER_LOGIN));
-    <%_ } else { _%>
-    void testAuthenticatedUser() {
-        webTestClient
-            .get().uri("/api/authenticate")
-            .accept(MediaType.APPLICATION_JSON)
-            .exchange()
-            .expectStatus().isOk()
-            .expectBody(String.class).isEqualTo(TEST_USER_LOGIN);
-    <%_ } _%>
+<%_ } _%>
     }
 }

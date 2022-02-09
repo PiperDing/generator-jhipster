@@ -1,5 +1,5 @@
 #
-# Copyright 2013-2021 the original author or authors from the JHipster project.
+# Copyright 2013-2022 the original author or authors from the JHipster project.
 #
 # This file is part of the JHipster project, see https://www.jhipster.tech/
 # for more information.
@@ -73,7 +73,7 @@ jobs:
       # Install all tools and check configuration
       #----------------------------------------------------------------------
       - name: 'SETUP: Checkout generator-jhipster'
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.4.0
         with:
           path: generator-jhipster
       - name: 'SETUP: environment'
@@ -85,15 +85,15 @@ jobs:
           application-environment: ${{ matrix.environment }}
           application-packaging: ${{ (matrix.war == 1 && 'war') || 'jar' }}
           enable-testcontainers: ${{ matrix.testcontainers == 1 }}
-      - uses: actions/setup-node@v2.3.2
+      - uses: actions/setup-node@v2.5.1
         with:
           node-version: ${{ steps.setup.outputs.node-version }}
       - uses: actions/setup-java@v2
         with:
-          distribution: 'adopt'
+          distribution: 'temurin'
           java-version: ${{ steps.setup.outputs.java-version }}
       - name: 'SETUP: load npm cache'
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v2.1.7
         with:
           path: |
             ~/.npm
@@ -104,7 +104,7 @@ jobs:
             ${{ runner.os }}-node-${{ steps.setup.outputs.date }}-
             ${{ runner.os }}-node-${{ steps.setup.outputs.date }}
       - name: 'SETUP: load maven cache'
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v2.1.7
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ steps.setup.outputs.date }}-${{ hashFiles('generator-jhipster/**/pom.xml.ejs') }}
@@ -113,7 +113,7 @@ jobs:
             ${{ runner.os }}-maven-${{ steps.setup.outputs.date }}
       - name: 'SETUP: load gradle cache'
         if: contains(matrix.app-type, 'gradle')
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v2.1.7
         with:
           path: |
             ~/.gradle/caches
@@ -146,8 +146,6 @@ jobs:
         run: |
           git add .
           git -c color.ui=always diff --cached
-      - name: 'GENERATION: replace version in generated project'
-        run: $JHI_SCRIPTS/13-replace-version-generated-project.sh
       - name: 'GENERATION: jhipster info'
         run: $JHI_SCRIPTS/14-jhipster-info.sh
       #----------------------------------------------------------------------

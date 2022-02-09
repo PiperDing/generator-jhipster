@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -18,28 +18,36 @@
  */
 const chalk = require('chalk');
 const shelljs = require('shelljs');
+
+const BaseDockerGenerator = require('../generator-base-docker');
+const { INITIALIZING_PRIORITY, PROMPTING_PRIORITY, CONFIGURING_PRIORITY, LOADING_PRIORITY, WRITING_PRIORITY } =
+  require('../../lib/constants/priorities.cjs').compat;
+
 const prompts = require('./prompts');
 const { GENERATOR_OPENSHIFT } = require('../generator-list');
 const { KAFKA } = require('../../jdl/jhipster/message-broker-types');
 const { PROMETHEUS } = require('../../jdl/jhipster/monitoring-types');
 const { ELASTICSEARCH } = require('../../jdl/jhipster/search-engine-types');
 const { GATEWAY, MONOLITH } = require('../../jdl/jhipster/application-types');
+const { EUREKA } = require('../../jdl/jhipster/service-discovery-types');
+const serviceDiscoveryTypes = require('../../jdl/jhipster/service-discovery-types');
+const { StorageTypes } = require('../../jdl/jhipster/openshift-platform-types');
 const databaseTypes = require('../../jdl/jhipster/database-types');
 const writeFiles = require('./files').writeFiles;
-const BaseDockerGenerator = require('../generator-base-docker');
 const { loadFromYoRc, checkImages, generateJwtSecret, configureImageNames, setAppsFolderPaths } = require('../docker-base');
 const { setupKubernetesConstants } = require('../kubernetes-base');
 const statistics = require('../statistics');
 
 const NO_DATABASE = databaseTypes.NO;
-
-let useBlueprints;
+const NO_SERVICE_DISCOVERY = serviceDiscoveryTypes.NO;
+const { EPHEMERAL, PERSISTENT } = StorageTypes;
 
 /* eslint-disable consistent-return */
 module.exports = class extends BaseDockerGenerator {
-  constructor(args, options) {
-    super(args, options);
-    useBlueprints = !this.fromBlueprint && this.instantiateBlueprints(GENERATOR_OPENSHIFT);
+  async _postConstruct() {
+    if (!this.fromBlueprint) {
+      await this.composeWithBlueprints(GENERATOR_OPENSHIFT);
+    }
   }
 
   _initializing() {
@@ -84,8 +92,8 @@ module.exports = class extends BaseDockerGenerator {
     };
   }
 
-  get initializing() {
-    if (useBlueprints) return;
+  get [INITIALIZING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._initializing();
   }
 
@@ -104,8 +112,8 @@ module.exports = class extends BaseDockerGenerator {
     };
   }
 
-  get prompting() {
-    if (useBlueprints) return;
+  get [PROMPTING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._prompting();
   }
 
@@ -153,8 +161,8 @@ module.exports = class extends BaseDockerGenerator {
     };
   }
 
-  get configuring() {
-    if (useBlueprints) return;
+  get [CONFIGURING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._configuring();
   }
 
@@ -162,17 +170,17 @@ module.exports = class extends BaseDockerGenerator {
     return {
       loadSharedConfig() {
         this.appConfigs.forEach(element => {
-          this.loadServerConfig(element);
-          this.loadDerivedServerConfig(element);
+          this.loadServerConfig(element, element);
           this.loadDerivedAppConfig(element);
         });
         this.loadDeploymentConfig(this);
+        this._loadDerivedOpenshiftConfig(this);
       },
     };
   }
 
-  get loading() {
-    if (useBlueprints) return;
+  get [LOADING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._loading();
   }
 
@@ -180,8 +188,8 @@ module.exports = class extends BaseDockerGenerator {
     return writeFiles();
   }
 
-  get writing() {
-    if (useBlueprints) return;
+  get [WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._writing();
   }
 
@@ -217,7 +225,7 @@ module.exports = class extends BaseDockerGenerator {
         if (this.monitoring === PROMETHEUS) {
           this.log(`  ${chalk.cyan(`oc process -f ${this.directoryPath}ocp/monitoring/jhipster-metrics.yml | oc apply -f -`)}`);
         }
-        if (this.useKafka === true) {
+        if (this.useKafka) {
           this.log(`  ${chalk.cyan(`oc process -f ${this.directoryPath}ocp/messagebroker/kafka.yml | oc apply -f -`)}`);
         }
         for (let i = 0, regIndex = 0; i < this.appsFolders.length; i++) {
@@ -226,9 +234,9 @@ module.exports = class extends BaseDockerGenerator {
           if (app.searchEngine === ELASTICSEARCH) {
             this.log(`  ${chalk.cyan(`oc process -f ${this.directoryPath}ocp/${appName}/${appName}-elasticsearch.yml | oc apply -f -`)}`);
           }
-          if (app.serviceDiscoveryType !== false && regIndex++ === 0) {
+          if (app.serviceDiscoveryType !== NO_SERVICE_DISCOVERY && regIndex++ === 0) {
             this.log(`  ${chalk.cyan(`oc process -f ${this.directoryPath}ocp/registry/application-configmap.yml | oc apply -f -`)}`);
-            if (app.serviceDiscoveryType === 'eureka') {
+            if (app.serviceDiscoveryType === EUREKA) {
               this.log(`  ${chalk.cyan(`oc process -f ${this.directoryPath}ocp/registry/jhipster-registry.yml | oc apply -f -`)}`);
             } else {
               this.log(`  ${chalk.cyan(`oc process -f ${this.directoryPath}ocp/registry/consul.yml | oc apply -f -`)}`);
@@ -256,7 +264,12 @@ module.exports = class extends BaseDockerGenerator {
   }
 
   end() {
-    if (useBlueprints) return;
+    if (this.delegateToBlueprint) return {};
     return this._end();
+  }
+
+  _loadDerivedOpenshiftConfig(dest = this) {
+    dest.storageTypeEphemeral = dest.storageType === EPHEMERAL;
+    dest.storageTypePersistent = dest.storageType === PERSISTENT;
   }
 };

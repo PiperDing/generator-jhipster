@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -19,21 +19,22 @@
 /* eslint-disable consistent-return */
 const _ = require('lodash');
 const chalk = require('chalk');
+
+const BaseBlueprintGenerator = require('../generator-base-blueprint');
+const { INITIALIZING_PRIORITY, PROMPTING_PRIORITY, CONFIGURING_PRIORITY, LOADING_PRIORITY, WRITING_PRIORITY } =
+  require('../../lib/constants/priorities.cjs').compat;
 const { defaultConfig } = require('../generator-defaults');
 const prompts = require('./prompts');
-const BaseBlueprintGenerator = require('../generator-base-blueprint');
 const statistics = require('../statistics');
 const constants = require('../generator-constants');
 const { MAVEN, GRADLE } = require('../../jdl/jhipster/build-tool-types');
-const { GENERATOR_CICD } = require('../generator-list');
+const { GENERATOR_CI_CD } = require('../generator-list');
 
 const REACT = constants.SUPPORTED_CLIENT_FRAMEWORKS.REACT;
 
-let useBlueprints;
-
 module.exports = class extends BaseBlueprintGenerator {
-  constructor(args, opts) {
-    super(args, opts);
+  constructor(args, options, features) {
+    super(args, options, features);
 
     // Automatically configure Travis
     this.option('autoconfigure-travis', {
@@ -76,8 +77,12 @@ module.exports = class extends BaseBlueprintGenerator {
       defaults: false,
       description: 'Automatically configure CircleCI',
     });
+  }
 
-    useBlueprints = !this.fromBlueprint && this.instantiateBlueprints(GENERATOR_CICD);
+  async _postConstruct() {
+    if (!this.fromBlueprint) {
+      await this.composeWithBlueprints(GENERATOR_CI_CD);
+    }
   }
 
   // Public API method used by the getter and also by Blueprints
@@ -124,12 +129,13 @@ module.exports = class extends BaseBlueprintGenerator {
         this.SERVER_MAIN_RES_DIR = constants.SERVER_MAIN_RES_DIR;
         this.DOCKER_JENKINS = constants.DOCKER_JENKINS;
         this.ANGULAR = constants.SUPPORTED_CLIENT_FRAMEWORKS.ANGULAR;
+        this.JAVA_VERSION = constants.JAVA_VERSION;
       },
     };
   }
 
-  get initializing() {
-    if (useBlueprints) return;
+  get [INITIALIZING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._initializing();
   }
 
@@ -141,8 +147,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get prompting() {
-    if (useBlueprints) return;
+  get [PROMPTING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._prompting();
   }
 
@@ -151,7 +157,7 @@ module.exports = class extends BaseBlueprintGenerator {
     return {
       insight() {
         if (this.abort) return;
-        statistics.sendSubGenEvent('generator', GENERATOR_CICD);
+        statistics.sendSubGenEvent('generator', GENERATOR_CI_CD);
       },
       setTemplateConstants() {
         if (this.abort) return;
@@ -170,8 +176,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get configuring() {
-    if (useBlueprints) return;
+  get [CONFIGURING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._configuring();
   }
 
@@ -194,17 +200,15 @@ module.exports = class extends BaseBlueprintGenerator {
         this.loadClientConfig();
         this.loadDerivedClientConfig();
         this.loadServerConfig();
-        this.loadDerivedServerConfig();
         this.loadTranslationConfig();
         this._loadCiCdConfig();
         this.loadPlatformConfig();
-        this.loadDerivedPlatformConfig();
       },
     };
   }
 
-  get loading() {
-    if (useBlueprints) return;
+  get [LOADING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._loading();
   }
 
@@ -255,8 +259,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get writing() {
-    if (useBlueprints) return;
+  get [WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._writing();
   }
 };

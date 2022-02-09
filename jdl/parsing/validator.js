@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -211,6 +211,12 @@ const configPropsValidations = {
     type: 'NAME',
     pattern: ALPHANUMERIC_DASH,
     msg: 'websocket property',
+  },
+  ENABLE_GRADLE_ENTERPRISE: { type: 'BOOLEAN' },
+  GRADLE_ENTERPRISE_HOST: {
+    type: 'STRING',
+    pattern: JWT_SECRET_KEY_PATTERN,
+    msg: 'gradleEnterpriseHost property',
   },
 };
 

@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -54,6 +54,7 @@ module.exports = ([jdlFiles = []], options = {}, env, forkProcess) => {
   }
   const promises = jdlFiles.map(toJdlFile).map(filename => {
     if (!fs.existsSync(filename)) {
+      logger.info(`File not found: ${filename}. Attempting download from jdl-samples repository`);
       return download([[filename]], options);
     }
     return Promise.resolve(filename);

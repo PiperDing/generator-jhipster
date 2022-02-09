@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -19,23 +19,37 @@
 /* eslint-disable consistent-return */
 const shelljs = require('shelljs');
 const chalk = require('chalk');
-const { GENERATOR_OPENAPI } = require('../generator-list');
+
+const BaseBlueprintGenerator = require('../generator-base-blueprint');
+const {
+  INITIALIZING_PRIORITY,
+  PROMPTING_PRIORITY,
+  CONFIGURING_PRIORITY,
+  WRITING_PRIORITY,
+  POST_WRITING_PRIORITY,
+  INSTALL_PRIORITY,
+  END_PRIORITY,
+} = require('../../lib/constants/priorities.cjs').compat;
+
+const { GENERATOR_OPENAPI_CLIENT } = require('../generator-list');
 const { OpenAPIOptionsNames, OpenAPIDefaultValues } = require('../../jdl/jhipster/openapi-options');
 const prompts = require('./prompts');
 const { writeFiles, customizeFiles } = require('./files');
-const BaseBlueprintGenerator = require('../generator-base-blueprint');
-
-let useBlueprints;
 
 module.exports = class extends BaseBlueprintGenerator {
-  constructor(args, opts) {
-    super(args, opts);
+  constructor(args, options, features) {
+    super(args, options, features);
     this.option(OpenAPIOptionsNames.REGEN, {
       desc: 'Regenerates all saved clients',
       type: Boolean,
       defaults: OpenAPIDefaultValues.REGEN,
     });
-    useBlueprints = !this.fromBlueprint && this.instantiateBlueprints(GENERATOR_OPENAPI);
+  }
+
+  async _postConstruct() {
+    if (!this.fromBlueprint) {
+      await this.composeWithBlueprints(GENERATOR_OPENAPI_CLIENT);
+    }
   }
 
   _initializing() {
@@ -54,8 +68,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get initializing() {
-    if (useBlueprints) return;
+  get [INITIALIZING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._initializing();
   }
 
@@ -67,8 +81,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get prompting() {
-    if (useBlueprints) return;
+  get [PROMPTING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._prompting();
   }
 
@@ -100,8 +114,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get configuring() {
-    if (useBlueprints) return;
+  get [CONFIGURING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._configuring();
   }
 
@@ -109,8 +123,8 @@ module.exports = class extends BaseBlueprintGenerator {
     return writeFiles();
   }
 
-  get writing() {
-    if (useBlueprints) return;
+  get [WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._writing();
   }
 
@@ -118,8 +132,8 @@ module.exports = class extends BaseBlueprintGenerator {
     return customizeFiles();
   }
 
-  get postWriting() {
-    if (useBlueprints) return;
+  get [POST_WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._postWriting();
   }
 
@@ -145,8 +159,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  install() {
-    if (useBlueprints) return;
+  get [INSTALL_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._install();
   }
 
@@ -158,8 +172,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  end() {
-    if (useBlueprints) return;
+  get [END_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._end();
   }
 };

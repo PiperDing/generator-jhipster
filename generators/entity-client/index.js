@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -18,24 +18,47 @@
  */
 /* eslint-disable consistent-return */
 const _ = require('lodash');
-const { writeFiles, addToMenu, replaceTranslations } = require('./files');
-const utils = require('../utils');
+
 const BaseBlueprintGenerator = require('../generator-base-blueprint');
+const { PREPARING_PRIORITY, DEFAULT_PRIORITY, WRITING_PRIORITY, POST_WRITING_PRIORITY } =
+  require('../../lib/constants/priorities.cjs').compat;
+
+const { writeFiles, addToMenu, replaceTranslations } = require('./files');
+const { entityClientI18nFiles } = require('../entity-i18n/files');
+
+const utils = require('../utils');
 const {
   SUPPORTED_CLIENT_FRAMEWORKS: { ANGULAR, REACT },
 } = require('../generator-constants');
 const { GENERATOR_ENTITY_CLIENT } = require('../generator-list');
-
-let useBlueprints;
+const { POSTGRESQL, MARIADB } = require('../../jdl/jhipster/database-types');
 
 module.exports = class extends BaseBlueprintGenerator {
-  constructor(args, opts) {
-    super(args, opts);
-    this.entity = opts.context;
+  constructor(args, options, features) {
+    super(args, options, features);
 
-    this.jhipsterContext = opts.jhipsterContext || opts.context;
+    this.entity = this.options.context;
+    this.jhipsterContext = this.options.jhipsterContext || this.options.context;
+  }
 
-    useBlueprints = !this.fromBlueprint && this.instantiateBlueprints(GENERATOR_ENTITY_CLIENT, { context: opts.context });
+  async _postConstruct() {
+    if (!this.fromBlueprint) {
+      await this.composeWithBlueprints(GENERATOR_ENTITY_CLIENT, { context: this.options.context });
+    }
+  }
+
+  // Public API method used by the getter and also by Blueprints
+  _preparing() {
+    return {
+      async loadNativeLanguage() {
+        await this._loadEntityClientTranslations(this.entity, this.jhipsterConfig);
+      },
+    };
+  }
+
+  get [PREPARING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
+    return this._preparing();
   }
 
   // Public API method used by the getter and also by Blueprints
@@ -52,11 +75,22 @@ module.exports = class extends BaseBlueprintGenerator {
           this.tsKeyType = this.getTypescriptKeyType(this.primaryKey.type);
         }
       },
+
+      setupCypress() {
+        // Blueprints may disable cypress relationships by setting to false.
+        this.cypressBootstrapEntities = true;
+
+        const entity = this.entity;
+        // Reactive with PostgreSQL doesn't allow insertion without data.
+        this.workaroundRelationshipReactivePostgress = entity.reactive && entity.prodDatabaseType === POSTGRESQL;
+        // Reactive with MariaDB doesn't allow null value at Instant fields.
+        this.workaroundInstantReactiveMariaDB = entity.reactive && entity.prodDatabaseType === MARIADB;
+      },
     };
   }
 
-  get default() {
-    if (useBlueprints) return;
+  get [DEFAULT_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._default();
   }
 
@@ -114,8 +148,8 @@ module.exports = class extends BaseBlueprintGenerator {
     };
   }
 
-  get writing() {
-    if (useBlueprints) return;
+  get [WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._writing();
   }
 
@@ -127,18 +161,51 @@ module.exports = class extends BaseBlueprintGenerator {
       },
 
       replaceTranslations() {
-        if (
-          this.skipClient ||
-          (this.jhipsterConfig.microfrontend && this.jhipsterConfig.applicationType === 'gateway' && this.microserviceName)
-        )
-          return undefined;
+        if (this.skipClient || (this.microfrontend && this.applicationTypeGateway && this.microserviceName)) return undefined;
         return replaceTranslations.call(this);
       },
     };
   }
 
-  get postWriting() {
-    if (useBlueprints) return;
+  get [POST_WRITING_PRIORITY]() {
+    if (this.delegateToBlueprint) return {};
     return this._postWriting();
+  }
+
+  /**
+   * @experimental
+   * Load entity client native translation.
+   */
+  async _loadEntityClientTranslations(entity, configContext = this) {
+    const { frontendAppName = this.getFrontendAppName(), nativeLanguage = 'en' } = configContext;
+    entity.entityClientTranslations = entity.entityClientTranslations || {};
+    const { entityClientTranslations } = entity;
+    const rootTemplatesPath = this.fetchFromInstalledJHipster('entity-i18n/templates/');
+    const translationFiles = await this.writeFiles({
+      sections: entityClientI18nFiles,
+      rootTemplatesPath,
+      context: { ...entity, clientSrcDir: '__tmp__', frontendAppName, lang: 'en' },
+    });
+    if (nativeLanguage && nativeLanguage !== 'en') {
+      translationFiles.push(
+        ...(await this.writeFiles({
+          sections: entityClientI18nFiles,
+          rootTemplatesPath,
+          context: { ...entity, clientSrcDir: '__tmp__', frontendAppName, lang: nativeLanguage },
+        }))
+      );
+    }
+    for (const translationFile of translationFiles) {
+      _.merge(entityClientTranslations, this.readDestinationJSON(translationFile));
+      delete this.env.sharedFs.get(translationFile).state;
+    }
+  }
+
+  /**
+   * @experimental
+   * Get translation value for a key.
+   */
+  _getEntityClientTranslation(translationKey) {
+    return _.get(this.entityClientTranslations, translationKey, `Translation missing for ${translationKey}`);
   }
 };

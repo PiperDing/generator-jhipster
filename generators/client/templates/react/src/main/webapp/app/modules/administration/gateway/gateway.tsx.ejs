@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -38,8 +38,8 @@ export const GatewayPage = () => {
     Object.keys(instance).map((key, index) => {
       spans.push((
         <span key={key.toString() + 'value'}>
-          <Badge key={key.toString() + '-containerbadge'} className="font-weight-normal">
-            <Badge key={key.toString() + '-badge'} color="info" className="font-weight-normal" pill>{key}</Badge>
+          <Badge key={key.toString() + '-containerbadge'} className="fw-normal">
+            <Badge key={key.toString() + '-badge'} color="info" className="fw-normal" pill>{key}</Badge>
             {instance[key]}
           </Badge>
         </span>

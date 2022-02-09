@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -75,7 +75,7 @@ async function askForApplicationType() {
 }
 
 function askForModuleName() {
-  if (this.existingProject) return undefined;
+  if (this.existingProject || this.jhipsterConfig.baseName) return undefined;
   return this.askModuleName(this);
 }
 

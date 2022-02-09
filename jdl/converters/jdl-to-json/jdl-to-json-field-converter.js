@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -62,6 +62,14 @@ function getConvertedFieldsForEntity(jdlEntity, jdlObject) {
     }
     if (jdlObject.hasEnum(jdlField.type)) {
       fieldData.fieldValues = jdlObject.getEnum(fieldData.fieldType).getValuesAsString();
+      const fieldTypeComment = jdlObject.getEnum(fieldData.fieldType).comment;
+      if (fieldTypeComment) {
+        fieldData.fieldTypeJavadoc = fieldTypeComment;
+      }
+      const fieldValuesJavadocs = jdlObject.getEnum(fieldData.fieldType).getValueJavadocs();
+      if (fieldValuesJavadocs && Object.keys(fieldValuesJavadocs).length > 0) {
+        fieldData.fieldValuesJavadocs = fieldValuesJavadocs;
+      }
     }
     if (fieldData.fieldType && isBlobType(fieldData.fieldType)) {
       const blobFieldData = getBlobFieldData(fieldData.fieldType);

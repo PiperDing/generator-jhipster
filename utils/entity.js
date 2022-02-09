@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -31,7 +31,7 @@ const { OAUTH2 } = require('../jdl/jhipster/authentication-types');
 const { CommonDBTypes } = require('../jdl/jhipster/field-types');
 
 const { BOOLEAN, LONG, STRING, UUID } = CommonDBTypes;
-const { MAPSTRUCT } = MapperTypes;
+const { NO: NO_DTO, MAPSTRUCT } = MapperTypes;
 const { PAGINATION, INFINITE_SCROLL } = PaginationTypes;
 const { SERVICE_IMPL } = ServiceTypes;
 const NO_SERVICE = ServiceTypes.NO;
@@ -40,6 +40,7 @@ const NO_MAPPER = MapperTypes.NO;
 
 const BASE_TEMPLATE_DATA = {
   primaryKey: undefined,
+  entityPackage: undefined,
   skipUiGrouping: false,
   haveFieldWithJavadoc: false,
   existingEnum: false,
@@ -83,7 +84,7 @@ const BASE_TEMPLATE_DATA = {
     return [];
   },
   get differentRelationships() {
-    return [];
+    return {};
   },
   get i18nToLoad() {
     return [];
@@ -105,10 +106,12 @@ function _derivedProperties(entityWithConfig) {
 }
 
 function prepareEntityForTemplates(entityWithConfig, generator) {
-  const entityName = entityWithConfig.name;
+  const entityName = _.upperFirst(entityWithConfig.name);
   _.defaults(entityWithConfig, entityDefaultConfig, BASE_TEMPLATE_DATA);
 
-  entityWithConfig.changelogDateForRecent = parseLiquibaseChangelogDate(entityWithConfig.changelogDate);
+  if (entityWithConfig.changelogDate) {
+    entityWithConfig.changelogDateForRecent = parseLiquibaseChangelogDate(entityWithConfig.changelogDate);
+  }
   entityWithConfig.faker = entityWithConfig.faker || createFaker(generator.jhipsterConfig.nativeLanguage);
   entityWithConfig.resetFakerSeed = (suffix = '') =>
     entityWithConfig.faker.seed(stringHashCode(entityWithConfig.name.toLowerCase() + suffix));
@@ -128,15 +131,17 @@ function prepareEntityForTemplates(entityWithConfig, generator) {
     entityWithConfig.skipServer = true;
   }
 
+  entityWithConfig.builtInUser = generator.isBuiltInUser(entityName);
+
   _.defaults(entityWithConfig, {
-    entityNameCapitalized: _.upperFirst(entityName),
+    entityNameCapitalized: entityName,
     entityClass: _.upperFirst(entityName),
     entityInstance: _.lowerFirst(entityName),
     entityTableName: generator.getTableName(entityName),
     entityNamePlural: pluralize(entityName),
   });
 
-  const dto = entityWithConfig.dto === MAPSTRUCT;
+  const dto = entityWithConfig.dto && entityWithConfig.dto !== NO_DTO;
   if (dto) {
     _.defaults(entityWithConfig, {
       dtoClass: generator.asDto(entityWithConfig.entityClass),
@@ -200,6 +205,13 @@ function prepareEntityForTemplates(entityWithConfig, generator) {
   if (entityWithConfig.microserviceAppName) {
     entityWithConfig.i18nAlertHeaderPrefix = `${entityWithConfig.microserviceAppName}.${entityWithConfig.entityTranslationKey}`;
   }
+
+  const { microserviceName, entityFileName, microfrontend } = entityWithConfig;
+  entityWithConfig.entityApi = microserviceName ? `services/${microserviceName.toLowerCase()}/` : '';
+  entityWithConfig.entityPage =
+    microfrontend && microserviceName && (entityWithConfig.applicationType === MICROSERVICE || entityWithConfig.applicationType === GATEWAY)
+      ? `${microserviceName.toLowerCase()}/${entityFileName}`
+      : `${entityFileName}`;
 
   const hasBuiltInUserField = entityWithConfig.relationships.some(relationship => generator.isBuiltInUser(relationship.otherEntityName));
   entityWithConfig.saveUserSnapshot =
@@ -446,6 +458,9 @@ function loadRequiredConfigIntoEntity(entity, config) {
     jhiPrefix: config.jhiPrefix,
     authenticationType: config.authenticationType,
     reactive: config.reactive,
+    microfrontend: config.microfrontend,
+    // Workaround different paths
+    clientFramework: config.clientFramework,
   });
   return entity;
 }

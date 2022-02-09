@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -46,7 +46,6 @@ public class OAuth2ReactiveRefreshTokensWebFilter implements WebFilter {
             .filter(principal -> principal instanceof OAuth2AuthenticationToken)
             .cast(OAuth2AuthenticationToken.class)
             .flatMap(authentication -> authorizedClient(exchange, authentication))
-            .onErrorResume(e -> Mono.empty())
             .thenReturn(exchange)
             .flatMap(chain::filter);
     }

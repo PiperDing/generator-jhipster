@@ -6,17 +6,17 @@ Object {
     "contents": "{
   \\"generator-jhipster\\": {
     \\"appsFolders\\": [\\"09-kafka\\"],
-    \\"directoryPath\\": \\"./\\",
     \\"clusteredDbApps\\": {},
-    \\"serviceDiscoveryType\\": false,
-    \\"jwtSecretKey\\": \\"SECRET--50\\",
-    \\"dockerRepositoryName\\": \\"jhipster\\",
+    \\"directoryPath\\": \\"./\\",
     \\"dockerPushCommand\\": \\"docker push\\",
+    \\"dockerRepositoryName\\": \\"jhipster\\",
+    \\"ingressDomain\\": \\"\\",
+    \\"istio\\": false,
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"kubernetesNamespace\\": \\"default\\",
     \\"kubernetesServiceType\\": \\"LoadBalancer\\",
-    \\"ingressDomain\\": \\"\\",
     \\"monitoring\\": \\"no\\",
-    \\"istio\\": false
+    \\"serviceDiscoveryType\\": false
   }
 }
 ",
@@ -70,7 +70,6 @@ For Kubernetes specific information, refer to the \`kubernetes\` sub-generator R
 
 ### Backlogs to be covered
 
-- Couchbase is yet to be integrated with Helm repository, it is still referring the Kubernetes sub-generator manifest - to be tested
 - helm upgrade - to be tested
 - Istio - to be tested
 ",
@@ -94,6 +93,11 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
+- name: kafka
+  version: ^0.20.1
+  repository: https://charts.helm.sh/incubator
+  condition: kafka.enabled
 ",
     "stateCleared": "modified",
   },
@@ -215,6 +219,11 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
+- name: mysql
+  version: ^1.4.0
+  repository: https://charts.helm.sh/stable
+  condition: mysql.enabled
 ",
     "stateCleared": "modified",
   },
@@ -383,17 +392,17 @@ Object {
     "contents": "{
   \\"generator-jhipster\\": {
     \\"appsFolders\\": [\\"02-mysql\\", \\"03-psql\\"],
-    \\"directoryPath\\": \\"./\\",
     \\"clusteredDbApps\\": {},
-    \\"serviceDiscoveryType\\": \\"eureka\\",
-    \\"jwtSecretKey\\": \\"SECRET--50\\",
-    \\"dockerRepositoryName\\": \\"jhipster\\",
+    \\"directoryPath\\": \\"./\\",
     \\"dockerPushCommand\\": \\"docker push\\",
+    \\"dockerRepositoryName\\": \\"jhipster\\",
+    \\"ingressDomain\\": \\"\\",
+    \\"istio\\": false,
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"kubernetesNamespace\\": \\"default\\",
     \\"kubernetesServiceType\\": \\"LoadBalancer\\",
-    \\"ingressDomain\\": \\"\\",
     \\"monitoring\\": \\"no\\",
-    \\"istio\\": false
+    \\"serviceDiscoveryType\\": \\"eureka\\"
   }
 }
 ",
@@ -449,7 +458,6 @@ For Kubernetes specific information, refer to the \`kubernetes\` sub-generator R
 
 ### Backlogs to be covered
 
-- Couchbase is yet to be integrated with Helm repository, it is still referring the Kubernetes sub-generator manifest - to be tested
 - helm upgrade - to be tested
 - Istio - to be tested
 ",
@@ -473,6 +481,7 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
 ",
     "stateCleared": "modified",
   },
@@ -588,7 +597,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: jhipster-registry
-          image: jhipster/jhipster-registry:v6.8.0
+          image: jhipster/jhipster-registry:v7.2.0
           ports:
             - containerPort: 8761
           env:
@@ -725,6 +734,11 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
+- name: mysql
+  version: ^1.4.0
+  repository: https://charts.helm.sh/stable
+  condition: mysql.enabled
 ",
     "stateCleared": "modified",
   },
@@ -895,6 +909,11 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
+- name: postgresql
+  version: ^6.5.3
+  repository: https://charts.bitnami.com/bitnami
+  condition: postgresql.enabled
 ",
     "stateCleared": "modified",
   },
@@ -902,7 +921,7 @@ maintainers:
     "contents": "dependencies:
   - name: postgresql
     version: ^6.5.3
-    repository: https://charts.helm.sh/stable
+    repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled
 ",
     "stateCleared": "modified",
@@ -1060,7 +1079,7 @@ spec:
             privileged: true
       containers:
         - name: elasticsearch
-          image: docker.elastic.co/elasticsearch/elasticsearch:7.13.3
+          image: docker.elastic.co/elasticsearch/elasticsearch:7.15.2
           env:
             - name: discovery.type
               value: single-node
@@ -1134,18 +1153,18 @@ Object {
     "contents": "{
   \\"generator-jhipster\\": {
     \\"appsFolders\\": [\\"01-gateway\\"],
-    \\"directoryPath\\": \\"./\\",
     \\"clusteredDbApps\\": {},
-    \\"serviceDiscoveryType\\": \\"eureka\\",
-    \\"jwtSecretKey\\": \\"SECRET--50\\",
-    \\"dockerRepositoryName\\": \\"jhipster\\",
+    \\"directoryPath\\": \\"./\\",
     \\"dockerPushCommand\\": \\"docker push\\",
+    \\"dockerRepositoryName\\": \\"jhipster\\",
+    \\"ingressDomain\\": \\"example.com\\",
+    \\"ingressType\\": \\"gke\\",
+    \\"istio\\": false,
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"kubernetesNamespace\\": \\"default\\",
     \\"kubernetesServiceType\\": \\"Ingress\\",
-    \\"ingressType\\": \\"gke\\",
-    \\"ingressDomain\\": \\"example.com\\",
     \\"monitoring\\": \\"no\\",
-    \\"istio\\": false
+    \\"serviceDiscoveryType\\": \\"eureka\\"
   }
 }
 ",
@@ -1199,7 +1218,6 @@ For Kubernetes specific information, refer to the \`kubernetes\` sub-generator R
 
 ### Backlogs to be covered
 
-- Couchbase is yet to be integrated with Helm repository, it is still referring the Kubernetes sub-generator manifest - to be tested
 - helm upgrade - to be tested
 - Istio - to be tested
 ",
@@ -1223,6 +1241,7 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
 ",
     "stateCleared": "modified",
   },
@@ -1338,7 +1357,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: jhipster-registry
-          image: jhipster/jhipster-registry:v6.8.0
+          image: jhipster/jhipster-registry:v7.2.0
           ports:
             - containerPort: 8761
           env:
@@ -1462,6 +1481,11 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
+- name: mysql
+  version: ^1.4.0
+  repository: https://charts.helm.sh/stable
+  condition: mysql.enabled
 ",
     "stateCleared": "modified",
   },
@@ -1642,17 +1666,17 @@ Object {
     "contents": "{
   \\"generator-jhipster\\": {
     \\"appsFolders\\": [\\"01-gateway\\", \\"02-mysql\\"],
-    \\"directoryPath\\": \\"./\\",
     \\"clusteredDbApps\\": {},
-    \\"serviceDiscoveryType\\": \\"eureka\\",
-    \\"jwtSecretKey\\": \\"SECRET--50\\",
-    \\"dockerRepositoryName\\": \\"jhipster\\",
+    \\"directoryPath\\": \\"./\\",
     \\"dockerPushCommand\\": \\"docker push\\",
+    \\"dockerRepositoryName\\": \\"jhipster\\",
+    \\"ingressDomain\\": \\"\\",
+    \\"istio\\": false,
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"kubernetesNamespace\\": \\"default\\",
     \\"kubernetesServiceType\\": \\"LoadBalancer\\",
-    \\"ingressDomain\\": \\"\\",
     \\"monitoring\\": \\"no\\",
-    \\"istio\\": false
+    \\"serviceDiscoveryType\\": \\"eureka\\"
   }
 }
 ",
@@ -1708,7 +1732,6 @@ For Kubernetes specific information, refer to the \`kubernetes\` sub-generator R
 
 ### Backlogs to be covered
 
-- Couchbase is yet to be integrated with Helm repository, it is still referring the Kubernetes sub-generator manifest - to be tested
 - helm upgrade - to be tested
 - Istio - to be tested
 ",
@@ -1732,6 +1755,7 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
 ",
     "stateCleared": "modified",
   },
@@ -1847,7 +1871,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: jhipster-registry
-          image: jhipster/jhipster-registry:v6.8.0
+          image: jhipster/jhipster-registry:v7.2.0
           ports:
             - containerPort: 8761
           env:
@@ -1984,6 +2008,11 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
+- name: mysql
+  version: ^1.4.0
+  repository: https://charts.helm.sh/stable
+  condition: mysql.enabled
 ",
     "stateCleared": "modified",
   },
@@ -2155,6 +2184,11 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
+- name: mysql
+  version: ^1.4.0
+  repository: https://charts.helm.sh/stable
+  condition: mysql.enabled
 ",
     "stateCleared": "modified",
   },
@@ -2316,17 +2350,17 @@ Object {
     "contents": "{
   \\"generator-jhipster\\": {
     \\"appsFolders\\": [\\"01-gateway\\"],
-    \\"directoryPath\\": \\"./\\",
     \\"clusteredDbApps\\": {},
-    \\"serviceDiscoveryType\\": \\"eureka\\",
-    \\"jwtSecretKey\\": \\"SECRET--50\\",
-    \\"dockerRepositoryName\\": \\"jhipster\\",
+    \\"directoryPath\\": \\"./\\",
     \\"dockerPushCommand\\": \\"docker push\\",
+    \\"dockerRepositoryName\\": \\"jhipster\\",
+    \\"ingressDomain\\": \\"example.com\\",
+    \\"istio\\": true,
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"kubernetesNamespace\\": \\"default\\",
     \\"kubernetesServiceType\\": \\"LoadBalancer\\",
-    \\"ingressDomain\\": \\"example.com\\",
     \\"monitoring\\": \\"no\\",
-    \\"istio\\": true
+    \\"serviceDiscoveryType\\": \\"eureka\\"
   }
 }
 ",
@@ -2380,7 +2414,6 @@ For Kubernetes specific information, refer to the \`kubernetes\` sub-generator R
 
 ### Backlogs to be covered
 
-- Couchbase is yet to be integrated with Helm repository, it is still referring the Kubernetes sub-generator manifest - to be tested
 - helm upgrade - to be tested
 - Istio - to be tested
 ",
@@ -2404,6 +2437,7 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
 ",
     "stateCleared": "modified",
   },
@@ -2456,7 +2490,10 @@ data:
     "stateCleared": "modified",
   },
   "csvc-helm/templates/grafana-gateway.yml": Object {
-    "contents": "apiVersion: networking.istio.io/v1alpha3
+    "contents": "# This configuration uses 'http' and is not recommended for production use.
+# Refer https://istio.io/latest/docs/tasks/observability/gateways/ for a more secure 'https' config
+# using a self signed certificate and prefer that for production use
+apiVersion: networking.istio.io/v1beta1
 kind: Gateway
 metadata:
   name: grafana-observability-gateway
@@ -2478,7 +2515,7 @@ spec:
       hosts:
         - grafana.istio-system.example.com
 ---
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: grafana-gw-virtualservice
@@ -2564,7 +2601,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: jhipster-registry
-          image: jhipster/jhipster-registry:v6.8.0
+          image: jhipster/jhipster-registry:v7.2.0
           ports:
             - containerPort: 8761
           env:
@@ -2616,7 +2653,10 @@ spec:
     "stateCleared": "modified",
   },
   "csvc-helm/templates/kiali-gateway.yml": Object {
-    "contents": "apiVersion: networking.istio.io/v1alpha3
+    "contents": "# This configuration uses 'http' and is not recommended for production use.
+# Refer https://istio.io/latest/docs/tasks/observability/gateways/ for a more secure 'https' config
+# using a self signed certificate and prefer that for production use
+apiVersion: networking.istio.io/v1beta1
 kind: Gateway
 metadata:
   name: kiali-observability-gateway
@@ -2638,7 +2678,7 @@ spec:
       hosts:
         - kiali.istio-system.example.com
 ---
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: kiali-gw-virtualservice
@@ -2649,17 +2689,19 @@ spec:
   gateways:
     - kiali-observability-gateway
   http:
-    - match:
-        - uri:
-            prefix: /
-      route:
+    - route:
         - destination:
             host: kiali
+            port:
+              number: 20001
 ",
     "stateCleared": "modified",
   },
   "csvc-helm/templates/zipkin-gateway.yml": Object {
-    "contents": "apiVersion: networking.istio.io/v1alpha3
+    "contents": "# This configuration uses 'http' and is not recommended for production use.
+# Refer https://istio.io/latest/docs/tasks/observability/gateways/ for a more secure 'https' config
+# using a self signed certificate and prefer that for production use
+apiVersion: networking.istio.io/v1beta1
 kind: Gateway
 metadata:
   name: zipkin-observability-gateway
@@ -2681,7 +2723,7 @@ spec:
       hosts:
         - zipkin.istio-system.example.com
 ---
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: zipkin-gw-virtualservice
@@ -2777,6 +2819,11 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
+- name: mysql
+  version: ^1.4.0
+  repository: https://charts.helm.sh/stable
+  condition: mysql.enabled
 ",
     "stateCleared": "modified",
   },
@@ -2906,7 +2953,7 @@ spec:
     "stateCleared": "modified",
   },
   "jhgate-helm/templates/jhgate-destination-rule.yml": Object {
-    "contents": "apiVersion: networking.istio.io/v1alpha3
+    "contents": "apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
 metadata:
   name: jhgate-destinationrule
@@ -2926,7 +2973,7 @@ spec:
         maxRequestsPerConnection: 10
         maxRetries: 5
     outlierDetection:
-      consecutiveErrors: 5
+      consecutive5xxErrors: 5
       interval: 30s
       baseEjectionTime: 60s
   subsets:
@@ -2937,7 +2984,10 @@ spec:
     "stateCleared": "modified",
   },
   "jhgate-helm/templates/jhgate-gateway.yml": Object {
-    "contents": "apiVersion: networking.istio.io/v1alpha3
+    "contents": "# This configuration uses 'http' and is not recommended for production use.
+# Refer https://istio.io/latest/docs/reference/config/networking/gateway/ for a more secure 'https' config
+# using certificates and prefer that for production use
+apiVersion: networking.istio.io/v1beta1
 kind: Gateway
 metadata:
   name: jhgate-gateway
@@ -2962,7 +3012,7 @@ spec:
       hosts:
         - jhgate.default.example.com
 ---
-apiVersion: networking.istio.io/v1alpha3
+apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: jhgate-gw-virtualservice
@@ -2975,10 +3025,7 @@ spec:
   gateways:
     - jhgate-gateway
   http:
-    - match:
-        - uri:
-            prefix: /
-      route:
+    - route:
         - destination:
             host: jhgate
 ",
@@ -3003,7 +3050,7 @@ spec:
     "stateCleared": "modified",
   },
   "jhgate-helm/templates/jhgate-virtual-service.yml": Object {
-    "contents": "apiVersion: networking.istio.io/v1alpha3
+    "contents": "apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: jhgate-virtualservice
@@ -3051,17 +3098,17 @@ Object {
       \\"04-mongo\\",
       \\"07-mariadb\\"
     ],
-    \\"directoryPath\\": \\"./\\",
     \\"clusteredDbApps\\": [],
-    \\"serviceDiscoveryType\\": \\"eureka\\",
-    \\"jwtSecretKey\\": \\"SECRET--50\\",
-    \\"dockerRepositoryName\\": \\"jhipster\\",
+    \\"directoryPath\\": \\"./\\",
     \\"dockerPushCommand\\": \\"docker push\\",
+    \\"dockerRepositoryName\\": \\"jhipster\\",
+    \\"ingressDomain\\": \\"\\",
+    \\"istio\\": false,
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"kubernetesNamespace\\": \\"default\\",
     \\"kubernetesServiceType\\": \\"LoadBalancer\\",
-    \\"ingressDomain\\": \\"\\",
     \\"monitoring\\": \\"no\\",
-    \\"istio\\": false
+    \\"serviceDiscoveryType\\": \\"eureka\\"
   }
 }
 ",
@@ -3123,7 +3170,6 @@ For Kubernetes specific information, refer to the \`kubernetes\` sub-generator R
 
 ### Backlogs to be covered
 
-- Couchbase is yet to be integrated with Helm repository, it is still referring the Kubernetes sub-generator manifest - to be tested
 - helm upgrade - to be tested
 - Istio - to be tested
 ",
@@ -3147,6 +3193,7 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
 ",
     "stateCleared": "modified",
   },
@@ -3262,7 +3309,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: jhipster-registry
-          image: jhipster/jhipster-registry:v6.8.0
+          image: jhipster/jhipster-registry:v7.2.0
           ports:
             - containerPort: 8761
           env:
@@ -3438,6 +3485,11 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
+- name: mysql
+  version: ^1.4.0
+  repository: https://charts.helm.sh/stable
+  condition: mysql.enabled
 ",
     "stateCleared": "modified",
   },
@@ -3609,6 +3661,11 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
+- name: mariadb
+  version: ^6.12.2
+  repository: https://charts.bitnami.com/bitnami
+  condition: mariadb.enabled
 ",
     "stateCleared": "modified",
   },
@@ -3616,7 +3673,7 @@ maintainers:
     "contents": "dependencies:
   - name: mariadb
     version: ^6.12.2
-    repository: https://charts.helm.sh/stable
+    repository: https://charts.bitnami.com/bitnami
     condition: mariadb.enabled
 ",
     "stateCleared": "modified",
@@ -3792,6 +3849,11 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
+- name: mongodb-replicaset
+  version: ^3.10.1
+  repository: https://charts.helm.sh/stable
+  condition: mongodb.enabled
 ",
     "stateCleared": "modified",
   },
@@ -3968,6 +4030,11 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
+- name: mysql
+  version: ^1.4.0
+  repository: https://charts.helm.sh/stable
+  condition: mysql.enabled
 ",
     "stateCleared": "modified",
   },
@@ -4138,6 +4205,11 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
+- name: postgresql
+  version: ^6.5.3
+  repository: https://charts.bitnami.com/bitnami
+  condition: postgresql.enabled
 ",
     "stateCleared": "modified",
   },
@@ -4145,7 +4217,7 @@ maintainers:
     "contents": "dependencies:
   - name: postgresql
     version: ^6.5.3
-    repository: https://charts.helm.sh/stable
+    repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled
 ",
     "stateCleared": "modified",
@@ -4303,7 +4375,7 @@ spec:
             privileged: true
       containers:
         - name: elasticsearch
-          image: docker.elastic.co/elasticsearch/elasticsearch:7.13.3
+          image: docker.elastic.co/elasticsearch/elasticsearch:7.15.2
           env:
             - name: discovery.type
               value: single-node
@@ -4377,17 +4449,17 @@ Object {
     "contents": "{
   \\"generator-jhipster\\": {
     \\"appsFolders\\": [\\"08-monolith\\"],
-    \\"directoryPath\\": \\"./\\",
     \\"clusteredDbApps\\": {},
-    \\"serviceDiscoveryType\\": false,
-    \\"jwtSecretKey\\": \\"SECRET--50\\",
-    \\"dockerRepositoryName\\": \\"jhipster\\",
+    \\"directoryPath\\": \\"./\\",
     \\"dockerPushCommand\\": \\"docker push\\",
+    \\"dockerRepositoryName\\": \\"jhipster\\",
+    \\"ingressDomain\\": \\"\\",
+    \\"istio\\": false,
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"kubernetesNamespace\\": \\"default\\",
     \\"kubernetesServiceType\\": \\"LoadBalancer\\",
-    \\"ingressDomain\\": \\"\\",
     \\"monitoring\\": \\"no\\",
-    \\"istio\\": false
+    \\"serviceDiscoveryType\\": false
   }
 }
 ",
@@ -4441,7 +4513,6 @@ For Kubernetes specific information, refer to the \`kubernetes\` sub-generator R
 
 ### Backlogs to be covered
 
-- Couchbase is yet to be integrated with Helm repository, it is still referring the Kubernetes sub-generator manifest - to be tested
 - helm upgrade - to be tested
 - Istio - to be tested
 ",
@@ -4518,6 +4589,11 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
+- name: mysql
+  version: ^1.4.0
+  repository: https://charts.helm.sh/stable
+  condition: mysql.enabled
 ",
     "stateCleared": "modified",
   },
@@ -4665,7 +4741,7 @@ spec:
             privileged: true
       containers:
         - name: elasticsearch
-          image: docker.elastic.co/elasticsearch/elasticsearch:7.13.3
+          image: docker.elastic.co/elasticsearch/elasticsearch:7.15.2
           env:
             - name: discovery.type
               value: single-node
@@ -4744,17 +4820,17 @@ Object {
     "contents": "{
   \\"generator-jhipster\\": {
     \\"appsFolders\\": [\\"02-mysql\\"],
-    \\"directoryPath\\": \\"./\\",
     \\"clusteredDbApps\\": {},
-    \\"serviceDiscoveryType\\": \\"eureka\\",
-    \\"jwtSecretKey\\": \\"SECRET--50\\",
-    \\"dockerRepositoryName\\": \\"jhipster\\",
+    \\"directoryPath\\": \\"./\\",
     \\"dockerPushCommand\\": \\"docker push\\",
+    \\"dockerRepositoryName\\": \\"jhipster\\",
+    \\"ingressDomain\\": \\"\\",
+    \\"istio\\": false,
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"kubernetesNamespace\\": \\"mynamespace\\",
     \\"kubernetesServiceType\\": \\"LoadBalancer\\",
-    \\"ingressDomain\\": \\"\\",
     \\"monitoring\\": \\"prometheus\\",
-    \\"istio\\": false
+    \\"serviceDiscoveryType\\": \\"eureka\\"
   }
 }
 ",
@@ -4808,7 +4884,6 @@ For Kubernetes specific information, refer to the \`kubernetes\` sub-generator R
 
 ### Backlogs to be covered
 
-- Couchbase is yet to be integrated with Helm repository, it is still referring the Kubernetes sub-generator manifest - to be tested
 - helm upgrade - to be tested
 - Istio - to be tested
 ",
@@ -4832,6 +4907,15 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
+- name: prometheus
+  version: ^9.2.0
+  repository: https://prometheus-community.github.io/helm-charts
+  condition: prometheus.enabled
+- name: grafana
+  version: ^4.0.0
+  repository: https://grafana.github.io/helm-charts
+  condition: prometheus.enabled
 ",
     "stateCleared": "modified",
   },
@@ -4839,11 +4923,11 @@ maintainers:
     "contents": "dependencies:
   - name: prometheus
     version: ^9.2.0
-    repository: https://charts.helm.sh/stable
+    repository: https://prometheus-community.github.io/helm-charts
     condition: prometheus.enabled
   - name: grafana
     version: ^4.0.0
-    repository: https://charts.helm.sh/stable
+    repository: https://grafana.github.io/helm-charts
     condition: prometheus.enabled
 ",
     "stateCleared": "modified",
@@ -4989,7 +5073,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: jhipster-registry
-          image: jhipster/jhipster-registry:v6.8.0
+          image: jhipster/jhipster-registry:v7.2.0
           ports:
             - containerPort: 8761
           env:
@@ -7409,6 +7493,11 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
+- name: mysql
+  version: ^1.4.0
+  repository: https://charts.helm.sh/stable
+  condition: mysql.enabled
 ",
     "stateCleared": "modified",
   },
@@ -7580,17 +7669,17 @@ Object {
     "contents": "{
   \\"generator-jhipster\\": {
     \\"appsFolders\\": [\\"02-mysql\\"],
-    \\"directoryPath\\": \\"./\\",
     \\"clusteredDbApps\\": {},
-    \\"serviceDiscoveryType\\": \\"eureka\\",
-    \\"jwtSecretKey\\": \\"SECRET--50\\",
-    \\"dockerRepositoryName\\": \\"jhipster\\",
+    \\"directoryPath\\": \\"./\\",
     \\"dockerPushCommand\\": \\"docker push\\",
+    \\"dockerRepositoryName\\": \\"jhipster\\",
+    \\"ingressDomain\\": \\"\\",
+    \\"istio\\": false,
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"kubernetesNamespace\\": \\"mynamespace\\",
     \\"kubernetesServiceType\\": \\"LoadBalancer\\",
-    \\"ingressDomain\\": \\"\\",
     \\"monitoring\\": \\"no\\",
-    \\"istio\\": false
+    \\"serviceDiscoveryType\\": \\"eureka\\"
   }
 }
 ",
@@ -7644,7 +7733,6 @@ For Kubernetes specific information, refer to the \`kubernetes\` sub-generator R
 
 ### Backlogs to be covered
 
-- Couchbase is yet to be integrated with Helm repository, it is still referring the Kubernetes sub-generator manifest - to be tested
 - helm upgrade - to be tested
 - Istio - to be tested
 ",
@@ -7668,6 +7756,7 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
 ",
     "stateCleared": "modified",
   },
@@ -7783,7 +7872,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: jhipster-registry
-          image: jhipster/jhipster-registry:v6.8.0
+          image: jhipster/jhipster-registry:v7.2.0
           ports:
             - containerPort: 8761
           env:
@@ -7908,6 +7997,11 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
+- name: mysql
+  version: ^1.4.0
+  repository: https://charts.helm.sh/stable
+  condition: mysql.enabled
 ",
     "stateCleared": "modified",
   },
@@ -8077,17 +8171,17 @@ Object {
     "contents": "{
   \\"generator-jhipster\\": {
     \\"appsFolders\\": [\\"01-gateway\\"],
-    \\"directoryPath\\": \\"./\\",
     \\"clusteredDbApps\\": {},
-    \\"serviceDiscoveryType\\": \\"eureka\\",
-    \\"jwtSecretKey\\": \\"SECRET--50\\",
-    \\"dockerRepositoryName\\": \\"jhipsterrepository\\",
+    \\"directoryPath\\": \\"./\\",
     \\"dockerPushCommand\\": \\"docker push\\",
+    \\"dockerRepositoryName\\": \\"jhipsterrepository\\",
+    \\"ingressDomain\\": \\"\\",
+    \\"istio\\": false,
+    \\"jwtSecretKey\\": \\"SECRET--50\\",
     \\"kubernetesNamespace\\": \\"jhipsternamespace\\",
     \\"kubernetesServiceType\\": \\"LoadBalancer\\",
-    \\"ingressDomain\\": \\"\\",
     \\"monitoring\\": \\"no\\",
-    \\"istio\\": false
+    \\"serviceDiscoveryType\\": \\"eureka\\"
   }
 }
 ",
@@ -8141,7 +8235,6 @@ For Kubernetes specific information, refer to the \`kubernetes\` sub-generator R
 
 ### Backlogs to be covered
 
-- Couchbase is yet to be integrated with Helm repository, it is still referring the Kubernetes sub-generator manifest - to be tested
 - helm upgrade - to be tested
 - Istio - to be tested
 ",
@@ -8165,6 +8258,7 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
 ",
     "stateCleared": "modified",
   },
@@ -8280,7 +8374,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: jhipster-registry
-          image: jhipster/jhipster-registry:v6.8.0
+          image: jhipster/jhipster-registry:v7.2.0
           ports:
             - containerPort: 8761
           env:
@@ -8405,6 +8499,11 @@ sources:
 maintainers:
 - name: Team JHipster
   email:
+dependencies:
+- name: mysql
+  version: ^1.4.0
+  repository: https://charts.helm.sh/stable
+  condition: mysql.enabled
 ",
     "stateCleared": "modified",
   },

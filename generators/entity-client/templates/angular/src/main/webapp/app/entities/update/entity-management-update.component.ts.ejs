@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -43,7 +43,7 @@ import { Observable } from 'rxjs';
 import { finalize<% if (relationships.some(rel => rel.ownerSide === true)) { %>, map<% } %> } from 'rxjs/operators';
 
 <%_ if (fieldsContainInstant || fieldsContainZonedDateTime) { _%>
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs/esm';
 import { DATE_TIME_FORMAT } from 'app/config/input.constants';
 <%_ } _%>
 
@@ -74,6 +74,10 @@ import { <%= uniqueRel.otherEntityAngularName %>Service } from 'app/entities/<%=
     }
 });
 _%>
+<%_ const enumImports = generateEntityClientEnumImports(fields); _%>
+<%_ enumImports.forEach( (importedPath, importedType) => { _%>
+import { <%- importedType %> } from '<%- importedPath %>';
+<%_ }); _%>
 
 @Component({
     selector: '<%= jhiPrefixDashed %>-<%= entityFileName %>-update',
@@ -81,6 +85,9 @@ _%>
 })
 export class <%= entityAngularName %>UpdateComponent implements OnInit {
     isSaving = false;
+<%_ enumImports.forEach( (importedPath, importedType) => { _%>
+    <%- _.lowerFirst(importedType) %>Values = Object.keys(<%- importedType %>);
+<%_ }); _%>
 
 <%_ for (const relationshipsByEntityNeedingOptions of Object.values(differentRelationships).map(relationships => relationships.filter(rel => rel.ownerSide)).filter(relationships => relationships.length > 0)) { _%>
     <%_ const relationshipsWithCustomUniqueOptions = relationshipsByEntityNeedingOptions.filter(rel => rel.relationshipOneToOne && !rel.otherEntityUser); _%>
@@ -232,10 +239,10 @@ _%>
     <%_ } _%>
 
     protected subscribeToSaveResponse(result: Observable<HttpResponse<I<%= entityAngularName %>>>): void {
-        result.pipe(finalize(() => this.onSaveFinalize())).subscribe(
-            () => this.onSaveSuccess(),
-            () => this.onSaveError()
-        );
+        result.pipe(finalize(() => this.onSaveFinalize())).subscribe({
+            next: () => this.onSaveSuccess(),
+            error: () => this.onSaveError()
+        });
     }
 
     protected onSaveSuccess(): void {

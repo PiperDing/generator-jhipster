@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -20,6 +20,8 @@ const assert = require('assert');
 const fs = require('fs');
 const fse = require('fs-extra');
 const path = require('path');
+const { JWT, SESSION } = require('../jdl/jhipster/authentication-types');
+const { GATEWAY, MICROSERVICE } = require('../jdl/jhipster/application-types');
 
 const { formatDateForChangelog } = require('../utils/liquibase');
 
@@ -40,11 +42,14 @@ describe('Integration Test reproducibility', () => {
                 config.creationTimestamp = 1596513172471;
                 fse.writeJsonSync(yoFile, yoJson);
               }
-              if (config.authenticationType === 'session' && !config.rememberMeKey) {
+              if (config.authenticationType === SESSION && !config.rememberMeKey) {
                 config.rememberMeKey =
                   'a5e93fdeb16e2ee2dc4a629b5dbdabb30f968e418dfc0483c53afdc695cfac96d06cf5c581cbefb93e3aaa241880857fcafe';
                 fse.writeJsonSync(yoFile, yoJson);
-              } else if (config.authenticationType === 'jwt' && !config.jwtSecretKey) {
+              } else if (
+                (config.authenticationType === JWT || config.applicationType === MICROSERVICE || config.applicationType === GATEWAY) &&
+                !config.jwtSecretKey
+              ) {
                 config.jwtSecretKey =
                   'ZjY4MTM4YjI5YzMwZjhjYjI2OTNkNTRjMWQ5Y2Q0Y2YwOWNmZTE2NzRmYzU3NTMwM2NjOTE3MTllOTM3MWRkMzcyYTljMjVmNmQ0Y2MxOTUzODc0MDhhMTlkMDIxMzI2YzQzZDM2ZDE3MmQ3NjVkODk3OTVmYzljYTQyZDNmMTQ=';
                 fse.writeJsonSync(yoFile, yoJson);
@@ -54,11 +59,11 @@ describe('Integration Test reproducibility', () => {
           it('should contain creationTimestamp', () => {
             assert(config.creationTimestamp);
           });
-          if (config.authenticationType === 'jwt') {
+          if (config.authenticationType === JWT || config.applicationType === MICROSERVICE || config.applicationType === GATEWAY) {
             it('should contain jwtSecretKey', () => {
               assert(config.jwtSecretKey);
             });
-          } else if (config.authenticationType === 'session') {
+          } else if (config.authenticationType === SESSION) {
             it('should contain rememberMeKey', () => {
               assert(config.rememberMeKey);
             });

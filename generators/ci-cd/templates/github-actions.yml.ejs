@@ -1,5 +1,5 @@
 <%#
- Copyright 2013-2021 the original author or authors from the JHipster project.
+ Copyright 2013-2022 the original author or authors from the JHipster project.
 
  This file is part of the JHipster project, see https://www.jhipster.tech/
  for more information.
@@ -48,6 +48,9 @@ if (!databaseTypeNo && !skipServer ) { _%>
 <%_ if (clientFrameworkAngular) { _%>
             NG_CLI_ANALYTICS: false
 <%_ } _%>
+<%_ if (enableGradleEnterprise) { _%>
+            GRADLE_ENTERPRISE_ACCESS_KEY: ${{secrets.GRADLE_ENTERPRISE_ACCESS_KEY}}
+<%_ } _%>
         steps:
             - uses: actions/checkout@v2
 <%_ if (!skipClient) { _%>
@@ -58,8 +61,8 @@ if (!databaseTypeNo && !skipServer ) { _%>
 if (!skipServer) { _%>
             - uses: actions/setup-java@v2
               with:
-                  distribution: 'adopt'
-                  java-version: '11.x'
+                  distribution: 'temurin'
+                  java-version: <%= JAVA_VERSION %>
 <%_ }
 if (!skipClient) { _%>
             - name: Install node.js packages

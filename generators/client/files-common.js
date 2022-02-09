@@ -1,5 +1,5 @@
 /**
- * Copyright 2013-2021 the original author or authors from the JHipster project.
+ * Copyright 2013-2022 the original author or authors from the JHipster project.
  *
  * This file is part of the JHipster project, see https://www.jhipster.tech/
  * for more information.
@@ -20,11 +20,7 @@ const constants = require('../generator-constants');
 
 const { CLIENT_MAIN_SRC_DIR } = constants;
 
-module.exports = {
-  writeFiles,
-};
-
-const commonFiles = {
+const files = {
   common: [
     {
       templates: ['.eslintignore', 'README.md.jhi.client', `${CLIENT_MAIN_SRC_DIR}manifest.webapp`],
@@ -62,14 +58,18 @@ const commonFiles = {
       ],
     },
     {
-      condition: generator => generator.enableI18nRTL,
+      condition: generator => generator.enableI18nRTL && !generator.clientFrameworkReact,
       path: CLIENT_MAIN_SRC_DIR,
       templates: ['content/scss/rtl.scss'],
+    },
+    {
+      condition: generator => generator.microfrontend && generator.clientFrameworkVue,
+      templates: ['webpack/webpack.microfrontend.js.jhi'],
     },
   ],
   swagger: [
     {
-      condition: generator => !generator.applicationTypeMicroservice,
+      condition: generator => !generator.applicationTypeMicroservice || generator.microfrontend,
       path: CLIENT_MAIN_SRC_DIR,
       templates: ['swagger-ui/index.html', { file: 'swagger-ui/dist/images/throbber.gif', method: 'copy' }],
     },
@@ -77,5 +77,10 @@ const commonFiles = {
 };
 
 function writeFiles() {
-  return this.writeFilesToDisk(commonFiles, 'common');
+  return this.writeFilesToDisk(files, 'common');
 }
+
+module.exports = {
+  files,
+  writeFiles,
+};
